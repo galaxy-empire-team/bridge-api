@@ -3,11 +3,11 @@ package user
 import (
 	"context"
 
-	userstorage "initialservice/internal/storage/user"
+	"initialservice/internal/models"
 )
 
 type userRepository interface {
-	CreateUser(ctx context.Context, user userstorage.User) (userstorage.User, error)
+	CreateUser(ctx context.Context, user models.User) (models.User, error)
 }
 
 type Service struct {

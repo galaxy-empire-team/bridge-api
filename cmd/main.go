@@ -13,6 +13,8 @@ import (
 	"initialservice/internal/logger"
 	userservice "initialservice/internal/service/user"
 	userstorage "initialservice/internal/storage/user"
+	planetservice "initialservice/internal/service/planet"
+	planetstorage "initialservice/internal/storage/planet"
 )
 
 func main() {
@@ -44,14 +46,16 @@ func run() error {
 
 	// initialize storages
 	userStorage := userstorage.New(db)
+	planetStorage := planetstorage.New(db)
 
 	// initialize services
 	userService := userservice.New(userStorage)
+	planetService := planetservice.New(planetStorage)
 
 	// initialize http server
 	httpServer := httpserver.New(logger)
 
-	httpServer.RegisterUserRoutes(userService)
+	httpServer.RegisterRoutes(userService, planetService)
 
 	logger.Info("--- Start app ---")
 

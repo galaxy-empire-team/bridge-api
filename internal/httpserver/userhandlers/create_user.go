@@ -1,6 +1,7 @@
-package httpserver
+package userhandlers
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -11,6 +12,10 @@ import (
 
 	"initialservice/internal/models"
 )
+
+type UserService interface {
+	CreateUser(ctx context.Context, user models.User) (models.User, error)
+}
 
 const (
 	minLoginLength = 3
@@ -29,7 +34,7 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
-func createUser(userService userService) func(c *gin.Context) {
+func CreateUser(userService UserService) func(c *gin.Context) {
 	loginChecker := regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
 
 	return func(c *gin.Context) {

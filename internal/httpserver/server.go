@@ -12,12 +12,7 @@ import (
 	"go.uber.org/zap"
 
 	"initialservice/internal/config"
-	"initialservice/internal/models"
 )
-
-type userService interface {
-	CreateUser(ctx context.Context, user models.User) (models.User, error)
-}
 
 type HttpServer struct {
 	server    *gin.Engine
@@ -78,8 +73,4 @@ func (hs *HttpServer) Start(ctx context.Context, cfg config.Server, logger *zap.
 	}
 
 	return nil
-}
-
-func (hs *HttpServer) RegisterUserRoutes(userService userService) {
-	hs.apiRouter.POST("/user/create", createUser(userService))
 }
