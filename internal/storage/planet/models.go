@@ -1,4 +1,4 @@
-package user
+package planet
 
 import (
 	"time"
@@ -25,7 +25,7 @@ type Resources struct {
 
 type PlanetToColonize struct {
 	ID uuid.UUID
-	X uint8
-	Y uint8
-	Z uint8
+	X  uint8
+	Y  uint8
+	Z  uint8
 }

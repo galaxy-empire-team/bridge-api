@@ -4,16 +4,24 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"initialservice/internal/config"
 )
 
-type DB struct {
-	Pool *pgxpool.Pool
+type DB interface {
+	Exec(ctx context.Context, sql string, arguments ...any) (pgconn.CommandTag, error)
+	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
+	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
 }
 
-func New(ctx context.Context, cfg config.PgConn) (DB, error) {
+type ConnPool struct {
+	*pgxpool.Pool
+}
+
+func New(ctx context.Context, cfg config.PgConn) (*ConnPool, error) {
 	dsn := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s ",
 		cfg.Host, cfg.Port, cfg.Username, cfg.Password, cfg.DBName,
@@ -21,15 +29,15 @@ func New(ctx context.Context, cfg config.PgConn) (DB, error) {
 
 	pgCfg, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
-		return DB{}, fmt.Errorf("pgxpool.ParseConfig(): %w", err)
+		return nil, fmt.Errorf("pgxpool.ParseConfig(): %w", err)
 	}
 
 	pool, err := pgxpool.NewWithConfig(ctx, pgCfg)
 	if err != nil {
-		return DB{}, fmt.Errorf("create pool with config: %w", err)
+		return nil, fmt.Errorf("create pool with config: %w", err)
 	}
 
-	return DB{
-		Pool: pool,
+	return &ConnPool{
+		pool,
 	}, nil
 }

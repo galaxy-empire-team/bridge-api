@@ -4,12 +4,13 @@ import (
 	"initialservice/internal/db"
 )
 
-type Repository struct {
+// Embed txManager requires different naming -> can't use 'storage' storage name :()
+type UserStorage struct {
 	DB db.DB
 }
 
-func New(db db.DB) *Repository {
-	return &Repository{
+func New(db db.DB) *UserStorage {
+	return &UserStorage{
 		DB: db,
 	}
 }

@@ -1,4 +1,4 @@
-package user
+package planet
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"initialservice/internal/models"
 )
 
-func (r *Repository) GetCapitol(ctx context.Context, userID uuid.UUID) (models.Planet, error) {
+func (r *PlanetStorage) GetCapitol(ctx context.Context, userID uuid.UUID) (models.Planet, error) {
 	const getCapitolQuery = `
 		SELECT 
 			p.id, 
@@ -31,7 +31,7 @@ func (r *Repository) GetCapitol(ctx context.Context, userID uuid.UUID) (models.P
 
 	var planet Planet
 
-	err := r.DB.Pool.QueryRow(ctx, getCapitolQuery, userID).Scan(
+	err := r.DB.QueryRow(ctx, getCapitolQuery, userID).Scan(
 		&planet.ID,
 		&planet.X,
 		&planet.Y,

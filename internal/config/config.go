@@ -9,7 +9,11 @@ import (
 type Config struct {
 	Server Server `envconfig:"SERVER"`
 	PgConn PgConn `envconfig:"PG"`
-	Logger Logger `envconfig:"LOGGER"`
+	App    App    `envconfig:"APP"`
+}
+
+type App struct {
+	Logger `envconfig:"LOGGER"`
 }
 
 type Server struct {

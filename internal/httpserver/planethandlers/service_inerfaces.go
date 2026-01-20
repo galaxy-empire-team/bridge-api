@@ -10,5 +10,6 @@ import (
 
 type PlanetService interface {
 	GetCapitolPlanet(ctx context.Context, userID uuid.UUID) (models.Planet, error)
-	ColonizeCapitol(ctx context.Context, userID uuid.UUID) error
+	CreateCapitol(ctx context.Context, userID uuid.UUID) error
+	UpgradeBuilding(ctx context.Context, planetID uuid.UUID, buildingType string) error
 }

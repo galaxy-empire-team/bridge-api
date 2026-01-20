@@ -1,8 +1,8 @@
 package planethandlers
 
 import (
-	"net/http"
 	"errors"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 
@@ -11,7 +11,7 @@ import (
 
 func GetCapitol(planetService PlanetService) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		var req UserRequest
+		var req UserIDRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{
 				Error: err.Error(),

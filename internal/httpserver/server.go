@@ -17,6 +17,8 @@ import (
 type HttpServer struct {
 	server    *gin.Engine
 	apiRouter *gin.RouterGroup
+
+	logger *zap.Logger
 }
 
 func New(logger *zap.Logger) *HttpServer {
@@ -42,20 +44,22 @@ func New(logger *zap.Logger) *HttpServer {
 	return &HttpServer{
 		server:    server,
 		apiRouter: server.Group("/api/v1"),
+		logger:    logger,
 	}
 }
 
-func (hs *HttpServer) Start(ctx context.Context, cfg config.Server, logger *zap.Logger) error {
+func (s *HttpServer) Start(ctx context.Context, cfg config.Server) error {
 	srv := &http.Server{
 		Addr:              cfg.Endpoint,
-		Handler:           hs.server,
-		ReadTimeout:       3 * time.Second,
-		ReadHeaderTimeout: 1 * time.Second,
-		WriteTimeout:      5 * time.Second,
-		IdleTimeout:       30 * time.Second,
+		Handler:           s.server,
+		ReadTimeout:       120 * time.Second,
+		ReadHeaderTimeout: 120 * time.Second,
+		WriteTimeout:      120 * time.Second,
+		IdleTimeout:       120 * time.Second,
 	}
 
 	go func() {
+		s.logger.Info("---  start server  ---")
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("Failed to start server: %v", err)
 		}
@@ -63,12 +67,12 @@ func (hs *HttpServer) Start(ctx context.Context, cfg config.Server, logger *zap.
 
 	<-ctx.Done()
 
-	logger.Info("--- shutting down http server ---")
+	s.logger.Info("--- stop server ---")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	if err := srv.Shutdown(ctx); err != nil { //nolint:contextcheck
+	if err := srv.Shutdown(shutdownCtx); err != nil { //nolint:contextcheck
 		return fmt.Errorf("server.Shutdown(): %w", err)
 	}
 

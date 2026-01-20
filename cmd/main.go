@@ -1,20 +1,18 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
-	"os/signal"
-	"syscall"
 
+	"initialservice/internal/app"
 	"initialservice/internal/config"
 	"initialservice/internal/db"
 	"initialservice/internal/httpserver"
-	"initialservice/internal/logger"
-	userservice "initialservice/internal/service/user"
-	userstorage "initialservice/internal/storage/user"
 	planetservice "initialservice/internal/service/planet"
+	userservice "initialservice/internal/service/user"
 	planetstorage "initialservice/internal/storage/planet"
+	"initialservice/internal/storage/txmanager"
+	userstorage "initialservice/internal/storage/user"
 )
 
 func main() {
@@ -24,42 +22,38 @@ func main() {
 }
 
 func run() error {
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
-
 	cfg, err := config.New()
 	if err != nil {
 		return fmt.Errorf("config.New(): %w", err)
 	}
 
-	logger, err := logger.New(cfg.Logger)
+	ctx, app, err := app.New(cfg.App)
 	if err != nil {
-		return fmt.Errorf("logger.New(): %w", err)
+		return fmt.Errorf("app.New(): %w", err)
 	}
-	defer logger.Sync() //nolint:errcheck
 
+	// initialize pgx infra
 	db, err := db.New(ctx, cfg.PgConn)
 	if err != nil {
 		return fmt.Errorf("db.New(): %w", err)
 	}
-	defer db.Pool.Close()
+	defer db.Close()
 
 	// initialize storages
+	txManager := txmanager.New(db)
 	userStorage := userstorage.New(db)
 	planetStorage := planetstorage.New(db)
 
 	// initialize services
 	userService := userservice.New(userStorage)
-	planetService := planetservice.New(planetStorage)
+	planetService := planetservice.New(txManager, planetStorage)
 
 	// initialize http server
-	httpServer := httpserver.New(logger)
+	httpServer := httpserver.New(app.ComponentLogger("httpserver"))
 
 	httpServer.RegisterRoutes(userService, planetService)
 
-	logger.Info("--- Start app ---")
-
-	err = httpServer.Start(ctx, cfg.Server, logger)
+	err = httpServer.Start(ctx, cfg.Server)
 	if err != nil {
 		return fmt.Errorf("httpServer.Start(): %w", err)
 	}

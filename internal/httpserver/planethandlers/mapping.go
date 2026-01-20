@@ -8,7 +8,7 @@ func toTransportPlanet(p models.Planet) PlanetResponse {
 		X:        p.X,
 		Y:        p.Y,
 		Z:        p.Z,
-		HasMoon:   p.HasMoon,
+		HasMoon:  p.HasMoon,
 		Resource: PlanetResources{
 			Metal:   p.Resources.Metal,
 			Crystal: p.Resources.Crystal,

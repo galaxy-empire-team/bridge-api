@@ -1,4 +1,4 @@
-package user
+package planet
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"initialservice/internal/models"
 )
 
-func (r *Repository) ColonizeCapitol(ctx context.Context, userID uuid.UUID, planetToColonize models.Planet) error {
+func (r *PlanetStorage) CreateCapitol(ctx context.Context, userID uuid.UUID, planetToColonize models.Planet) error {
 	const createCapitolQuery = `
 		WITH user_recorses_row_create AS (
 			INSERT INTO session_beta.planet_resources (planet_id, metal, crystal, gas, updated_at)
@@ -37,8 +37,8 @@ func (r *Repository) ColonizeCapitol(ctx context.Context, userID uuid.UUID, plan
 			NOW()
 		);
 	`
-	
-	_, err := r.DB.Pool.Exec(
+
+	_, err := r.DB.Exec(
 		ctx,
 		createCapitolQuery,
 		planetToColonize.ID,

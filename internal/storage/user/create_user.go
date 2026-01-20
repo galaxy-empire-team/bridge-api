@@ -10,7 +10,7 @@ import (
 	"initialservice/internal/models"
 )
 
-func (r *Repository) CreateUser(ctx context.Context, user models.User) (models.User, error) {
+func (r *UserStorage) CreateUser(ctx context.Context, user models.User) (models.User, error) {
 	const createUserQuery = `
 		INSERT INTO session_beta.users (id, login, created_at)
 		VALUES ($1, $2, NOW())
@@ -20,7 +20,7 @@ func (r *Repository) CreateUser(ctx context.Context, user models.User) (models.U
 	dbUser := toStorageUser(user)
 
 	var createdUser User
-	err := r.DB.Pool.QueryRow(
+	err := r.DB.QueryRow(
 		ctx,
 		createUserQuery,
 		dbUser.ID,

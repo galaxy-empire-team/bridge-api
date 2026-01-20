@@ -1,22 +1,22 @@
 package planethandlers
 
-
-import (	
+import (
 	"github.com/google/uuid"
 )
+
 // Use POST. Change to Get after authorization implementation
-type UserRequest struct {
+type UserIDRequest struct {
 	UserID uuid.UUID `json:"userID"`
 }
 
 type PlanetResponse struct {
-	PlanetID uuid.UUID `json:"planetID"`
-	X 	  uint8    `json:"x"`
-	Y 	  uint8    `json:"y"`
-	Z 	  uint8    `json:"z"`
-	Resource PlanetResources `json:"resources"`
-	IsCapitol bool     `json:"isCapitol"`
-	HasMoon  bool     `json:"hasMoon"`
+	PlanetID  uuid.UUID       `json:"planetID"`
+	X         uint8           `json:"x"`
+	Y         uint8           `json:"y"`
+	Z         uint8           `json:"z"`
+	Resource  PlanetResources `json:"resources"`
+	IsCapitol bool            `json:"isCapitol"`
+	HasMoon   bool            `json:"hasMoon"`
 }
 
 type PlanetResources struct {
@@ -27,4 +27,9 @@ type PlanetResources struct {
 
 type ErrorResponse struct {
 	Error string `json:"error"`
+}
+
+type CreateBuildingRequest struct {
+	PlanetID  uuid.UUID `json:"planetID"`
+	BuildType string    `json:"buildType"`
 }

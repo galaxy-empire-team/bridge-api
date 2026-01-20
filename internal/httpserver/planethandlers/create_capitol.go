@@ -1,17 +1,17 @@
 package planethandlers
 
 import (
-	"net/http"
 	"errors"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 
 	"initialservice/internal/models"
 )
 
-func ColonizeCapitol(planetService PlanetService) func(c *gin.Context) {
+func CreateCapitol(planetService PlanetService) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		var req UserRequest
+		var req UserIDRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{
 				Error: "invalid request body",
@@ -19,7 +19,7 @@ func ColonizeCapitol(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		err := planetService.ColonizeCapitol(c.Request.Context(), req.UserID)
+		err := planetService.CreateCapitol(c.Request.Context(), req.UserID)
 		if err != nil {
 			handleColonizeCapitolError(c, err)
 			return
@@ -36,7 +36,7 @@ func handleColonizeCapitolError(c *gin.Context, err error) {
 	case errors.Is(err, models.ErrCapitolAlreadyExists):
 		c.JSON(http.StatusConflict, ErrorResponse{
 			Error: "capitol planet already exists for user",
-		})	
+		})
 	case errors.Is(err, models.ErrPlanetCoordinatesAlreadyTaken):
 		c.JSON(http.StatusConflict, ErrorResponse{
 			Error: "planet coordinates are already taken",

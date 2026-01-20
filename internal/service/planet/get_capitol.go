@@ -10,7 +10,17 @@ import (
 )
 
 func (s *Service) GetCapitolPlanet(ctx context.Context, userID uuid.UUID) (models.Planet, error) {
-	capitolPlanet, err := s.planetRepo.GetCapitol(ctx, userID)
+	planetIDs, err := s.planetStorage.GetUserPlanetIDs(ctx, userID)
+	if err != nil {
+		return models.Planet{}, fmt.Errorf("planetRepo.GetUserPlanetIDs(): %w", err)
+	}
+
+	err = s.recalcResources(ctx, planetIDs[0])
+	if err != nil {
+		return models.Planet{}, fmt.Errorf("recalcResources(): %w", err)
+	}
+
+	capitolPlanet, err := s.planetStorage.GetCapitol(ctx, userID)
 	if err != nil {
 		return models.Planet{}, fmt.Errorf("planetRepo.GetCapitol(): %w", err)
 	}
