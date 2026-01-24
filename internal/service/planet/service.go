@@ -24,6 +24,7 @@ type planetStorage interface {
 	GetResources(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
 	GetLocation(ctx context.Context, planetID uuid.UUID) (models.Location, error)
 	GetBuildingsInfo(ctx context.Context, planetID uuid.UUID, BuildingTypes []models.BuildingType) (map[models.BuildingType]models.BuildingInfo, error)
+	GetBuildingStats(ctx context.Context, BuildingType models.BuildingType, level uint8) (models.BuildingStats, error)
 }
 
 // Separate storage methods that executes inside a transaction

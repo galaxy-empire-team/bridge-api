@@ -31,3 +31,16 @@ func toTransportPlanet(p models.Planet) PlanetResponse {
 		Buildings: buildings,
 	}
 }
+
+func toTransportBuildingStats(bs models.BuildingStats) GetBuildStatsResponse {
+	return GetBuildStatsResponse{
+		Type:                 string(bs.Type),
+		Level:                bs.Level,
+		MetalCost:            bs.MetalCost,
+		CrystalCost:          bs.CrystalCost,
+		GasCost:              bs.GasCost,
+		ProductionPerSecond:  bs.MetalPerSecond + bs.CrystalPerSecond + bs.GasPerSecond,
+		Bonuses:              bs.Bonuses,
+		UpgradeTimeInSeconds: bs.UpgradeTimeInSeconds,
+	}
+}

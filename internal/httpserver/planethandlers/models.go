@@ -11,6 +11,22 @@ type UserIDRequest struct {
 	UserID uuid.UUID `json:"userID"`
 }
 
+type GetBuildStatsRequest struct {
+	BuildingType string `json:"buildingType"`
+	Level        uint8  `json:"level"`
+}
+
+type GetBuildStatsResponse struct {
+	Type                 string  `json:"type"`
+	Level                uint8   `json:"level"`
+	MetalCost            uint64  `json:"metalCost"`
+	CrystalCost          uint64  `json:"crystalCost"`
+	GasCost              uint64  `json:"gasCost"`
+	ProductionPerSecond  uint64  `json:"productionPerSecond"`
+	Bonuses              *string `json:"bonuses,omitempty"`
+	UpgradeTimeInSeconds uint16  `json:"upgradeTimeInSeconds"`
+}
+
 type PlanetResponse struct {
 	PlanetID  uuid.UUID               `json:"planetID"`
 	X         uint8                   `json:"x"`
