@@ -14,7 +14,7 @@ import (
 // use before any operation that changes resources.
 func (s *Service) recalcResources(ctx context.Context, planetID uuid.UUID) error {
 	return s.txManager.ExecPlanetTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
-		planetBuildsInfo, err := planetRepo.GetBuildsInfo(ctx, planetID, []models.BuildType{
+		planetBuildingsInfo, err := planetRepo.GetBuildingsInfo(ctx, planetID, []models.BuildingType{
 			models.BuildingTypeMetalMine,
 			models.BuildingTypeCrystalMine,
 			models.BuildingTypeGasMine,
@@ -23,7 +23,7 @@ func (s *Service) recalcResources(ctx context.Context, planetID uuid.UUID) error
 			return fmt.Errorf("planetRepo.GetBuildsInfo(): %w", err)
 		}
 
-		err = getDefaultIfMinesNotExists(ctx, planetBuildsInfo, planetRepo)
+		err = getDefaultIfMinesNotExists(ctx, planetBuildingsInfo, planetRepo)
 		if err != nil {
 			return fmt.Errorf("getDefaultIfMinesNotExists(): %w", err)
 		}
@@ -37,15 +37,15 @@ func (s *Service) recalcResources(ctx context.Context, planetID uuid.UUID) error
 		secondsSinceLastUpdate := updatedTime.Sub(resources.UpdatedAt).Milliseconds()
 
 		updatedResources := models.Resources{
-			Metal:     resources.Metal + uint64(secondsSinceLastUpdate)*planetBuildsInfo[models.BuildingTypeMetalMine].MetalPerSecond/1000,
-			Crystal:   resources.Crystal + uint64(secondsSinceLastUpdate)*planetBuildsInfo[models.BuildingTypeCrystalMine].CrystalPerSecond/1000,
-			Gas:       resources.Gas + uint64(secondsSinceLastUpdate)*planetBuildsInfo[models.BuildingTypeGasMine].GasPerSecond/1000,
+			Metal:     resources.Metal + uint64(secondsSinceLastUpdate)*planetBuildingsInfo[models.BuildingTypeMetalMine].MetalPerSecond/1000,
+			Crystal:   resources.Crystal + uint64(secondsSinceLastUpdate)*planetBuildingsInfo[models.BuildingTypeCrystalMine].CrystalPerSecond/1000,
+			Gas:       resources.Gas + uint64(secondsSinceLastUpdate)*planetBuildingsInfo[models.BuildingTypeGasMine].GasPerSecond/1000,
 			UpdatedAt: updatedTime,
 		}
 
-		err = planetRepo.SaveResources(ctx, planetID, updatedResources)
+		err = planetRepo.SetResources(ctx, planetID, updatedResources)
 		if err != nil {
-			return fmt.Errorf("planetRepo.SaveResources(): %w", err)
+			return fmt.Errorf("planetRepo.SetResources(): %w", err)
 		}
 
 		return nil
@@ -55,25 +55,25 @@ func (s *Service) recalcResources(ctx context.Context, planetID uuid.UUID) error
 // getDefaultIfMinesNotExists adds default level 0 mines to the map if they do not exist
 func getDefaultIfMinesNotExists(
 	ctx context.Context,
-	planetMines map[models.BuildType]models.PlanetBuildInfo,
+	planetMines map[models.BuildingType]models.BuildingInfo,
 	planetRepo TxStorages,
 ) error {
-	buildTypes := []models.BuildType{
+	BuildingTypes := []models.BuildingType{
 		models.BuildingTypeMetalMine,
 		models.BuildingTypeCrystalMine,
 		models.BuildingTypeGasMine,
 	}
 
-	for _, buildType := range buildTypes {
-		if _, exists := planetMines[buildType]; exists {
+	for _, BuildingType := range BuildingTypes {
+		if _, exists := planetMines[BuildingType]; exists {
 			continue
 		}
 
-		mine, err := planetRepo.GetBuildStats(ctx, buildType, defaultLvl)
+		mine, err := planetRepo.GetBuildingStats(ctx, BuildingType, defaultLvl)
 		if err != nil {
-			return fmt.Errorf("planetRepo.GetBuildStats(): %w", err)
+			return fmt.Errorf("planetRepo.GetBuildingStats(): %w", err)
 		}
-		planetMines[buildType] = models.PlanetBuildInfo{
+		planetMines[BuildingType] = models.BuildingInfo{
 			Type:             mine.Type,
 			Level:            mine.Level,
 			MetalPerSecond:   mine.MetalPerSecond,

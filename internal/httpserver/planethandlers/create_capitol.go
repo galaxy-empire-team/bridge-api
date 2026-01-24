@@ -14,7 +14,7 @@ func CreateCapitol(planetService PlanetService) func(c *gin.Context) {
 		var req UserIDRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{
-				Error: "invalid request body",
+				Err: "invalid request body",
 			})
 			return
 		}
@@ -35,15 +35,15 @@ func handleColonizeCapitolError(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, models.ErrCapitolAlreadyExists):
 		c.JSON(http.StatusConflict, ErrorResponse{
-			Error: "capitol planet already exists for user",
+			Err: "capitol planet already exists for user",
 		})
 	case errors.Is(err, models.ErrPlanetCoordinatesAlreadyTaken):
 		c.JSON(http.StatusConflict, ErrorResponse{
-			Error: "planet coordinates are already taken",
+			Err: "planet coordinates are already taken",
 		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
-			Error: "internal server error",
+			Err: "internal server error",
 		})
 	}
 }

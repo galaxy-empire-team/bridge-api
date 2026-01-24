@@ -9,7 +9,7 @@ import (
 	"initialservice/internal/models"
 )
 
-func (r *PlanetStorage) GetResourcesForUpdate(ctx context.Context, planetID uuid.UUID) (models.Resources, error) {
+func (r *PlanetStorage) GetResources(ctx context.Context, planetID uuid.UUID) (models.Resources, error) {
 	const getResourcesQuery = `
 		SELECT 
 			metal,

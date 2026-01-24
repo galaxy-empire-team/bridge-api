@@ -19,18 +19,22 @@ const (
 )
 
 type planetStorage interface {
-	GetCapitol(ctx context.Context, userID uuid.UUID) (models.Planet, error)
-	CreateCapitol(ctx context.Context, userID uuid.UUID, planet models.Planet) error
-	GetUserPlanetIDs(ctx context.Context, userID uuid.UUID) ([]uuid.UUID, error)
+	CreatePlanet(ctx context.Context, userID uuid.UUID, planet models.Planet) error
+	GetUserPlanetIDs(ctx context.Context, userID uuid.UUID) ([]models.PlanetIDWithCapitol, error)
+	GetResources(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
+	GetLocation(ctx context.Context, planetID uuid.UUID) (models.Location, error)
+	GetBuildingsInfo(ctx context.Context, planetID uuid.UUID, BuildingTypes []models.BuildingType) (map[models.BuildingType]models.BuildingInfo, error)
 }
 
+// Separate storage methods that executes inside a transaction
 type TxStorages interface {
 	GetResourcesForUpdate(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
-	SaveResources(ctx context.Context, planetID uuid.UUID, updatedResources models.Resources) error
-	GetBuildStats(ctx context.Context, buildType models.BuildType, level uint8) (models.BuildStats, error)
-	GetBuildLvl(ctx context.Context, planetID uuid.UUID, buildType models.BuildType) (uint8, error)
-	GetBuildsInfo(ctx context.Context, planetID uuid.UUID, buildTypes []models.BuildType) (map[models.BuildType]models.PlanetBuildInfo, error)
-	SaveBuild(ctx context.Context, planetID uuid.UUID, buildInfo models.PlanetBuildInfo) error
+	SetResources(ctx context.Context, planetID uuid.UUID, updatedResources models.Resources) error
+	GetBuildingStats(ctx context.Context, BuildingType models.BuildingType, level uint8) (models.BuildingStats, error)
+	GetBuildingLvl(ctx context.Context, planetID uuid.UUID, BuildingType models.BuildingType) (uint8, error)
+	GetBuildingsInfo(ctx context.Context, planetID uuid.UUID, BuildingTypes []models.BuildingType) (map[models.BuildingType]models.BuildingInfo, error)
+	CreateBuildingEvent(ctx context.Context, buildEvent models.BuildEvent) error
+	SetFinishedBuildingTime(ctx context.Context, planetID uuid.UUID, buildingInfo models.BuildingInfo) error
 }
 
 type txManager interface {

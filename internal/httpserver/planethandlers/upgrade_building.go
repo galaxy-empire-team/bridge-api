@@ -11,15 +11,15 @@ func UpgradeBuilding(planetService PlanetService) func(c *gin.Context) {
 		var req CreateBuildingRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{
-				Error: "invalid request body",
+				Err: "invalid request body",
 			})
 			return
 		}
 
-		err := planetService.UpgradeBuilding(c.Request.Context(), req.PlanetID, req.BuildType)
+		err := planetService.UpgradeBuilding(c.Request.Context(), req.PlanetID, req.BuildingType)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{
-				Error: err.Error(),
+				Err: err.Error(),
 			})
 			return
 		}

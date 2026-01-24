@@ -29,3 +29,9 @@ type PlanetToColonize struct {
 	Y  uint8
 	Z  uint8
 }
+
+type finishedBuilding struct {
+	Type       string
+	Level      uint8
+	FinishedAt time.Time
+}

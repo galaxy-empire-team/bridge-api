@@ -9,7 +9,7 @@ import (
 	"initialservice/internal/models"
 )
 
-func (r *PlanetStorage) SaveResources(ctx context.Context, planetID uuid.UUID, updatedResources models.Resources) error {
+func (r *PlanetStorage) SetResources(ctx context.Context, planetID uuid.UUID, updatedResources models.Resources) error {
 	const updateResourcesQuery = `
 		INSERT INTO session_beta.planet_resources (
 			planet_id,

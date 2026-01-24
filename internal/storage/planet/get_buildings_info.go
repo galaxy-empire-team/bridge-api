@@ -10,7 +10,7 @@ import (
 )
 
 // GetBuildsInfo retrieves mine infromation from the target planet's buildings
-func (s *PlanetStorage) GetBuildsInfo(ctx context.Context, planetID uuid.UUID, BuildTypes []models.BuildType) (map[models.BuildType]models.PlanetBuildInfo, error) {
+func (s *PlanetStorage) GetBuildingsInfo(ctx context.Context, planetID uuid.UUID, BuildingTypes []models.BuildingType) (map[models.BuildingType]models.BuildingInfo, error) {
 	const getMineInfoQuery = `
 		SELECT 
 			b.level,
@@ -18,38 +18,42 @@ func (s *PlanetStorage) GetBuildsInfo(ctx context.Context, planetID uuid.UUID, B
 			b.metal_production_s,
 			b.crystal_production_s,
 			b.gas_production_s,
-			b.bonuses
+			b.bonuses,
+			pb.updated_at,
+			pb.finished_at
 		FROM session_beta.planet_buildings pb
 		JOIN session_beta.buildings b ON pb.building_id = b.id
 		WHERE pb.planet_id = $1 AND b.type = ANY($2);
 	`
 
-	rows, err := s.DB.Query(ctx, getMineInfoQuery, planetID, BuildTypes)
+	rows, err := s.DB.Query(ctx, getMineInfoQuery, planetID, BuildingTypes)
 	if err != nil {
 		return nil, fmt.Errorf("DB.Query.Scan(): %w", err)
 	}
 
-	minesInfo := make(map[models.BuildType]models.PlanetBuildInfo)
+	buildingsInfo := make(map[models.BuildingType]models.BuildingInfo)
 	for rows.Next() {
-		var mineInfo models.PlanetBuildInfo
+		var buildingInfo models.BuildingInfo
 		err = rows.Scan(
-			&mineInfo.Level,
-			&mineInfo.Type,
-			&mineInfo.MetalPerSecond,
-			&mineInfo.CrystalPerSecond,
-			&mineInfo.GasPerSecond,
-			&mineInfo.Bonuses,
+			&buildingInfo.Level,
+			&buildingInfo.Type,
+			&buildingInfo.MetalPerSecond,
+			&buildingInfo.CrystalPerSecond,
+			&buildingInfo.GasPerSecond,
+			&buildingInfo.Bonuses,
+			&buildingInfo.UpdatedAt,
+			&buildingInfo.FinishedAt,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("DB.QueryRow.Scan(): %w", err)
 		}
 
-		minesInfo[mineInfo.Type] = mineInfo
+		buildingsInfo[buildingInfo.Type] = buildingInfo
 	}
 
 	if err = rows.Err(); err != nil {
 		return nil, fmt.Errorf("rows.Err(): %w", err)
 	}
 
-	return minesInfo, nil
+	return buildingsInfo, nil
 }

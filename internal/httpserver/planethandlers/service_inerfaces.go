@@ -9,7 +9,7 @@ import (
 )
 
 type PlanetService interface {
-	GetCapitolPlanet(ctx context.Context, userID uuid.UUID) (models.Planet, error)
+	GetCapitol(ctx context.Context, userID uuid.UUID) (models.Planet, error)
 	CreateCapitol(ctx context.Context, userID uuid.UUID) error
 	UpgradeBuilding(ctx context.Context, planetID uuid.UUID, buildingType string) error
 }

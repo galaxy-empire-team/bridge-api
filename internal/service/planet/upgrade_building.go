@@ -10,18 +10,18 @@ import (
 	"initialservice/internal/models"
 )
 
-func (s *Service) UpgradeBuilding(ctx context.Context, planetID uuid.UUID, buildType string) error {
+func (s *Service) UpgradeBuilding(ctx context.Context, planetID uuid.UUID, BuildingType string) error {
 	err := s.recalcResources(ctx, planetID)
 	if err != nil {
 		return fmt.Errorf("recalcResources(): %w", err)
 	}
 
 	return s.txManager.ExecPlanetTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
-		updatedTime := time.Now()
-		planetBuild := models.PlanetBuildInfo{
-			Type:      models.BuildType(buildType),
-			Level:     0,
-			UpdatedAt: updatedTime,
+		updatedTime := time.Now().UTC()
+
+		planetBuild := models.BuildingInfo{
+			Type:      models.BuildingType(BuildingType),
+			UpdatedAt: time.Now().UTC(),
 		}
 
 		resources, err := planetRepo.GetResourcesForUpdate(ctx, planetID)
@@ -29,40 +29,52 @@ func (s *Service) UpgradeBuilding(ctx context.Context, planetID uuid.UUID, build
 			return fmt.Errorf("planetRepo.GetResourcesForUpdate(): %w", err)
 		}
 
-		currentBuildLvl, err := planetRepo.GetBuildLvl(ctx, planetID, planetBuild.Type)
+		currentBuildLvl, err := planetRepo.GetBuildingLvl(ctx, planetID, planetBuild.Type)
 		if err != nil {
 			return fmt.Errorf("planetRepo.GetResourcesForUpdate(): %w", err)
 		}
 
 		planetBuild.Level = currentBuildLvl
 
-		// get stats for next level
-		updatedBuildStats, err := planetRepo.GetBuildStats(ctx, planetBuild.Type, planetBuild.Level+1)
+		// get stats for the next level
+		updateBuildingStats, err := planetRepo.GetBuildingStats(ctx, planetBuild.Type, planetBuild.Level+1)
 		if err != nil {
-			return fmt.Errorf("planetRepo.GetBuildStats(): %w", err)
+			return fmt.Errorf("planetRepo.GetBuildingStats(): %w", err)
 		}
 
-		if resources.Metal <= updatedBuildStats.MetalCost ||
-			resources.Crystal <= updatedBuildStats.CrystalCost ||
-			resources.Gas <= updatedBuildStats.GasCost {
-			return fmt.Errorf("not enough resources to build %s", buildType)
+		if resources.Metal <= updateBuildingStats.MetalCost ||
+			resources.Crystal <= updateBuildingStats.CrystalCost ||
+			resources.Gas <= updateBuildingStats.GasCost {
+			return fmt.Errorf("not enough resources to build %s", BuildingType)
 		}
 
-		resources.Metal -= updatedBuildStats.MetalCost
-		resources.Crystal -= updatedBuildStats.CrystalCost
-		resources.Gas -= updatedBuildStats.GasCost
+		resources.Metal -= updateBuildingStats.MetalCost
+		resources.Crystal -= updateBuildingStats.CrystalCost
+		resources.Gas -= updateBuildingStats.GasCost
 		resources.UpdatedAt = updatedTime
 
-		err = planetRepo.SaveResources(ctx, planetID, resources)
+		err = planetRepo.SetResources(ctx, planetID, resources)
 		if err != nil {
-			return fmt.Errorf("planetRepo.SaveResources(): %w", err)
+			return fmt.Errorf("planetRepo.SetResources(): %w", err)
 		}
 
-		planetBuild.Level++
+		finishedAt := updatedTime.Add(time.Duration(updateBuildingStats.UpgradeTimeInSeconds) * time.Second)
+		planetBuild.FinishedAt = &finishedAt
 
-		err = planetRepo.SaveBuild(ctx, planetID, planetBuild)
+		err = planetRepo.SetFinishedBuildingTime(ctx, planetID, planetBuild)
 		if err != nil {
-			return fmt.Errorf("planetRepo.SaveBuild(): %w", err)
+			return fmt.Errorf("planetRepo.SetFinishedBuildingTime(): %w", err)
+		}
+
+		buildingEvent := models.BuildEvent{
+			PlanetID:     planetID,
+			BuildingType: planetBuild.Type,
+			FinishedAt:   finishedAt,
+		}
+
+		err = planetRepo.CreateBuildingEvent(ctx, buildingEvent)
+		if err != nil {
+			return fmt.Errorf("planetRepo.CreateBuildingEvent(): %w", err)
 		}
 
 		return nil

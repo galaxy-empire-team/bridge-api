@@ -5,11 +5,15 @@ import (
 )
 
 func toModelPlanet(p Planet) models.Planet {
+	planetLocation := models.Location{
+		X: p.X,
+		Y: p.Y,
+		Z: p.Z,
+	}
+
 	return models.Planet{
 		ID:          p.ID,
-		X:           p.X,
-		Y:           p.Y,
-		Z:           p.Z,
+		Location:    planetLocation,
 		HasMoon:     p.HasMoon,
 		ColonizedAt: p.ColonizedAt,
 		Resources: models.Resources{

@@ -7,8 +7,8 @@ import (
 	"initialservice/internal/models"
 )
 
-// GetBuildStats retrieves mine infromation from building stats table: (level, it's production and costs)
-func (s *PlanetStorage) GetBuildStats(ctx context.Context, buildType models.BuildType, level uint8) (models.BuildStats, error) {
+// GetBuildingStats retrieves mine infromation from building stats table: (level, it's production and costs)
+func (s *PlanetStorage) GetBuildingStats(ctx context.Context, BuildingType models.BuildingType, level uint8) (models.BuildingStats, error) {
 	const getMineStatQuery = `
 		SELECT 
 			type, 
@@ -25,8 +25,8 @@ func (s *PlanetStorage) GetBuildStats(ctx context.Context, buildType models.Buil
 		WHERE type = $1 AND level = $2;
 	`
 
-	var mineInfo models.BuildStats
-	err := s.DB.QueryRow(ctx, getMineStatQuery, buildType, level).Scan(
+	var mineInfo models.BuildingStats
+	err := s.DB.QueryRow(ctx, getMineStatQuery, BuildingType, level).Scan(
 		&mineInfo.Type,
 		&mineInfo.Level,
 		&mineInfo.MetalCost,
@@ -39,7 +39,7 @@ func (s *PlanetStorage) GetBuildStats(ctx context.Context, buildType models.Buil
 		&mineInfo.UpgradeTimeInSeconds,
 	)
 	if err != nil {
-		return models.BuildStats{}, fmt.Errorf("DB.QueryRow.Scan(): %w", err)
+		return models.BuildingStats{}, fmt.Errorf("DB.QueryRow.Scan(): %w", err)
 	}
 
 	return mineInfo, nil

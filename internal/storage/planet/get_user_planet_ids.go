@@ -3,14 +3,16 @@ package planet
 import (
 	"context"
 	"fmt"
+	"initialservice/internal/models"
 
 	"github.com/google/uuid"
 )
 
-func (r *PlanetStorage) GetUserPlanetIDs(ctx context.Context, userID uuid.UUID) ([]uuid.UUID, error) {
+func (r *PlanetStorage) GetUserPlanetIDs(ctx context.Context, userID uuid.UUID) ([]models.PlanetIDWithCapitol, error) {
 	const getPlanetIDsQuery = `
 		SELECT 
-			p.id
+			id, 
+			is_capitol
 		FROM session_beta.planets p
 		WHERE p.user_id = $1;
 	`
@@ -20,11 +22,12 @@ func (r *PlanetStorage) GetUserPlanetIDs(ctx context.Context, userID uuid.UUID) 
 		return nil, fmt.Errorf("DB.Query.Scan(): %w", err)
 	}
 
-	var planetIDs []uuid.UUID
+	var planetIDs []models.PlanetIDWithCapitol
 	for rows.Next() {
-		var planetID uuid.UUID
+		var planetID models.PlanetIDWithCapitol
 		err = rows.Scan(
-			&planetID,
+			&planetID.PlanetID,
+			&planetID.IsCapitol,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("DB.QueryRow.Scan(): %w", err)

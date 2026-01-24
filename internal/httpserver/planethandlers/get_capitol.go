@@ -14,12 +14,12 @@ func GetCapitol(planetService PlanetService) func(c *gin.Context) {
 		var req UserIDRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{
-				Error: err.Error(),
+				Err: err.Error(),
 			})
 			return
 		}
 
-		userCapitolPlanet, err := planetService.GetCapitolPlanet(c.Request.Context(), req.UserID)
+		userCapitolPlanet, err := planetService.GetCapitol(c.Request.Context(), req.UserID)
 		if err != nil {
 			handleGetCapitolError(c, err)
 			return
@@ -33,11 +33,11 @@ func handleGetCapitolError(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, models.ErrCapitolNotFound):
 		c.JSON(http.StatusNotFound, ErrorResponse{
-			Error: "capitol planet for user not found",
+			Err: "capitol planet for user not found",
 		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
-			Error: "internal server error",
+			Err: "internal server error" + err.Error(),
 		})
 	}
 }
