@@ -2,7 +2,8 @@ package app
 
 import (
 	"fmt"
-	"initialservice/internal/config"
+
+	"github.com/galaxy-empire-team/bridge-api/internal/config"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"

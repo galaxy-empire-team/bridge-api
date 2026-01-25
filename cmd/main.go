@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"log"
 
-	"initialservice/internal/app"
-	"initialservice/internal/config"
-	"initialservice/internal/db"
-	"initialservice/internal/httpserver"
-	planetservice "initialservice/internal/service/planet"
-	userservice "initialservice/internal/service/user"
-	planetstorage "initialservice/internal/storage/planet"
-	"initialservice/internal/storage/txmanager"
-	userstorage "initialservice/internal/storage/user"
+	"github.com/galaxy-empire-team/bridge-api/internal/app"
+	"github.com/galaxy-empire-team/bridge-api/internal/config"
+	"github.com/galaxy-empire-team/bridge-api/internal/db"
+	"github.com/galaxy-empire-team/bridge-api/internal/httpserver"
+	planetservice "github.com/galaxy-empire-team/bridge-api/internal/service/planet"
+	userservice "github.com/galaxy-empire-team/bridge-api/internal/service/user"
+	planetstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/planet"
+	"github.com/galaxy-empire-team/bridge-api/internal/storage/txmanager"
+	userstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/user"
 )
 
 func main() {

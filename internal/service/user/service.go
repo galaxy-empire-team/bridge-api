@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 
-	"initialservice/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 type userRepository interface {

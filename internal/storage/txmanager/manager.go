@@ -7,8 +7,8 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
-	"initialservice/internal/db"
-	planetservice "initialservice/internal/service/planet"
+	"github.com/galaxy-empire-team/bridge-api/internal/db"
+	planetservice "github.com/galaxy-empire-team/bridge-api/internal/service/planet"
 )
 
 type TxManager struct {

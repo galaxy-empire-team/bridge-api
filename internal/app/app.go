@@ -6,7 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"initialservice/internal/config"
+	"github.com/galaxy-empire-team/bridge-api/internal/config"
 
 	"go.uber.org/zap"
 )
@@ -27,7 +27,7 @@ func New(cfg config.App) (context.Context, *App, error) {
 
 	go func() {
 		<-ctx.Done()
-		logger.Sync() // nolint:errcheck
+		logger.Sync() // nolint:errcheck, gosec
 	}()
 
 	return ctx, &App{

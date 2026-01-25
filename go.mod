@@ -1,4 +1,4 @@
-module initialservice
+module github.com/galaxy-empire-team/bridge-api
 
 go 1.24.0
 

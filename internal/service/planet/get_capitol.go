@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"initialservice/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 func (s *Service) GetCapitol(ctx context.Context, userID uuid.UUID) (models.Planet, error) {

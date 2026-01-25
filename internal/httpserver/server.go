@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	"initialservice/internal/config"
+	"github.com/galaxy-empire-team/bridge-api/internal/config"
 )
 
 type HttpServer struct {

@@ -1,7 +1,7 @@
 package user
 
 import (
-	"initialservice/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 func toStorageUser(u models.User) User {

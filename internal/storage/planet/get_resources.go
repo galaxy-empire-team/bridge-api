@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"initialservice/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 func (r *PlanetStorage) GetResources(ctx context.Context, planetID uuid.UUID) (models.Resources, error) {

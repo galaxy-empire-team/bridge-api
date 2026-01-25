@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"initialservice/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 // recalcResources recalculates the resources of a planet based on the time since the last update
@@ -34,12 +34,12 @@ func (s *Service) recalcResources(ctx context.Context, planetID uuid.UUID) error
 		}
 
 		updatedTime := time.Now()
-		secondsSinceLastUpdate := updatedTime.Sub(resources.UpdatedAt).Milliseconds()
+		secondsSinceLastUpdate := uint64(updatedTime.Sub(resources.UpdatedAt).Milliseconds())
 
 		updatedResources := models.Resources{
-			Metal:     resources.Metal + uint64(secondsSinceLastUpdate)*planetBuildingsInfo[models.BuildingTypeMetalMine].MetalPerSecond/1000,
-			Crystal:   resources.Crystal + uint64(secondsSinceLastUpdate)*planetBuildingsInfo[models.BuildingTypeCrystalMine].CrystalPerSecond/1000,
-			Gas:       resources.Gas + uint64(secondsSinceLastUpdate)*planetBuildingsInfo[models.BuildingTypeGasMine].GasPerSecond/1000,
+			Metal:     resources.Metal + secondsSinceLastUpdate*planetBuildingsInfo[models.BuildingTypeMetalMine].MetalPerSecond/1000,
+			Crystal:   resources.Crystal + secondsSinceLastUpdate*planetBuildingsInfo[models.BuildingTypeCrystalMine].CrystalPerSecond/1000,
+			Gas:       resources.Gas + secondsSinceLastUpdate*planetBuildingsInfo[models.BuildingTypeGasMine].GasPerSecond/1000,
 			UpdatedAt: updatedTime,
 		}
 

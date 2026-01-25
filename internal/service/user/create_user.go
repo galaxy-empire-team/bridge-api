@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"initialservice/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 func (s *Service) CreateUser(ctx context.Context, user models.User) (models.User, error) {

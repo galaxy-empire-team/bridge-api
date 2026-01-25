@@ -1,8 +1,8 @@
 package httpserver
 
 import (
-	"initialservice/internal/httpserver/planethandlers"
-	"initialservice/internal/httpserver/userhandlers"
+	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/planethandlers"
+	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/userhandlers"
 )
 
 func (hs *HttpServer) RegisterRoutes(

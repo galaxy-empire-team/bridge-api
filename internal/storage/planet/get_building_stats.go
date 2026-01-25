@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"initialservice/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 // GetBuildingStats retrieves mine infromation from building stats table: (level, it's production and costs)

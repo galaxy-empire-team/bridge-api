@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"initialservice/internal/config"
+	"github.com/galaxy-empire-team/bridge-api/internal/config"
 )
 
 type DB interface {

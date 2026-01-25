@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"initialservice/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 func GetCapitol(planetService PlanetService) func(c *gin.Context) {
@@ -14,7 +14,7 @@ func GetCapitol(planetService PlanetService) func(c *gin.Context) {
 		var req UserIDRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{
-				Err: err.Error(),
+				Err: "invalid request body",
 			})
 			return
 		}

@@ -3,7 +3,8 @@ package planet
 import (
 	"context"
 	"fmt"
-	"initialservice/internal/models"
+
+	"github.com/galaxy-empire-team/bridge-api/internal/models"
 
 	"github.com/google/uuid"
 )

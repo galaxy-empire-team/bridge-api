@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"initialservice/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 func (s *PlanetStorage) CreateBuildingEvent(ctx context.Context, buildEvent models.BuildEvent) error {
@@ -28,7 +28,7 @@ func (s *PlanetStorage) CreateBuildingEvent(ctx context.Context, buildEvent mode
 		buildEvent.FinishedAt,
 	)
 	if err != nil {
-		return fmt.Errorf("DB.Exec(): %w", err)
+		return fmt.Errorf("DB.Exec(): %w", models.ErrEventIsAlreadyScheduled)
 	}
 
 	return nil

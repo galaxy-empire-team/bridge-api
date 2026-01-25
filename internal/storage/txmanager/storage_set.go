@@ -3,8 +3,8 @@ package txmanager
 import (
 	"github.com/jackc/pgx/v5"
 
-	planetstorage "initialservice/internal/storage/planet"
-	userstorage "initialservice/internal/storage/user"
+	planetstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/planet"
+	userstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/user"
 )
 
 // I don't want to write boilerplate stuff, embed all storages ^_^

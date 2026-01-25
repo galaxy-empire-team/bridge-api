@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"initialservice/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 const (
@@ -16,6 +16,7 @@ const (
 	planetsInSystemCount = 16
 
 	defaultLvl = 0
+	maxLvl     = 2
 )
 
 type planetStorage interface {

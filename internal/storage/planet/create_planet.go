@@ -9,7 +9,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 
-	"initialservice/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 func (r *PlanetStorage) CreatePlanet(ctx context.Context, userID uuid.UUID, planet models.Planet) error {
@@ -164,7 +164,7 @@ func (r *PlanetStorage) createBuildingsRows(ctx context.Context, tx pgx.Tx, plan
 	}
 
 	batchResults := tx.SendBatch(ctx, batch)
-	defer batchResults.Close()
+	defer batchResults.Close() //nolint:errcheck
 
 	for i := 0; i < batch.Len(); i++ {
 		_, err := batchResults.Exec()

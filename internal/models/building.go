@@ -60,3 +60,13 @@ func GetAllBuildings() []BuildingType {
 
 	return buildings
 }
+
+func IsValidBuildingType(buildingType BuildingType) bool {
+	for _, bt := range GetAllBuildings() {
+		if bt == buildingType {
+			return true
+		}
+	}
+
+	return false
+}

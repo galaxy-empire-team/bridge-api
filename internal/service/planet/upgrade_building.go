@@ -7,10 +7,14 @@ import (
 
 	"github.com/google/uuid"
 
-	"initialservice/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 func (s *Service) UpgradeBuilding(ctx context.Context, planetID uuid.UUID, BuildingType string) error {
+	if !models.IsValidBuildingType(models.BuildingType(BuildingType)) {
+		return models.ErrBuildTypeInvalid
+	}
+
 	err := s.recalcResources(ctx, planetID)
 	if err != nil {
 		return fmt.Errorf("recalcResources(): %w", err)
@@ -36,6 +40,10 @@ func (s *Service) UpgradeBuilding(ctx context.Context, planetID uuid.UUID, Build
 
 		planetBuild.Level = currentBuildLvl
 
+		if planetBuild.Level >= maxLvl {
+			return models.ErrBuildingMaxLevelReached
+		}
+
 		// get stats for the next level
 		updateBuildingStats, err := planetRepo.GetBuildingStats(ctx, planetBuild.Type, planetBuild.Level+1)
 		if err != nil {
@@ -45,7 +53,7 @@ func (s *Service) UpgradeBuilding(ctx context.Context, planetID uuid.UUID, Build
 		if resources.Metal <= updateBuildingStats.MetalCost ||
 			resources.Crystal <= updateBuildingStats.CrystalCost ||
 			resources.Gas <= updateBuildingStats.GasCost {
-			return fmt.Errorf("not enough resources to build %s", BuildingType)
+			return models.ErrNotEngoughResources
 		}
 
 		resources.Metal -= updateBuildingStats.MetalCost

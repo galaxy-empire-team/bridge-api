@@ -1,8 +1,8 @@
 package planethandlers
 
-import "initialservice/internal/models"
+import "github.com/galaxy-empire-team/bridge-api/internal/models"
 
-func toTransportPlanet(p models.Planet) PlanetResponse {
+func toTransportPlanet(p models.Planet) GetPlanetResponse {
 	buildings := make(map[string]BuildingInfo)
 	for bType, bInfo := range p.Buildings {
 		buildings[string(bType)] = BuildingInfo{
@@ -16,7 +16,7 @@ func toTransportPlanet(p models.Planet) PlanetResponse {
 		}
 	}
 
-	return PlanetResponse{
+	return GetPlanetResponse{
 		PlanetID: p.ID,
 		X:        p.Location.X,
 		Y:        p.Location.Y,
