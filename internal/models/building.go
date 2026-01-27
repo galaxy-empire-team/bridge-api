@@ -42,7 +42,7 @@ type BuildingInfo struct {
 	GasPerSecond     uint64
 	Bonuses          *string
 	UpdatedAt        time.Time
-	FinishedAt       *time.Time
+	FinishedAt       time.Time
 }
 
 func GetMines() []BuildingType {

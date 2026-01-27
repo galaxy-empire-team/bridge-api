@@ -9,11 +9,14 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
+// SetFinishedBuildingTime updates updatedAt and finishedAt times. This denormailization
+// is needed to optimize common planet queries.
 func (r *PlanetStorage) SetFinishedBuildingTime(ctx context.Context, planetID uuid.UUID, buildingInfo models.BuildingInfo) error {
 	const setFinishedBuildingQuery = `
 		UPDATE session_beta.planet_buildings
 		SET 
-			finished_at = $4
+			updated_at  = $4,
+			finished_at = $5
 		WHERE planet_id = $1 
 		AND 
 			building_id = (
@@ -25,7 +28,8 @@ func (r *PlanetStorage) SetFinishedBuildingTime(ctx context.Context, planetID uu
 	finishedBuilding := finishedBuilding{
 		Type:       string(buildingInfo.Type),
 		Level:      buildingInfo.Level,
-		FinishedAt: *buildingInfo.FinishedAt,
+		UpdatedAt:  buildingInfo.UpdatedAt,
+		FinishedAt: buildingInfo.FinishedAt,
 	}
 	_, err := r.DB.Exec(
 		ctx,
@@ -33,6 +37,7 @@ func (r *PlanetStorage) SetFinishedBuildingTime(ctx context.Context, planetID uu
 		planetID,
 		finishedBuilding.Type,
 		finishedBuilding.Level,
+		finishedBuilding.UpdatedAt,
 		finishedBuilding.FinishedAt,
 	)
 	if err != nil {

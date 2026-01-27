@@ -33,5 +33,6 @@ type PlanetToColonize struct {
 type finishedBuilding struct {
 	Type       string
 	Level      uint8
+	UpdatedAt  time.Time
 	FinishedAt time.Time
 }

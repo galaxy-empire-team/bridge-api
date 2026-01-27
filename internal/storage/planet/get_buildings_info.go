@@ -3,6 +3,7 @@ package planet
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 
@@ -31,6 +32,8 @@ func (s *PlanetStorage) GetBuildingsInfo(ctx context.Context, planetID uuid.UUID
 		return nil, fmt.Errorf("DB.Query.Scan(): %w", err)
 	}
 
+	var updatedAt time.Time
+	var finishedAt *time.Time
 	buildingsInfo := make(map[models.BuildingType]models.BuildingInfo)
 	for rows.Next() {
 		var buildingInfo models.BuildingInfo
@@ -41,11 +44,16 @@ func (s *PlanetStorage) GetBuildingsInfo(ctx context.Context, planetID uuid.UUID
 			&buildingInfo.CrystalPerSecond,
 			&buildingInfo.GasPerSecond,
 			&buildingInfo.Bonuses,
-			&buildingInfo.UpdatedAt,
-			&buildingInfo.FinishedAt,
+			&updatedAt,
+			&finishedAt,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("DB.QueryRow.Scan(): %w", err)
+		}
+
+		buildingInfo.UpdatedAt = updatedAt.UTC()
+		if finishedAt != nil {
+			buildingInfo.FinishedAt = finishedAt.UTC()
 		}
 
 		buildingsInfo[buildingInfo.Type] = buildingInfo

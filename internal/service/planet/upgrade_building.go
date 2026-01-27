@@ -67,7 +67,7 @@ func (s *Service) UpgradeBuilding(ctx context.Context, planetID uuid.UUID, Build
 		}
 
 		finishedAt := updatedTime.Add(time.Duration(updateBuildingStats.UpgradeTimeInSeconds) * time.Second)
-		planetBuild.FinishedAt = &finishedAt
+		planetBuild.FinishedAt = finishedAt
 
 		err = planetRepo.SetFinishedBuildingTime(ctx, planetID, planetBuild)
 		if err != nil {

@@ -48,13 +48,13 @@ type ErrorResponse struct {
 }
 
 type BuildingInfo struct {
-	Level            uint8      `json:"level"`
-	MetalPerSecond   uint64     `json:"metalPerSecond"`
-	CrystalPerSecond uint64     `json:"crystalPerSecond"`
-	GasPerSecond     uint64     `json:"gasPerSecond"`
-	Bonuses          *string    `json:"bonuses"`
-	UpdatedAt        time.Time  `json:"updatedAt"`
-	FinishedAt       *time.Time `json:"finishedAt"`
+	Level            uint8     `json:"level"`
+	MetalPerSecond   uint64    `json:"metalPerSecond"`
+	CrystalPerSecond uint64    `json:"crystalPerSecond"`
+	GasPerSecond     uint64    `json:"gasPerSecond"`
+	Bonuses          *string   `json:"bonuses"`
+	UpdatedAt        time.Time `json:"updatedAt"`
+	FinishedAt       time.Time `json:"finishedAt"`
 }
 
 type PlanetResources struct {

@@ -24,7 +24,7 @@ type ConnPool struct {
 
 func New(ctx context.Context, cfg config.PgConn) (*ConnPool, error) {
 	dsn := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s ",
+		"host=%s port=%d user=%s password=%s dbname=%s",
 		cfg.Host, cfg.Port, cfg.Username, cfg.Password, cfg.DBName,
 	)
 
