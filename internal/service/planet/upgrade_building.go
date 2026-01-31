@@ -15,14 +15,21 @@ func (s *Service) UpgradeBuilding(ctx context.Context, planetID uuid.UUID, Build
 		return models.ErrBuildTypeInvalid
 	}
 
-	err := s.recalcResources(ctx, planetID)
+	currentBuildsCount, err := s.planetStorage.GetCurrentintBuildsCount(ctx, planetID)
+	if err != nil {
+		return fmt.Errorf("planetRepo.GetCurrentintBuildsCount(): %w", err)
+	}
+
+	if currentBuildsCount >= maxBuildingsInProgress {
+		return models.ErrTooManyBuildingsInProgress
+	}
+
+	err = s.recalcResources(ctx, planetID)
 	if err != nil {
 		return fmt.Errorf("recalcResources(): %w", err)
 	}
 
 	return s.txManager.ExecPlanetTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
-		updatedTime := time.Now().UTC()
-
 		planetBuild := models.BuildingInfo{
 			Type:      models.BuildingType(BuildingType),
 			UpdatedAt: time.Now().UTC(),
@@ -40,7 +47,7 @@ func (s *Service) UpgradeBuilding(ctx context.Context, planetID uuid.UUID, Build
 
 		planetBuild.Level = currentBuildLvl
 
-		if planetBuild.Level >= maxLvl {
+		if planetBuild.Level >= maxBuildingLvl {
 			return models.ErrBuildingMaxLevelReached
 		}
 
@@ -59,14 +66,14 @@ func (s *Service) UpgradeBuilding(ctx context.Context, planetID uuid.UUID, Build
 		resources.Metal -= updateBuildingStats.MetalCost
 		resources.Crystal -= updateBuildingStats.CrystalCost
 		resources.Gas -= updateBuildingStats.GasCost
-		resources.UpdatedAt = updatedTime
+		resources.UpdatedAt = planetBuild.UpdatedAt
 
 		err = planetRepo.SetResources(ctx, planetID, resources)
 		if err != nil {
 			return fmt.Errorf("planetRepo.SetResources(): %w", err)
 		}
 
-		finishedAt := updatedTime.Add(time.Duration(updateBuildingStats.UpgradeTimeInSeconds) * time.Second)
+		finishedAt := planetBuild.UpdatedAt.Add(time.Duration(updateBuildingStats.UpgradeTimeS) * time.Second)
 		planetBuild.FinishedAt = finishedAt
 
 		err = planetRepo.SetFinishedBuildingTime(ctx, planetID, planetBuild)

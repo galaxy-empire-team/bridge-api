@@ -3,6 +3,7 @@ package planet
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -27,9 +28,10 @@ func (s *Service) GetCapitol(ctx context.Context, userID uuid.UUID) (models.Plan
 		return models.Planet{}, models.ErrCapitolNotFound
 	}
 
-	err = s.recalcResources(ctx, capitolID)
+	updatedAt := time.Now().UTC().UTC()
+	err = s.recalcResourcesWithUpdatedTime(ctx, capitolID, updatedAt)
 	if err != nil {
-		return models.Planet{}, fmt.Errorf("recalcResources(): %w", err)
+		return models.Planet{}, fmt.Errorf("recalcResourcesWithUpdatedTime(): %w", err)
 	}
 
 	capitolLocation, err := s.planetStorage.GetLocation(ctx, capitolID)
@@ -54,5 +56,6 @@ func (s *Service) GetCapitol(ctx context.Context, userID uuid.UUID) (models.Plan
 		Buildings: buildings,
 		IsCapitol: true,
 		HasMoon:   false,
+		UpdatedAt: updatedAt,
 	}, nil
 }

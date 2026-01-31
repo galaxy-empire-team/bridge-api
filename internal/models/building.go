@@ -9,9 +9,12 @@ import (
 type BuildingType string
 
 const (
-	BuildingTypeMetalMine   BuildingType = "metal_mine"
-	BuildingTypeCrystalMine BuildingType = "crystal_mine"
-	BuildingTypeGasMine     BuildingType = "gas_mine"
+	BuildingTypeMetalMine     BuildingType = "metal_mine"
+	BuildingTypeCrystalMine   BuildingType = "crystal_mine"
+	BuildingTypeGasMine       BuildingType = "gas_mine"
+	BuildingTypeSpaceport     BuildingType = "space_port"
+	BuildingTypeResearchLab   BuildingType = "laboratory"
+	BuildingTypeDefenseCenter BuildingType = "robot_factory"
 )
 
 type BuildEvent struct {
@@ -22,27 +25,23 @@ type BuildEvent struct {
 }
 
 type BuildingStats struct {
-	Level                uint8
-	Type                 BuildingType
-	MetalCost            uint64
-	CrystalCost          uint64
-	GasCost              uint64
-	MetalPerSecond       uint64
-	CrystalPerSecond     uint64
-	GasPerSecond         uint64
-	Bonuses              *string
-	UpgradeTimeInSeconds uint16
+	Level        uint8
+	Type         BuildingType
+	MetalCost    uint64
+	CrystalCost  uint64
+	GasCost      uint64
+	ProductionS  uint64
+	Bonuses      *string
+	UpgradeTimeS uint16
 }
 
 type BuildingInfo struct {
-	Level            uint8
-	Type             BuildingType
-	MetalPerSecond   uint64
-	CrystalPerSecond uint64
-	GasPerSecond     uint64
-	Bonuses          *string
-	UpdatedAt        time.Time
-	FinishedAt       time.Time
+	Level       uint8
+	Type        BuildingType
+	ProductionS uint64
+	Bonuses     *string
+	UpdatedAt   time.Time
+	FinishedAt  time.Time
 }
 
 func GetMines() []BuildingType {
@@ -54,7 +53,11 @@ func GetMines() []BuildingType {
 }
 
 func GetAllBuildings() []BuildingType {
-	var buildings []BuildingType
+	buildings := []BuildingType{
+		BuildingTypeSpaceport,
+		BuildingTypeResearchLab,
+		BuildingTypeDefenseCenter,
+	}
 
 	buildings = append(buildings, GetMines()...)
 

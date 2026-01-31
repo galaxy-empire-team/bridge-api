@@ -15,8 +15,10 @@ const (
 	systemInGalaxyCount  = 3
 	planetsInSystemCount = 16
 
-	defaultLvl = 0
-	maxLvl     = 2
+	defaultLvl     = 0
+	maxBuildingLvl = 5
+
+	maxBuildingsInProgress = 2
 )
 
 type planetStorage interface {
@@ -26,6 +28,7 @@ type planetStorage interface {
 	GetLocation(ctx context.Context, planetID uuid.UUID) (models.Location, error)
 	GetBuildingsInfo(ctx context.Context, planetID uuid.UUID, BuildingTypes []models.BuildingType) (map[models.BuildingType]models.BuildingInfo, error)
 	GetBuildingStats(ctx context.Context, BuildingType models.BuildingType, level uint8) (models.BuildingStats, error)
+	GetCurrentintBuildsCount(ctx context.Context, planetID uuid.UUID) (uint8, error)
 }
 
 // Separate storage methods that executes inside a transaction

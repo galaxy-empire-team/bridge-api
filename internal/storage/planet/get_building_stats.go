@@ -11,18 +11,16 @@ import (
 func (s *PlanetStorage) GetBuildingStats(ctx context.Context, BuildingType models.BuildingType, level uint8) (models.BuildingStats, error) {
 	const getMineStatQuery = `
 		SELECT 
-			type, 
+			building_type, 
 			level,
 			metal_cost,
 			crystal_cost,
 			gas_cost,
-			metal_production_s,
-			crystal_production_s,
-			gas_production_s,
+			production_s,
 			bonuses,
 			upgrade_time_s
 		FROM session_beta.buildings
-		WHERE type = $1 AND level = $2;
+		WHERE building_type = $1 AND level = $2;
 	`
 
 	var mineInfo models.BuildingStats
@@ -32,11 +30,9 @@ func (s *PlanetStorage) GetBuildingStats(ctx context.Context, BuildingType model
 		&mineInfo.MetalCost,
 		&mineInfo.CrystalCost,
 		&mineInfo.GasCost,
-		&mineInfo.MetalPerSecond,
-		&mineInfo.CrystalPerSecond,
-		&mineInfo.GasPerSecond,
+		&mineInfo.ProductionS,
 		&mineInfo.Bonuses,
-		&mineInfo.UpgradeTimeInSeconds,
+		&mineInfo.UpgradeTimeS,
 	)
 	if err != nil {
 		return models.BuildingStats{}, fmt.Errorf("DB.QueryRow.Scan(): %w", err)

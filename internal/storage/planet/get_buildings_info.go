@@ -15,16 +15,14 @@ func (s *PlanetStorage) GetBuildingsInfo(ctx context.Context, planetID uuid.UUID
 	const getMineInfoQuery = `
 		SELECT 
 			b.level,
-			b.type,
-			b.metal_production_s,
-			b.crystal_production_s,
-			b.gas_production_s,
+			b.building_type,
+			b.production_s,
 			b.bonuses,
 			pb.updated_at,
 			pb.finished_at
 		FROM session_beta.planet_buildings pb
 		JOIN session_beta.buildings b ON pb.building_id = b.id
-		WHERE pb.planet_id = $1 AND b.type = ANY($2);
+		WHERE pb.planet_id = $1 AND b.building_type = ANY($2);
 	`
 
 	rows, err := s.DB.Query(ctx, getMineInfoQuery, planetID, BuildingTypes)
@@ -40,9 +38,7 @@ func (s *PlanetStorage) GetBuildingsInfo(ctx context.Context, planetID uuid.UUID
 		err = rows.Scan(
 			&buildingInfo.Level,
 			&buildingInfo.Type,
-			&buildingInfo.MetalPerSecond,
-			&buildingInfo.CrystalPerSecond,
-			&buildingInfo.GasPerSecond,
+			&buildingInfo.ProductionS,
 			&buildingInfo.Bonuses,
 			&updatedAt,
 			&finishedAt,

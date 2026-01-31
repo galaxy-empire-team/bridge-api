@@ -14,6 +14,7 @@ type Planet struct {
 	HasMoon     bool
 	IsCapitol   bool
 	ColonizedAt time.Time
+	UpdatedAt   time.Time
 }
 
 type Resources struct {

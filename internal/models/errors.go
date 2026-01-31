@@ -12,4 +12,5 @@ var (
 	ErrBuildTypeInvalid              = errors.New("invalid building type")
 	ErrNotEngoughResources           = errors.New("not enough resources to upgrade building")
 	ErrEventIsAlreadyScheduled       = errors.New("event is already scheduled")
+	ErrTooManyBuildingsInProgress    = errors.New("too many buildings are already in progress")
 )

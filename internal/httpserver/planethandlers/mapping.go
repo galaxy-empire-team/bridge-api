@@ -6,13 +6,11 @@ func toTransportPlanet(p models.Planet) GetPlanetResponse {
 	buildings := make(map[string]BuildingInfo)
 	for bType, bInfo := range p.Buildings {
 		buildings[string(bType)] = BuildingInfo{
-			Level:            bInfo.Level,
-			Bonuses:          bInfo.Bonuses,
-			MetalPerSecond:   bInfo.MetalPerSecond,
-			CrystalPerSecond: bInfo.CrystalPerSecond,
-			GasPerSecond:     bInfo.GasPerSecond,
-			UpdatedAt:        bInfo.UpdatedAt,
-			FinishedAt:       bInfo.FinishedAt,
+			Level:       bInfo.Level,
+			Bonuses:     bInfo.Bonuses,
+			ProductionS: bInfo.ProductionS,
+			UpdatedAt:   bInfo.UpdatedAt,
+			FinishedAt:  bInfo.FinishedAt,
 		}
 	}
 
@@ -39,8 +37,8 @@ func toTransportBuildingStats(bs models.BuildingStats) GetBuildStatsResponse {
 		MetalCost:            bs.MetalCost,
 		CrystalCost:          bs.CrystalCost,
 		GasCost:              bs.GasCost,
-		ProductionPerSecond:  bs.MetalPerSecond + bs.CrystalPerSecond + bs.GasPerSecond,
+		ProductionS:          bs.ProductionS,
 		Bonuses:              bs.Bonuses,
-		UpgradeTimeInSeconds: bs.UpgradeTimeInSeconds,
+		UpgradeTimeInSeconds: bs.UpgradeTimeS,
 	}
 }

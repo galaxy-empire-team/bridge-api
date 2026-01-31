@@ -21,7 +21,7 @@ func (r *PlanetStorage) SetFinishedBuildingTime(ctx context.Context, planetID uu
 		AND 
 			building_id = (
 				SELECT id FROM session_beta.buildings 
-				WHERE type = $2 AND level = $3
+				WHERE building_type = $2 AND level = $3
 			);
 	`
 

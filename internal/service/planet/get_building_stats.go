@@ -12,7 +12,7 @@ func (s *Service) GetBuildingStats(ctx context.Context, buildingType string, lev
 		return models.BuildingStats{}, models.ErrBuildTypeInvalid
 	}
 
-	if level > maxLvl {
+	if level > maxBuildingLvl {
 		return models.BuildingStats{}, models.ErrBuildingInvalidLevel
 	}
 

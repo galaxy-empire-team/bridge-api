@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// Use POST. Change to Get after authorization implementation
+// Use POST. Change to Get after authorization implementation.
 type UserIDRequest struct {
 	UserID uuid.UUID `json:"userID"`
 }
@@ -38,7 +38,7 @@ type GetBuildStatsResponse struct {
 	MetalCost            uint64  `json:"metalCost"`
 	CrystalCost          uint64  `json:"crystalCost"`
 	GasCost              uint64  `json:"gasCost"`
-	ProductionPerSecond  uint64  `json:"productionPerSecond"`
+	ProductionS          uint64  `json:"productionS"`
 	Bonuses              *string `json:"bonuses,omitempty"`
 	UpgradeTimeInSeconds uint16  `json:"upgradeTimeInSeconds"`
 }
@@ -48,13 +48,11 @@ type ErrorResponse struct {
 }
 
 type BuildingInfo struct {
-	Level            uint8     `json:"level"`
-	MetalPerSecond   uint64    `json:"metalPerSecond"`
-	CrystalPerSecond uint64    `json:"crystalPerSecond"`
-	GasPerSecond     uint64    `json:"gasPerSecond"`
-	Bonuses          *string   `json:"bonuses"`
-	UpdatedAt        time.Time `json:"updatedAt"`
-	FinishedAt       time.Time `json:"finishedAt"`
+	Level       uint8     `json:"level"`
+	ProductionS uint64    `json:"productionS"`
+	Bonuses     *string   `json:"bonuses"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+	FinishedAt  time.Time `json:"finishedAt"`
 }
 
 type PlanetResources struct {

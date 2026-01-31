@@ -148,7 +148,7 @@ func (r *PlanetStorage) createBuildingsRows(ctx context.Context, tx pgx.Tx, plan
 			finished_at
 		) VALUES (
 			$1,    --- planet.ID
-			( SELECT id FROM session_beta.buildings WHERE type = $2 AND level = 0 ), --- building_id
+			( SELECT id FROM session_beta.buildings WHERE building_type = $2 AND level = 0 ), --- building_id
 			NOW(),  --- updated_at
 			NULL	--- finished_at
 		);

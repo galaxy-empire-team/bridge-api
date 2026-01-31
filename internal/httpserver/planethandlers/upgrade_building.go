@@ -37,6 +37,10 @@ func handleUpgradeBuildingError(c *gin.Context, err error) {
 		c.JSON(http.StatusBadRequest, ErrorResponse{
 			Err: "invalid building type",
 		})
+	case errors.Is(err, models.ErrTooManyBuildingsInProgress):
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Err: "too many buildings are already in progress",
+		})
 	case errors.Is(err, models.ErrBuildingMaxLevelReached):
 		c.JSON(http.StatusConflict, ErrorResponse{
 			Err: "building has reached max level",
