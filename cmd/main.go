@@ -10,8 +10,10 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/httpserver"
 	missionservice "github.com/galaxy-empire-team/bridge-api/internal/service/mission"
 	planetservice "github.com/galaxy-empire-team/bridge-api/internal/service/planet"
+	systemservice "github.com/galaxy-empire-team/bridge-api/internal/service/system"
 	userservice "github.com/galaxy-empire-team/bridge-api/internal/service/user"
 	planetstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/planet"
+	systemstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/system"
 	"github.com/galaxy-empire-team/bridge-api/internal/storage/txmanager"
 	userstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/user"
 )
@@ -44,16 +46,18 @@ func run() error {
 	txManager := txmanager.New(db)
 	userStorage := userstorage.New(db)
 	planetStorage := planetstorage.New(db)
+	systemStorage := systemstorage.New(db)
 
 	// initialize services
 	userService := userservice.New(userStorage)
 	planetService := planetservice.New(txManager, planetStorage)
 	missionService := missionservice.New(txManager, planetStorage)
+	systemService := systemservice.New(systemStorage)
 
 	// initialize http server
 	httpServer := httpserver.New(app.ComponentLogger("httpserver"))
 
-	httpServer.RegisterRoutes(userService, planetService, missionService)
+	httpServer.RegisterRoutes(userService, planetService, missionService, systemService)
 
 	err = httpServer.Start(ctx, cfg.Server)
 	if err != nil {
