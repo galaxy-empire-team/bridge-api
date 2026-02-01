@@ -1,10 +1,4 @@
-package models
-
-import (
-	"time"
-
-	"github.com/google/uuid"
-)
+package consts
 
 type BuildingType string
 
@@ -17,34 +11,7 @@ const (
 	BuildingTypeDefenseCenter BuildingType = "robot_factory"
 )
 
-type BuildEvent struct {
-	PlanetID     uuid.UUID
-	BuildingType BuildingType
-	StartedAt    time.Time
-	FinishedAt   time.Time
-}
-
-type BuildingStats struct {
-	Level        uint8
-	Type         BuildingType
-	MetalCost    uint64
-	CrystalCost  uint64
-	GasCost      uint64
-	ProductionS  uint64
-	Bonuses      *string
-	UpgradeTimeS uint16
-}
-
-type BuildingInfo struct {
-	Level       uint8
-	Type        BuildingType
-	ProductionS uint64
-	Bonuses     *string
-	UpdatedAt   time.Time
-	FinishedAt  time.Time
-}
-
-func GetMines() []BuildingType {
+func GetMineTypes() []BuildingType {
 	return []BuildingType{
 		BuildingTypeMetalMine,
 		BuildingTypeCrystalMine,
@@ -52,20 +19,20 @@ func GetMines() []BuildingType {
 	}
 }
 
-func GetAllBuildings() []BuildingType {
+func GetBuildingTypes() []BuildingType {
 	buildings := []BuildingType{
 		BuildingTypeSpaceport,
 		BuildingTypeResearchLab,
 		BuildingTypeDefenseCenter,
 	}
 
-	buildings = append(buildings, GetMines()...)
+	buildings = append(buildings, GetMineTypes()...)
 
 	return buildings
 }
 
 func IsValidBuildingType(buildingType BuildingType) bool {
-	for _, bt := range GetAllBuildings() {
+	for _, bt := range GetBuildingTypes() {
 		if bt == buildingType {
 			return true
 		}

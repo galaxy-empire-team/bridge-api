@@ -37,7 +37,7 @@ func handleGetCapitolError(c *gin.Context, err error) {
 		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
-			Err: "internal server error" + err.Error(),
+			Err: "internal server error",
 		})
 	}
 }

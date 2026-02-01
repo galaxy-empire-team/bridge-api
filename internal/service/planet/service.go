@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
 const (
@@ -15,29 +16,30 @@ const (
 	systemInGalaxyCount  = 3
 	planetsInSystemCount = 16
 
-	defaultLvl     = 0
-	maxBuildingLvl = 5
+	defaultLvl         = 0
+	defaultProductionS = 10
+	maxBuildingLvl     = 5
 
 	maxBuildingsInProgress = 2
 )
 
 type planetStorage interface {
-	CreatePlanet(ctx context.Context, userID uuid.UUID, planet models.Planet) error
+	CreatePlanet(ctx context.Context, planet models.Planet) error
 	GetUserPlanetIDs(ctx context.Context, userID uuid.UUID) ([]models.PlanetIDWithCapitol, error)
 	GetResources(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
-	GetLocation(ctx context.Context, planetID uuid.UUID) (models.Location, error)
-	GetBuildingsInfo(ctx context.Context, planetID uuid.UUID, BuildingTypes []models.BuildingType) (map[models.BuildingType]models.BuildingInfo, error)
-	GetBuildingStats(ctx context.Context, BuildingType models.BuildingType, level uint8) (models.BuildingStats, error)
-	GetCurrentintBuildsCount(ctx context.Context, planetID uuid.UUID) (uint8, error)
+	GetCoordinates(ctx context.Context, planetID uuid.UUID) (models.Coordinates, error)
+	GetBuildingsInfo(ctx context.Context, planetID uuid.UUID, BuildingTypes []consts.BuildingType) (map[consts.BuildingType]models.BuildingInfo, error)
+	GetBuildingStats(ctx context.Context, BuildingType consts.BuildingType, level uint8) (models.BuildingStats, error)
+	GetCurrentBuildsCount(ctx context.Context, planetID uuid.UUID) (uint8, error)
 }
 
 // Separate storage methods that executes inside a transaction
 type TxStorages interface {
 	GetResourcesForUpdate(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
 	SetResources(ctx context.Context, planetID uuid.UUID, updatedResources models.Resources) error
-	GetBuildingStats(ctx context.Context, BuildingType models.BuildingType, level uint8) (models.BuildingStats, error)
-	GetBuildingLvl(ctx context.Context, planetID uuid.UUID, BuildingType models.BuildingType) (uint8, error)
-	GetBuildingsInfo(ctx context.Context, planetID uuid.UUID, BuildingTypes []models.BuildingType) (map[models.BuildingType]models.BuildingInfo, error)
+	GetBuildingStats(ctx context.Context, BuildingType consts.BuildingType, level uint8) (models.BuildingStats, error)
+	GetBuildingLvl(ctx context.Context, planetID uuid.UUID, BuildingType consts.BuildingType) (uint8, error)
+	GetBuildingsInfo(ctx context.Context, planetID uuid.UUID, BuildingTypes []consts.BuildingType) (map[consts.BuildingType]models.BuildingInfo, error)
 	CreateBuildingEvent(ctx context.Context, buildEvent models.BuildEvent) error
 	SetFinishedBuildingTime(ctx context.Context, planetID uuid.UUID, buildingInfo models.BuildingInfo) error
 }

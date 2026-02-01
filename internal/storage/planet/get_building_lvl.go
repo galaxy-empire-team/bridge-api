@@ -8,11 +8,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 
-	"github.com/galaxy-empire-team/bridge-api/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
 // GetBuildLvl retrieves mine infromation from the target planet's buildings.
-func (s *PlanetStorage) GetBuildingLvl(ctx context.Context, planetID uuid.UUID, BuildingType models.BuildingType) (uint8, error) {
+func (s *PlanetStorage) GetBuildingLvl(ctx context.Context, planetID uuid.UUID, BuildingType consts.BuildingType) (uint8, error) {
 	const getBuildingInfoQuery = `
 		SELECT b.level
 		FROM session_beta.planet_buildings pb

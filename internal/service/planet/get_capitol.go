@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
 func (s *Service) GetCapitol(ctx context.Context, userID uuid.UUID) (models.Planet, error) {
@@ -28,13 +29,13 @@ func (s *Service) GetCapitol(ctx context.Context, userID uuid.UUID) (models.Plan
 		return models.Planet{}, models.ErrCapitolNotFound
 	}
 
-	updatedAt := time.Now().UTC().UTC()
+	updatedAt := time.Now().UTC()
 	err = s.recalcResourcesWithUpdatedTime(ctx, capitolID, updatedAt)
 	if err != nil {
 		return models.Planet{}, fmt.Errorf("recalcResourcesWithUpdatedTime(): %w", err)
 	}
 
-	capitolLocation, err := s.planetStorage.GetLocation(ctx, capitolID)
+	capitolCoordinates, err := s.planetStorage.GetCoordinates(ctx, capitolID)
 	if err != nil {
 		return models.Planet{}, fmt.Errorf("planetRepo.GetCapitol(): %w", err)
 	}
@@ -44,18 +45,40 @@ func (s *Service) GetCapitol(ctx context.Context, userID uuid.UUID) (models.Plan
 		return models.Planet{}, fmt.Errorf("planetRepo.GetResources(): %w", err)
 	}
 
-	buildings, err := s.planetStorage.GetBuildingsInfo(ctx, capitolID, models.GetAllBuildings())
+	buildings, err := s.getBuildingsInfo(ctx, capitolID)
 	if err != nil {
-		return models.Planet{}, fmt.Errorf("planetRepo.GetBuildingsInfo(): %w", err)
+		return models.Planet{}, fmt.Errorf("GetBuildingsInfo(): %w", err)
 	}
 
 	return models.Planet{
-		ID:        capitolID,
-		Location:  capitolLocation,
-		Resources: resources,
-		Buildings: buildings,
-		IsCapitol: true,
-		HasMoon:   false,
-		UpdatedAt: updatedAt,
+		ID:          capitolID,
+		UserID:      userID,
+		Coordinates: capitolCoordinates,
+		Resources:   resources,
+		Buildings:   buildings,
+		IsCapitol:   true,
+		HasMoon:     false,
+		UpdatedAt:   updatedAt,
 	}, nil
+}
+
+func (s *Service) getBuildingsInfo(ctx context.Context, planetID uuid.UUID) (map[consts.BuildingType]models.BuildingInfo, error) {
+	buildings, err := s.planetStorage.GetBuildingsInfo(ctx, planetID, consts.GetBuildingTypes())
+	if err != nil {
+		return nil, fmt.Errorf("planetRepo.GetBuildingsInfo(): %w", err)
+	}
+
+	// If mines are not build yet, initialize them with default values
+	// TODO: get values from db
+	for _, mineType := range consts.GetMineTypes() {
+		if _, exists := buildings[mineType]; !exists {
+			buildings[mineType] = models.BuildingInfo{
+				Type:        mineType,
+				Level:       defaultLvl,
+				ProductionS: defaultProductionS,
+			}
+		}
+	}
+
+	return buildings, nil
 }

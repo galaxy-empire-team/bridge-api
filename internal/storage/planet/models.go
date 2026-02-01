@@ -6,28 +6,18 @@ import (
 	"github.com/google/uuid"
 )
 
-type Planet struct {
+type planetToColonize struct {
 	ID          uuid.UUID
-	X           uint8
-	Y           uint8
-	Z           uint8
-	Resources   Resources
+	UserID      uuid.UUID
+	Coordinates coordinates
 	HasMoon     bool
-	ColonizedAt time.Time
+	IsCapitol   bool
 }
 
-type Resources struct {
-	Metal     uint64
-	Crystal   uint64
-	Gas       uint64
-	UpdatedAt time.Time
-}
-
-type PlanetToColonize struct {
-	ID uuid.UUID
-	X  uint8
-	Y  uint8
-	Z  uint8
+type coordinates struct {
+	X uint8
+	Y uint8
+	Z uint8
 }
 
 type finishedBuilding struct {

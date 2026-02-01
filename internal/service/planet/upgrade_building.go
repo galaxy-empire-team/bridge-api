@@ -8,16 +8,17 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
 func (s *Service) UpgradeBuilding(ctx context.Context, planetID uuid.UUID, BuildingType string) error {
-	if !models.IsValidBuildingType(models.BuildingType(BuildingType)) {
+	if !consts.IsValidBuildingType(consts.BuildingType(BuildingType)) {
 		return models.ErrBuildTypeInvalid
 	}
 
-	currentBuildsCount, err := s.planetStorage.GetCurrentintBuildsCount(ctx, planetID)
+	currentBuildsCount, err := s.planetStorage.GetCurrentBuildsCount(ctx, planetID)
 	if err != nil {
-		return fmt.Errorf("planetRepo.GetCurrentintBuildsCount(): %w", err)
+		return fmt.Errorf("planetRepo.GetCurrentBuildsCount(): %w", err)
 	}
 
 	if currentBuildsCount >= maxBuildingsInProgress {
@@ -31,7 +32,7 @@ func (s *Service) UpgradeBuilding(ctx context.Context, planetID uuid.UUID, Build
 
 	return s.txManager.ExecPlanetTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
 		planetBuild := models.BuildingInfo{
-			Type:      models.BuildingType(BuildingType),
+			Type:      consts.BuildingType(BuildingType),
 			UpdatedAt: time.Now().UTC(),
 		}
 
@@ -57,10 +58,10 @@ func (s *Service) UpgradeBuilding(ctx context.Context, planetID uuid.UUID, Build
 			return fmt.Errorf("planetRepo.GetBuildingStats(): %w", err)
 		}
 
-		if resources.Metal <= updateBuildingStats.MetalCost ||
-			resources.Crystal <= updateBuildingStats.CrystalCost ||
-			resources.Gas <= updateBuildingStats.GasCost {
-			return models.ErrNotEngoughResources
+		if resources.Metal < updateBuildingStats.MetalCost ||
+			resources.Crystal < updateBuildingStats.CrystalCost ||
+			resources.Gas < updateBuildingStats.GasCost {
+			return models.ErrNotEnoughResources
 		}
 
 		resources.Metal -= updateBuildingStats.MetalCost

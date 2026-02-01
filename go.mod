@@ -3,7 +3,6 @@ module github.com/galaxy-empire-team/bridge-api
 go 1.24.0
 
 require (
-	github.com/gin-contrib/zap v1.1.6
 	github.com/gin-gonic/gin v1.10.0
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.8.0

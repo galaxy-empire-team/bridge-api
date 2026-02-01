@@ -32,7 +32,7 @@ func GetBuildingStats(planetService PlanetService) func(c *gin.Context) {
 func handleGetBuildingStatsError(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, models.ErrBuildingInvalidLevel):
-		c.JSON(http.StatusConflict, ErrorResponse{
+		c.JSON(http.StatusBadRequest, ErrorResponse{
 			Err: "invalid building level",
 		})
 	case errors.Is(err, models.ErrBuildTypeInvalid):

@@ -31,7 +31,7 @@ type UserResponse struct {
 }
 
 type ErrorResponse struct {
-	Error string `json:"error"`
+	Err string `json:"err"`
 }
 
 func CreateUser(userService UserService) func(c *gin.Context) {
@@ -41,7 +41,7 @@ func CreateUser(userService UserService) func(c *gin.Context) {
 		var req UserRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{
-				Error: "invalid request body",
+				Err: "invalid request body",
 			})
 			return
 		}
@@ -49,7 +49,7 @@ func CreateUser(userService UserService) func(c *gin.Context) {
 		req.Login = strings.TrimSpace(req.Login)
 		if err := validateLogin(req.Login, loginChecker); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{
-				Error: err.Error(),
+				Err: err.Error(),
 			})
 			return
 		}
@@ -82,7 +82,7 @@ func validateLogin(login string, checker *regexp.Regexp) error {
 	}
 
 	if !checker.MatchString(login) {
-		return fmt.Errorf("login have to contain only english letters, digits, _ or - characters")
+		return fmt.Errorf("login must contain only English letters, digits, '_' or '-' characters")
 	}
 
 	return nil
@@ -92,12 +92,12 @@ func handleServiceError(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, models.ErrUserAlreadyExists):
 		c.JSON(http.StatusConflict, ErrorResponse{
-			Error: "user with this login already exists",
+			Err: "user with this login already exists",
 		})
 	default:
 		// Internal server error for unhandled cases
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
-			Error: "internal server error",
+			Err: "internal server error",
 		})
 	}
 }

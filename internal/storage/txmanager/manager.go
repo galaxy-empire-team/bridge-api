@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 
 	"github.com/galaxy-empire-team/bridge-api/internal/db"
+	missionservice "github.com/galaxy-empire-team/bridge-api/internal/service/mission"
 	planetservice "github.com/galaxy-empire-team/bridge-api/internal/service/planet"
 )
 
@@ -24,6 +25,17 @@ func New(connPool *db.ConnPool) *TxManager {
 func (m *TxManager) ExecPlanetTx(
 	ctx context.Context,
 	handler func(ctx context.Context, storages planetservice.TxStorages) error,
+) error {
+	return m.exec(ctx, func(tx pgx.Tx) error {
+		return handler(ctx, newStorageSet(tx))
+	})
+}
+
+// ExecMissionTx implemets methods required by mission service. I decided to copy func for each service
+// insted of making factories or use empty interfaces.
+func (m *TxManager) ExecMissionTx(
+	ctx context.Context,
+	handler func(ctx context.Context, storages missionservice.TxStorages) error,
 ) error {
 	return m.exec(ctx, func(tx pgx.Tx) error {
 		return handler(ctx, newStorageSet(tx))

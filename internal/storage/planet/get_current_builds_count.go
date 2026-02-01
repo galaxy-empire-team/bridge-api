@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (r *PlanetStorage) GetCurrentintBuildsCount(ctx context.Context, planetID uuid.UUID) (uint8, error) {
+func (r *PlanetStorage) GetCurrentBuildsCount(ctx context.Context, planetID uuid.UUID) (uint8, error) {
 	const getResourcesQuery = `
 		SELECT count(id)
 		FROM session_beta.building_events

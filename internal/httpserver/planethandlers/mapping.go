@@ -16,9 +16,9 @@ func toTransportPlanet(p models.Planet) GetPlanetResponse {
 
 	return GetPlanetResponse{
 		PlanetID: p.ID,
-		X:        p.Location.X,
-		Y:        p.Location.Y,
-		Z:        p.Location.Z,
+		X:        p.Coordinates.X,
+		Y:        p.Coordinates.Y,
+		Z:        p.Coordinates.Z,
 		HasMoon:  p.HasMoon,
 		Resource: PlanetResources{
 			Metal:   p.Resources.Metal,

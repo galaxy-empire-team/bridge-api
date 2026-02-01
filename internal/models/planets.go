@@ -4,13 +4,16 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
+	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
 type Planet struct {
 	ID          uuid.UUID
-	Location    Location
+	UserID      uuid.UUID
+	Coordinates Coordinates
 	Resources   Resources
-	Buildings   map[BuildingType]BuildingInfo
+	Buildings   map[consts.BuildingType]BuildingInfo
 	HasMoon     bool
 	IsCapitol   bool
 	ColonizedAt time.Time
@@ -24,7 +27,7 @@ type Resources struct {
 	UpdatedAt time.Time
 }
 
-type Location struct {
+type Coordinates struct {
 	X uint8
 	Y uint8
 	Z uint8

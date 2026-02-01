@@ -5,10 +5,11 @@ import (
 	"fmt"
 
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
 // GetBuildingStats retrieves mine infromation from building stats table: (level, it's production and costs)
-func (s *PlanetStorage) GetBuildingStats(ctx context.Context, BuildingType models.BuildingType, level uint8) (models.BuildingStats, error) {
+func (s *PlanetStorage) GetBuildingStats(ctx context.Context, BuildingType consts.BuildingType, level uint8) (models.BuildingStats, error) {
 	const getMineStatQuery = `
 		SELECT 
 			building_type, 

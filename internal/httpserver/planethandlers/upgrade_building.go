@@ -45,7 +45,7 @@ func handleUpgradeBuildingError(c *gin.Context, err error) {
 		c.JSON(http.StatusConflict, ErrorResponse{
 			Err: "building has reached max level",
 		})
-	case errors.Is(err, models.ErrNotEngoughResources):
+	case errors.Is(err, models.ErrNotEnoughResources):
 		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
 			Err: "not enough resources to upgrade building",
 		})
@@ -55,7 +55,7 @@ func handleUpgradeBuildingError(c *gin.Context, err error) {
 		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
-			Err: "internal server error" + err.Error(),
+			Err: "internal server error",
 		})
 	}
 }

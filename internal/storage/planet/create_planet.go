@@ -12,7 +12,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
-func (r *PlanetStorage) CreatePlanet(ctx context.Context, userID uuid.UUID, planet models.Planet) error {
+func (r *PlanetStorage) CreatePlanet(ctx context.Context, planet models.Planet) error {
 	tx, err := r.DB.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("pool.Begin(): %w", err)
@@ -34,19 +34,16 @@ func (r *PlanetStorage) CreatePlanet(ctx context.Context, userID uuid.UUID, plan
 		err = fmt.Errorf("tx.Rollback(): %w", rollbackErr)
 	}()
 
-	err = r.createPlanetRow(ctx, tx, userID, planet)
+	planetToColonize := fromPlanetModel(planet)
+
+	err = r.createPlanetRow(ctx, tx, planetToColonize)
 	if err != nil {
 		return fmt.Errorf("createPlanet(): %w", err)
 	}
 
-	err = r.createResourcesRow(ctx, tx, planet.ID)
+	err = r.createResourcesRow(ctx, tx, planetToColonize.ID)
 	if err != nil {
 		return fmt.Errorf("createResources(): %w", err)
-	}
-
-	err = r.createBuildingsRows(ctx, tx, planet)
-	if err != nil {
-		return fmt.Errorf("createBuildings(): %w", err)
 	}
 
 	err = tx.Commit(ctx)
@@ -57,7 +54,7 @@ func (r *PlanetStorage) CreatePlanet(ctx context.Context, userID uuid.UUID, plan
 	return nil
 }
 
-func (r *PlanetStorage) createPlanetRow(ctx context.Context, tx pgx.Tx, userID uuid.UUID, planet models.Planet) error {
+func (r *PlanetStorage) createPlanetRow(ctx context.Context, tx pgx.Tx, planet planetToColonize) error {
 	const createPlanetQuery = `
 		INSERT INTO session_beta.planets (
 			id,
@@ -84,10 +81,10 @@ func (r *PlanetStorage) createPlanetRow(ctx context.Context, tx pgx.Tx, userID u
 		ctx,
 		createPlanetQuery,
 		planet.ID,
-		userID,
-		planet.Location.X,
-		planet.Location.Y,
-		planet.Location.Z,
+		planet.UserID,
+		planet.Coordinates.X,
+		planet.Coordinates.Y,
+		planet.Coordinates.Z,
 		planet.HasMoon,
 		planet.IsCapitol,
 	)
@@ -134,47 +131,6 @@ func (r *PlanetStorage) createResourcesRow(ctx context.Context, tx pgx.Tx, plane
 	)
 	if err != nil {
 		return fmt.Errorf("DB.Pool.Exec(): %w", err)
-	}
-
-	return nil
-}
-
-func (r *PlanetStorage) createBuildingsRows(ctx context.Context, tx pgx.Tx, planet models.Planet) error {
-	const createBuildingQuery = `
-		INSERT INTO session_beta.planet_buildings (
-			planet_id,
-			building_id,
-			updated_at,
-			finished_at
-		) VALUES (
-			$1,    --- planet.ID
-			( SELECT id FROM session_beta.buildings WHERE building_type = $2 AND level = 0 ), --- building_id
-			NOW(),  --- updated_at
-			NULL	--- finished_at
-		);
-	`
-
-	batch := &pgx.Batch{}
-	for buildingType := range planet.Buildings {
-		batch.Queue(
-			createBuildingQuery,
-			planet.ID,
-			buildingType,
-		)
-	}
-
-	batchResults := tx.SendBatch(ctx, batch)
-	defer batchResults.Close() //nolint:errcheck
-
-	for i := 0; i < batch.Len(); i++ {
-		_, err := batchResults.Exec()
-		if err != nil {
-			return fmt.Errorf("DB.Pool.Exec(): %w", err)
-		}
-	}
-
-	if err := batchResults.Close(); err != nil {
-		return fmt.Errorf("batchResults.Close(): %w", err)
 	}
 
 	return nil

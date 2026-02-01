@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/galaxy-empire-team/bridge-api/internal/models"
-
 	"github.com/google/uuid"
+
+	"github.com/galaxy-empire-team/bridge-api/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
 // GetBuildsInfo retrieves mine infromation from the target planet's buildings
-func (s *PlanetStorage) GetBuildingsInfo(ctx context.Context, planetID uuid.UUID, BuildingTypes []models.BuildingType) (map[models.BuildingType]models.BuildingInfo, error) {
+func (s *PlanetStorage) GetBuildingsInfo(ctx context.Context, planetID uuid.UUID, BuildingTypes []consts.BuildingType) (map[consts.BuildingType]models.BuildingInfo, error) {
 	const getMineInfoQuery = `
 		SELECT 
 			b.level,
@@ -32,7 +33,7 @@ func (s *PlanetStorage) GetBuildingsInfo(ctx context.Context, planetID uuid.UUID
 
 	var updatedAt time.Time
 	var finishedAt *time.Time
-	buildingsInfo := make(map[models.BuildingType]models.BuildingInfo)
+	buildingsInfo := make(map[consts.BuildingType]models.BuildingInfo)
 	for rows.Next() {
 		var buildingInfo models.BuildingInfo
 		err = rows.Scan(

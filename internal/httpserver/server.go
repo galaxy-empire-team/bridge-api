@@ -26,6 +26,8 @@ func New(logger *zap.Logger) *HttpServer {
 
 	server := gin.New()
 
+	server.Use(gin.Recovery())
+
 	server.Use(func(c *gin.Context) {
 		start := time.Now()
 
