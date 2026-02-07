@@ -43,7 +43,7 @@ func handleColonizeCapitolError(c *gin.Context, err error) {
 		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
-			Err: "internal server error",
+			Err: err.Error(),
 		})
 	}
 }

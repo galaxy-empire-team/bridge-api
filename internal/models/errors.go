@@ -16,6 +16,8 @@ var (
 	ErrNotEnoughResources            = errors.New("not enough resources to upgrade building")
 	ErrEventIsAlreadyScheduled       = errors.New("event is already scheduled")
 	ErrTooManyBuildingsInProgress    = errors.New("too many buildings are already in progress")
+	ErrNoPlanetsFound                = errors.New("no planets found for user")
+	ErrPlanetNotFound                = errors.New("planet not found")
 
 	// Mission errors
 	ErrColonizePlanetAlreadyExists = errors.New("planet already exists at the target coordinates")

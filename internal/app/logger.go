@@ -23,7 +23,7 @@ func newLogger(cfg config.App) (*zap.Logger, error) {
 		Level:             level,
 		Development:       false,
 		DisableCaller:     true,
-		DisableStacktrace: false,
+		DisableStacktrace: true,
 		Sampling:          nil,
 		Encoding:          cfg.LogFormat,
 		EncoderConfig:     encoderCfg,

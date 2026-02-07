@@ -9,7 +9,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
-func GetCapitol(planetService PlanetService) func(c *gin.Context) {
+func GetAllUserPlanets(planetService PlanetService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var req UserIDRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
@@ -19,21 +19,21 @@ func GetCapitol(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		userCapitolPlanet, err := planetService.GetCapitol(c.Request.Context(), req.UserID)
+		userPlanets, err := planetService.GetAllUserPlanets(c.Request.Context(), req.UserID)
 		if err != nil {
-			handleGetCapitolError(c, err)
+			handleGetAllPlanetsError(c, err)
 			return
 		}
 
-		c.JSON(http.StatusOK, toTransportPlanet(userCapitolPlanet))
+		c.JSON(http.StatusOK, toTransportPlanets(userPlanets))
 	}
 }
 
-func handleGetCapitolError(c *gin.Context, err error) {
+func handleGetAllPlanetsError(c *gin.Context, err error) {
 	switch {
-	case errors.Is(err, models.ErrCapitolNotFound):
+	case errors.Is(err, models.ErrNoPlanetsFound):
 		c.JSON(http.StatusNotFound, ErrorResponse{
-			Err: "capitol planet for user not found",
+			Err: "no planets found for user",
 		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{

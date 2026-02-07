@@ -14,6 +14,7 @@ import (
 // recalcResources recalculates the resources of a planet based on the time since the last update.
 // Recalcs using time.Now().UTC(). Use this before any operation that changes resources.
 func (s *Service) recalcResources(ctx context.Context, planetID uuid.UUID) error {
+	fmt.Println(planetID)
 	return s.recalcResourcesWithUpdatedTime(ctx, planetID, time.Now().UTC())
 }
 
@@ -31,12 +32,15 @@ func (s *Service) recalcResourcesWithUpdatedTime(ctx context.Context, planetID u
 			return fmt.Errorf("planetRepo.GetResourcesForUpdate(): %w", err)
 		}
 
-		millisecondsSinceLastUpdate := uint64(updatedAt.Sub(resources.UpdatedAt).Milliseconds())
+		millisecondsSinceLastUpdate := updatedAt.Sub(resources.UpdatedAt).Milliseconds()
+		if millisecondsSinceLastUpdate <= 0 {
+			return nil
+		}
 
 		updatedResources := models.Resources{
-			Metal:     resources.Metal + millisecondsSinceLastUpdate*planetBuildingsInfo[consts.BuildingTypeMetalMine].ProductionS/1000,
-			Crystal:   resources.Crystal + millisecondsSinceLastUpdate*planetBuildingsInfo[consts.BuildingTypeCrystalMine].ProductionS/1000,
-			Gas:       resources.Gas + millisecondsSinceLastUpdate*planetBuildingsInfo[consts.BuildingTypeGasMine].ProductionS/1000,
+			Metal:     resources.Metal + uint64(millisecondsSinceLastUpdate)*planetBuildingsInfo[consts.BuildingTypeMetalMine].ProductionS/1000,
+			Crystal:   resources.Crystal + uint64(millisecondsSinceLastUpdate)*planetBuildingsInfo[consts.BuildingTypeCrystalMine].ProductionS/1000,
+			Gas:       resources.Gas + uint64(millisecondsSinceLastUpdate)*planetBuildingsInfo[consts.BuildingTypeGasMine].ProductionS/1000,
 			UpdatedAt: updatedAt,
 		}
 

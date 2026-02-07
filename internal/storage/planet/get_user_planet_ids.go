@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/galaxy-empire-team/bridge-api/internal/models"
-
 	"github.com/google/uuid"
+
+	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 func (r *PlanetStorage) GetUserPlanetIDs(ctx context.Context, userID uuid.UUID) ([]models.PlanetIDWithCapitol, error) {

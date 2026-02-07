@@ -31,6 +31,7 @@ type planetStorage interface {
 	GetBuildingsInfo(ctx context.Context, planetID uuid.UUID, BuildingTypes []consts.BuildingType) (map[consts.BuildingType]models.BuildingInfo, error)
 	GetBuildingStats(ctx context.Context, BuildingType consts.BuildingType, level uint8) (models.BuildingStats, error)
 	GetCurrentBuildsCount(ctx context.Context, planetID uuid.UUID) (uint8, error)
+	GetAllUserPlanets(ctx context.Context, userID uuid.UUID) ([]models.Planet, error)
 }
 
 // Separate storage methods that executes inside a transaction

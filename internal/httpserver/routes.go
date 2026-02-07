@@ -17,7 +17,10 @@ func (hs *HttpServer) RegisterRoutes(
 	hs.apiRouter.POST("/user/create", userhandlers.CreateUser(userService))
 
 	// ----- Planet Routes -----
+	// Rewrite post > get after authorization
+	hs.apiRouter.POST("/planet/get", planethandlers.GetPlanet(planetService))
 	hs.apiRouter.POST("/planet/capitol", planethandlers.GetCapitol(planetService))
+	hs.apiRouter.POST("/planet/all", planethandlers.GetAllUserPlanets(planetService))
 	hs.apiRouter.POST("/planet/capitol/colonize", planethandlers.CreateCapitol(planetService))
 
 	hs.apiRouter.POST("/planet/building/upgrade", planethandlers.UpgradeBuilding(planetService))

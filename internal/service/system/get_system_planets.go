@@ -11,6 +11,6 @@ func (s *Service) GetSystemPlanets(ctx context.Context, system models.System) (m
 	if err != nil {
 		return models.SystemPlanets{}, err
 	}
-	
+
 	return planets, nil
 }

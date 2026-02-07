@@ -20,7 +20,7 @@ func toTransportPlanet(p models.Planet) GetPlanetResponse {
 		Y:        p.Coordinates.Y,
 		Z:        p.Coordinates.Z,
 		HasMoon:  p.HasMoon,
-		Resource: PlanetResources{
+		Resources: PlanetResources{
 			Metal:   p.Resources.Metal,
 			Crystal: p.Resources.Crystal,
 			Gas:     p.Resources.Gas,
@@ -41,4 +41,28 @@ func toTransportBuildingStats(bs models.BuildingStats) GetBuildStatsResponse {
 		Bonuses:              bs.Bonuses,
 		UpgradeTimeInSeconds: bs.UpgradeTimeS,
 	}
+}
+
+func toTransportPlanets(planets []models.Planet) UserPlanetsResponse {
+	resp := UserPlanetsResponse{
+		Planets: make([]GetShortPlanet, 0, len(planets)),
+	}
+
+	for _, p := range planets {
+		resp.Planets = append(resp.Planets, GetShortPlanet{
+			PlanetID:  p.ID,
+			X:         p.Coordinates.X,
+			Y:         p.Coordinates.Y,
+			Z:         p.Coordinates.Z,
+			IsCapitol: p.IsCapitol,
+			Resources: PlanetResources{
+				Metal:   p.Resources.Metal,
+				Crystal: p.Resources.Crystal,
+				Gas:     p.Resources.Gas,
+			},
+			ColonizedAt: p.ColonizedAt,
+		})
+	}
+
+	return resp
 }

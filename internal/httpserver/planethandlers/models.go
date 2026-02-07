@@ -11,6 +11,10 @@ type UserIDRequest struct {
 	UserID uuid.UUID `json:"userID"`
 }
 
+type PlanetIDRequest struct {
+	PlanetID uuid.UUID `json:"planetID"`
+}
+
 type UpgradeBuildingRequest struct {
 	PlanetID     uuid.UUID `json:"planetID"`
 	BuildingType string    `json:"buildingType"`
@@ -26,7 +30,7 @@ type GetPlanetResponse struct {
 	X         uint8                   `json:"x"`
 	Y         uint8                   `json:"y"`
 	Z         uint8                   `json:"z"`
-	Resource  PlanetResources         `json:"resources"`
+	Resources PlanetResources         `json:"resources"`
 	Buildings map[string]BuildingInfo `json:"buildings"`
 	IsCapitol bool                    `json:"isCapitol"`
 	HasMoon   bool                    `json:"hasMoon"`
@@ -59,4 +63,19 @@ type PlanetResources struct {
 	Metal   uint64 `json:"metal"`
 	Crystal uint64 `json:"crystal"`
 	Gas     uint64 `json:"gas"`
+}
+
+type UserPlanetsResponse struct {
+	Planets []GetShortPlanet `json:"planets"`
+}
+
+type GetShortPlanet struct {
+	PlanetID    uuid.UUID       `json:"planetID"`
+	X           uint8           `json:"x"`
+	Y           uint8           `json:"y"`
+	Z           uint8           `json:"z"`
+	Resources   PlanetResources `json:"resources"`
+	IsCapitol   bool            `json:"isCapitol"`
+	HasMoon     bool            `json:"hasMoon"`
+	ColonizedAt time.Time       `json:"colonizedAt"`
 }

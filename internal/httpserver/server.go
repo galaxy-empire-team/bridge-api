@@ -1,6 +1,7 @@
 package httpserver
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -19,6 +20,16 @@ type HttpServer struct {
 	apiRouter *gin.RouterGroup
 
 	logger *zap.Logger
+}
+
+type bodyWriter struct {
+	gin.ResponseWriter
+	buf *bytes.Buffer
+}
+
+func (w *bodyWriter) Write(b []byte) (int, error) {
+	w.buf.Write(b)
+	return w.ResponseWriter.Write(b)
 }
 
 func New(logger *zap.Logger) *HttpServer {
@@ -41,6 +52,27 @@ func New(logger *zap.Logger) *HttpServer {
 			zap.Int("status", c.Writer.Status()),
 			zap.Int64("μs", time.Since(start).Microseconds()),
 		)
+	})
+
+	server.Use(func(c *gin.Context) {
+		buf := &bytes.Buffer{}
+		writer := &bodyWriter{
+			ResponseWriter: c.Writer,
+			buf:            buf,
+		}
+
+		c.Writer = writer
+
+		c.Next()
+
+		status := c.Writer.Status()
+		if status >= 500 {
+			logger.Error("error",
+				zap.String("method", c.Request.Method),
+				zap.Int("status", status),
+				zap.String("body", buf.String()),
+			)
+		}
 	})
 
 	return &HttpServer{
