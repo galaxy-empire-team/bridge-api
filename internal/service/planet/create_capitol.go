@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
 func (s *Service) CreateCapitol(ctx context.Context, userID uuid.UUID) error {
@@ -16,9 +17,9 @@ func (s *Service) CreateCapitol(ctx context.Context, userID uuid.UUID) error {
 	}
 
 	generatedLocation := models.Coordinates{
-		X: uint8(s.randomGenerator.Uint32() % galaxyCount),
-		Y: uint8(s.randomGenerator.Uint32() % systemInGalaxyCount),
-		Z: uint8(s.randomGenerator.Uint32() % planetsInSystemCount),
+		X: uint8(s.randomGenerator.Uint32() % consts.GalaxyCount),
+		Y: uint8(s.randomGenerator.Uint32() % consts.SystemInGalaxyCount),
+		Z: uint8(s.randomGenerator.Uint32() % consts.PlanetsInSystemCount),
 	}
 	planetToColonize := models.Planet{
 		ID:          planetID,

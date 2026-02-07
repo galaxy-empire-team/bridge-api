@@ -9,28 +9,28 @@ import (
 )
 
 type BuildEvent struct {
-	PlanetID     uuid.UUID
-	BuildingType consts.BuildingType
-	StartedAt    time.Time
-	FinishedAt   time.Time
+	PlanetID   uuid.UUID
+	BuildingID consts.BuildingID
+	StartedAt  time.Time
+	FinishedAt time.Time
 }
 
 type BuildingStats struct {
-	Level        uint8
+	Level        consts.BuildingLevel
 	Type         consts.BuildingType
 	MetalCost    uint64
 	CrystalCost  uint64
 	GasCost      uint64
 	ProductionS  uint64
-	Bonuses      *string
-	UpgradeTimeS uint16
+	Bonuses      map[string]float64
+	UpgradeTimeS uint64
 }
 
 type BuildingInfo struct {
-	Level       uint8
+	Level       consts.BuildingLevel
 	Type        consts.BuildingType
 	ProductionS uint64
-	Bonuses     *string
+	Bonuses     map[string]float64
 	UpdatedAt   time.Time
 	FinishedAt  time.Time
 }

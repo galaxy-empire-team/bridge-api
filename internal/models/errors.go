@@ -13,11 +13,13 @@ var (
 	ErrBuildingMaxLevelReached       = errors.New("building has reached max level")
 	ErrBuildingInvalidLevel          = errors.New("invalid building level")
 	ErrBuildTypeInvalid              = errors.New("invalid building type")
+	ErrBuildingNotFound              = errors.New("building not found on planet")
 	ErrNotEnoughResources            = errors.New("not enough resources to upgrade building")
 	ErrEventIsAlreadyScheduled       = errors.New("event is already scheduled")
 	ErrTooManyBuildingsInProgress    = errors.New("too many buildings are already in progress")
 	ErrNoPlanetsFound                = errors.New("no planets found for user")
 	ErrPlanetNotFound                = errors.New("planet not found")
+	ErrBuildingAlreadyExists         = errors.New("building already exists on planet")
 
 	// Mission errors
 	ErrColonizePlanetAlreadyExists = errors.New("planet already exists at the target coordinates")

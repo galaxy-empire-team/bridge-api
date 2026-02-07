@@ -16,6 +16,7 @@ import (
 	systemstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/system"
 	"github.com/galaxy-empire-team/bridge-api/internal/storage/txmanager"
 	userstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/user"
+	"github.com/galaxy-empire-team/bridge-api/pkg/registry"
 )
 
 func main() {
@@ -48,9 +49,15 @@ func run() error {
 	planetStorage := planetstorage.New(db)
 	systemStorage := systemstorage.New(db)
 
+	// initialize registry
+	reg, err := registry.New(ctx, db.Pool)
+	if err != nil {
+		return fmt.Errorf("registry.New(): %w", err)
+	}
+
 	// initialize services
 	userService := userservice.New(userStorage)
-	planetService := planetservice.New(txManager, planetStorage)
+	planetService := planetservice.New(txManager, planetStorage, reg)
 	missionService := missionservice.New(txManager, planetStorage)
 	systemService := systemservice.New(systemStorage)
 

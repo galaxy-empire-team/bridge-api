@@ -58,15 +58,19 @@ func (s *Service) getMinesInfo(ctx context.Context, planetID uuid.UUID) (map[con
 	if err != nil {
 		return nil, fmt.Errorf("planetRepo.GetBuildingsInfo(): %w", err)
 	}
-
+	
 	// If mines are not build yet, initialize them with default values
-	// TODO: get values from db
 	for _, mineType := range consts.GetMineTypes() {
 		if _, exists := mines[mineType]; !exists {
+			stat, err := s.registry.GetBuildingZeroLvlStats(mineType)
+			if err != nil {
+				return nil, fmt.Errorf("registry.GetBuildingZeroLvlStats(): %w", err)
+			}
+
 			mines[mineType] = models.BuildingInfo{
-				Type:        mineType,
-				Level:       defaultLvl,
-				ProductionS: defaultProductionS,
+				Type:        stat.Type,
+				Level:       stat.Level,
+				ProductionS: stat.ProductionS,
 			}
 		}
 	}

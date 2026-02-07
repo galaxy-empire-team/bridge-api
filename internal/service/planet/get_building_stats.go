@@ -13,14 +13,14 @@ func (s *Service) GetBuildingStats(ctx context.Context, buildingType string, lev
 		return models.BuildingStats{}, models.ErrBuildTypeInvalid
 	}
 
-	if level > maxBuildingLvl {
+	if level > consts.MaxBuildingLvl {
 		return models.BuildingStats{}, models.ErrBuildingInvalidLevel
 	}
 
-	buildingStats, err := s.planetStorage.GetBuildingStats(ctx, consts.BuildingType(buildingType), level)
+	buildingStats, err := s.registry.GetBuildingStatsByType(consts.BuildingType(buildingType), consts.BuildingLevel(level))
 	if err != nil {
 		return models.BuildingStats{}, fmt.Errorf("planetRepo.GetBuildingStats(): %w", err)
 	}
 
-	return buildingStats, nil
+	return toModelBuildingStats(buildingStats), nil
 }

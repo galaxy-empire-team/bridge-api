@@ -11,24 +11,28 @@ func (s *PlanetStorage) CreateBuildingEvent(ctx context.Context, buildEvent mode
 	const setBuildLvlQuery = `
 		INSERT INTO session_beta.building_events (
 			planet_id,
-			build_type, 
+			building_id, 
 			started_at,
 			finished_at
 		) VALUES (
 			$1,    -- planet_id
-			$2,    -- build_type
+			$2,    -- building_id
 			NOW(), -- started_at
 			$3	   -- finished_at
-		)  
+		) ON CONFLICT (planet_id, building_id) DO NOTHING;
 		`
 
-	_, err := s.DB.Exec(ctx, setBuildLvlQuery,
+	cmd, err := s.DB.Exec(ctx, setBuildLvlQuery,
 		buildEvent.PlanetID,
-		buildEvent.BuildingType,
+		buildEvent.BuildingID,
 		buildEvent.FinishedAt,
 	)
 	if err != nil {
-		return fmt.Errorf("DB.Exec(): %w", models.ErrEventIsAlreadyScheduled)
+		return fmt.Errorf("DB.Exec(): %w", err)
+	}
+
+	if cmd.RowsAffected() == 0 {
+		return models.ErrEventIsAlreadyScheduled
 	}
 
 	return nil

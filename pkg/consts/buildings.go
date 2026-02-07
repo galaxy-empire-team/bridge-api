@@ -1,5 +1,7 @@
 package consts
 
+type BuildingID uint8
+type BuildingLevel uint8
 type BuildingType string
 
 const (

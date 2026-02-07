@@ -3,42 +3,32 @@ package planet
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 
-	"github.com/galaxy-empire-team/bridge-api/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
 // SetFinishedBuildingTime updates updatedAt and finishedAt times. This denormailization
 // is needed to optimize common planet queries.
-func (r *PlanetStorage) SetFinishedBuildingTime(ctx context.Context, planetID uuid.UUID, buildingInfo models.BuildingInfo) error {
+func (r *PlanetStorage) SetFinishedBuildingTime(ctx context.Context, planetID uuid.UUID, buildinID consts.BuildingID, finishedAt time.Time) error {
 	const setFinishedBuildingQuery = `
 		UPDATE session_beta.planet_buildings
 		SET 
-			updated_at  = $4,
-			finished_at = $5
+			updated_at  = Now(),
+			finished_at = $3
 		WHERE planet_id = $1 
 		AND 
-			building_id = (
-				SELECT id FROM session_beta.buildings 
-				WHERE building_type = $2 AND level = $3
-			);
+			building_id = $2;
 	`
 
-	finishedBuilding := finishedBuilding{
-		Type:       string(buildingInfo.Type),
-		Level:      buildingInfo.Level,
-		UpdatedAt:  buildingInfo.UpdatedAt,
-		FinishedAt: buildingInfo.FinishedAt,
-	}
 	_, err := r.DB.Exec(
 		ctx,
 		setFinishedBuildingQuery,
 		planetID,
-		finishedBuilding.Type,
-		finishedBuilding.Level,
-		finishedBuilding.UpdatedAt,
-		finishedBuilding.FinishedAt,
+		buildinID,
+		finishedAt,
 	)
 	if err != nil {
 		return fmt.Errorf("DB.Exec(): %w", err)

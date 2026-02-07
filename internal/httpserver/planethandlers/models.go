@@ -37,14 +37,14 @@ type GetPlanetResponse struct {
 }
 
 type GetBuildStatsResponse struct {
-	Type                 string  `json:"type"`
-	Level                uint8   `json:"level"`
-	MetalCost            uint64  `json:"metalCost"`
-	CrystalCost          uint64  `json:"crystalCost"`
-	GasCost              uint64  `json:"gasCost"`
-	ProductionS          uint64  `json:"productionPerSecond"`
-	Bonuses              *string `json:"bonuses,omitempty"`
-	UpgradeTimeInSeconds uint16  `json:"upgradeTimeInSeconds"`
+	Type                 string             `json:"type"`
+	Level                uint8              `json:"level"`
+	MetalCost            uint64             `json:"metalCost"`
+	CrystalCost          uint64             `json:"crystalCost"`
+	GasCost              uint64             `json:"gasCost"`
+	ProductionS          uint64             `json:"productionPerSecond"`
+	Bonuses              map[string]float64 `json:"bonuses,omitempty"`
+	UpgradeTimeInSeconds uint64             `json:"upgradeTimeInSeconds"`
 }
 
 type ErrorResponse struct {
@@ -52,11 +52,11 @@ type ErrorResponse struct {
 }
 
 type BuildingInfo struct {
-	Level       uint8     `json:"level"`
-	ProductionS uint64    `json:"productionPerSecond"`
-	Bonuses     *string   `json:"bonuses,omitempty"`
-	UpdatedAt   time.Time `json:"updatedAt,omitempty"`
-	FinishedAt  time.Time `json:"finishedAt,omitempty"`
+	Level       uint8              `json:"level"`
+	ProductionS uint64             `json:"productionPerSecond"`
+	Bonuses     map[string]float64 `json:"bonuses,omitempty"`
+	UpdatedAt   time.Time          `json:"updatedAt,omitempty"`
+	FinishedAt  time.Time          `json:"finishedAt,omitempty"`
 }
 
 type PlanetResources struct {
