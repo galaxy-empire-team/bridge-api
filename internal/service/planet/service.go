@@ -20,6 +20,7 @@ type planetStorage interface {
 	GetBuildingsInfo(ctx context.Context, planetID uuid.UUID, BuildingTypes []consts.BuildingType) (map[consts.BuildingType]models.BuildingInfo, error)
 	GetCurrentBuildsCount(ctx context.Context, planetID uuid.UUID) (uint8, error)
 	GetAllUserPlanets(ctx context.Context, userID uuid.UUID) ([]models.Planet, error)
+	GetFleetCount(ctx context.Context, planetID uuid.UUID) ([]models.PlanetFleetUnitCount, error)
 }
 
 // Separate storage methods that executes inside a transaction
@@ -42,6 +43,7 @@ type registryProvider interface {
 	GetBuildingStatsByID(buildingID consts.BuildingID) (registry.BuildingStats, error)
 	GetBuildingStatsByType(buildingType consts.BuildingType, level consts.BuildingLevel) (registry.BuildingStats, error)
 	GetBuildingNextLvlStats(buildingID consts.BuildingID) (registry.BuildingStats, error)
+	GetFleetUnitStatsByID(fleetUnitID consts.FleetUnitID) (registry.FleetUnitStats, error)
 }
 
 type Service struct {

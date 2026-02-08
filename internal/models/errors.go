@@ -19,6 +19,7 @@ var (
 	ErrTooManyBuildingsInProgress    = errors.New("too many buildings are already in progress")
 	ErrNoPlanetsFound                = errors.New("no planets found for user")
 	ErrPlanetNotFound                = errors.New("planet not found")
+	ErrFleetNotFound                 = errors.New("fleet not found")
 	ErrBuildingAlreadyExists         = errors.New("building already exists on planet")
 
 	// Mission errors

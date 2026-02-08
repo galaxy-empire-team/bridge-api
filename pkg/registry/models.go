@@ -15,3 +15,16 @@ type BuildingStats struct {
 	Bonuses      map[string]float64
 	UpgradeTimeS uint64
 }
+
+type FleetUnitStats struct {
+	ID            consts.FleetUnitID
+	Type          consts.FleetUnitType
+	Attack        uint64
+	Defense       uint64
+	Speed         uint64
+	MetalCost     uint64
+	CrystalCost   uint64
+	GasCost       uint64
+	CargoCapacity uint64
+	BuildTimeSec  uint64
+}

@@ -79,3 +79,12 @@ type GetShortPlanet struct {
 	HasMoon     bool            `json:"hasMoon"`
 	ColonizedAt time.Time       `json:"colonizedAt"`
 }
+
+type FleetPlanetsResponse struct {
+	FleetUnits []FleetUnitCount `json:"fleetUnits"`
+}
+
+type FleetUnitCount struct {
+	Type  string `json:"type"`
+	Count uint64 `json:"count"`
+}

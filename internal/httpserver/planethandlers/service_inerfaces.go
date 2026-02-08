@@ -15,4 +15,5 @@ type PlanetService interface {
 	GetBuildingStats(ctx context.Context, buildingType string, level uint8) (models.BuildingStats, error)
 	GetAllUserPlanets(ctx context.Context, userID uuid.UUID) ([]models.Planet, error)
 	GetPlanet(ctx context.Context, planetID uuid.UUID) (models.Planet, error)
+	GetFleet(ctx context.Context, planetID uuid.UUID) ([]models.PlanetFleetUnit, error)
 }

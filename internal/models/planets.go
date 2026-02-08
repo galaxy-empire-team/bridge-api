@@ -37,3 +37,27 @@ type PlanetIDWithCapitol struct {
 	PlanetID  uuid.UUID
 	IsCapitol bool
 }
+
+type PlanetFleetUnit struct {
+	ID    consts.FleetUnitID
+	Stats PlanetFleetStats
+	Count uint64
+}
+
+type PlanetFleetStats struct {
+	Type          consts.FleetUnitType
+	Attack        uint64
+	Defense       uint64
+	Speed         uint64
+	MetalCost     uint64
+	CrystalCost   uint64
+	GasCost       uint64
+	CargoCapacity uint64
+	BuildTimeSec  uint64
+	Count         uint64
+}
+
+type PlanetFleetUnitCount struct {
+	ID    consts.FleetUnitID
+	Count uint64
+}

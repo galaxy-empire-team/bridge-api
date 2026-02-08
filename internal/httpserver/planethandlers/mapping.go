@@ -66,3 +66,18 @@ func toTransportPlanets(planets []models.Planet) UserPlanetsResponse {
 
 	return resp
 }
+
+func toTransportFleet(fleet []models.PlanetFleetUnit) FleetPlanetsResponse {
+	resp := FleetPlanetsResponse{
+		FleetUnits: make([]FleetUnitCount, 0, len(fleet)),
+	}
+
+	for _, p := range fleet {
+		resp.FleetUnits = append(resp.FleetUnits, FleetUnitCount{
+			Type:  string(p.Stats.Type),
+			Count: p.Count,
+		})
+	}
+
+	return resp
+}
