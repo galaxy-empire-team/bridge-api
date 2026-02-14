@@ -1,6 +1,11 @@
 package consts
 
 type BuildingID uint8
+
+func (b BuildingID) ToUint8() uint8 {
+	return uint8(b)
+}
+
 type BuildingLevel uint8
 type BuildingType string
 

@@ -2,6 +2,7 @@ package mission
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
@@ -16,6 +17,8 @@ func (s *MissionStorage) CreateMissionEvent(ctx context.Context, missionEvent mo
 			planet_to_x, 
 			planet_to_y, 
 			planet_to_z, 
+			fleet,
+			is_returning,
 			started_at,
 			finished_at
 		) VALUES (
@@ -25,18 +28,27 @@ func (s *MissionStorage) CreateMissionEvent(ctx context.Context, missionEvent mo
 			$4,    -- planet_to_x
 			$5,    -- planet_to_y
 			$6,    -- planet_to_z
-			$7,    -- started_at
-			$8	   -- finished_at
+			$7,    -- fleet
+			$8,    -- is_returning
+			$9,    -- started_at
+			$10	   -- finished_at
 		)  
-		`
+	`
 
-	_, err := s.DB.Exec(ctx, createEventQuery,
+	fleetJson, err := json.Marshal(toFleetUnits(missionEvent.Fleet))
+	if err != nil {
+		return fmt.Errorf("json.Marshal(): %w", err)
+	}
+
+	_, err = s.DB.Exec(ctx, createEventQuery,
 		missionEvent.Type,
 		missionEvent.UserID,
 		missionEvent.PlanetFrom,
 		missionEvent.PlanetTo.X,
 		missionEvent.PlanetTo.Y,
 		missionEvent.PlanetTo.Z,
+		fleetJson,
+		missionEvent.IsReturning,
 		missionEvent.StartedAt,
 		missionEvent.FinishedAt,
 	)

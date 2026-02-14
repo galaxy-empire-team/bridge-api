@@ -58,7 +58,7 @@ func run() error {
 	// initialize services
 	userService := userservice.New(userStorage)
 	planetService := planetservice.New(txManager, planetStorage, reg)
-	missionService := missionservice.New(txManager, planetStorage)
+	missionService := missionservice.New(txManager, planetStorage, reg)
 	systemService := systemservice.New(systemStorage)
 
 	// initialize http server

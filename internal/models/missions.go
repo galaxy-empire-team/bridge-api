@@ -9,10 +9,12 @@ import (
 )
 
 type MissionEvent struct {
-	UserID     uuid.UUID
-	PlanetFrom uuid.UUID
-	PlanetTo   Coordinates
-	Type       consts.MissionType
-	StartedAt  time.Time
-	FinishedAt time.Time
+	UserID      uuid.UUID
+	PlanetFrom  uuid.UUID
+	PlanetTo    Coordinates
+	Type        consts.MissionType
+	Fleet       []PlanetFleetUnitCount
+	IsReturning bool
+	StartedAt   time.Time
+	FinishedAt  time.Time
 }

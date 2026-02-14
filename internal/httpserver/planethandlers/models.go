@@ -81,10 +81,10 @@ type GetShortPlanet struct {
 }
 
 type FleetPlanetsResponse struct {
-	FleetUnits []FleetUnitCount `json:"fleetUnits"`
+	Fleet []FleetUnitCount `json:"fleet"`
 }
 
 type FleetUnitCount struct {
-	Type  string `json:"type"`
+	ID    uint8  `json:"id"`
 	Count uint64 `json:"count"`
 }

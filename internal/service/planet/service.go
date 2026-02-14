@@ -20,7 +20,7 @@ type planetStorage interface {
 	GetBuildingsInfo(ctx context.Context, planetID uuid.UUID, BuildingTypes []consts.BuildingType) (map[consts.BuildingType]models.BuildingInfo, error)
 	GetCurrentBuildsCount(ctx context.Context, planetID uuid.UUID) (uint8, error)
 	GetAllUserPlanets(ctx context.Context, userID uuid.UUID) ([]models.Planet, error)
-	GetFleetCount(ctx context.Context, planetID uuid.UUID) ([]models.PlanetFleetUnitCount, error)
+	GetFleetForUpdate(ctx context.Context, planetID uuid.UUID) ([]models.PlanetFleetUnitCount, error)
 }
 
 // Separate storage methods that executes inside a transaction

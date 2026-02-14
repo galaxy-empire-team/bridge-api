@@ -33,12 +33,13 @@ func (s *Service) Colonize(ctx context.Context, userID uuid.UUID, planetFrom uui
 		startedAt := time.Now().UTC()
 		finishedAt := startedAt
 		colonizeEvent := models.MissionEvent{
-			UserID:     userID,
-			PlanetFrom: planetFrom,
-			PlanetTo:   planetTo,
-			Type:       consts.MissionTypeColonize,
-			StartedAt:  startedAt,
-			FinishedAt: finishedAt,
+			UserID:      userID,
+			PlanetFrom:  planetFrom,
+			PlanetTo:    planetTo,
+			Type:        consts.MissionTypeColonize,
+			IsReturning: false,
+			StartedAt:   startedAt,
+			FinishedAt:  finishedAt,
 		}
 
 		err = storages.CreateMissionEvent(ctx, colonizeEvent)

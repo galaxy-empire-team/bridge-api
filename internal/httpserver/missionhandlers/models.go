@@ -20,3 +20,15 @@ type Coordinates struct {
 type ErrorResponse struct {
 	Err string `json:"err"`
 }
+
+type AttackRequest struct {
+	UserID         uuid.UUID        `json:"userID"`
+	PlanetFrom     uuid.UUID        `json:"planetFrom"`
+	PlanetTo       Coordinates      `json:"planetTo"`
+	FleetUnitCount []FleetUnitCount `json:"fleet"`
+}
+
+type FleetUnitCount struct {
+	ID    uint8  `json:"id"`
+	Count uint64 `json:"count"`
+}

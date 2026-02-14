@@ -24,5 +24,9 @@ var (
 
 	// Mission errors
 	ErrColonizePlanetAlreadyExists = errors.New("planet already exists at the target coordinates")
+	ErrAttackPlanetNotFound        = errors.New("target planet not found")
 	ErrPlanetDoesNotBelongToUser   = errors.New("the planet does not belong to the user")
+	ErrFleetIDNotExists            = errors.New("fleet unit with given ID does not exist")
+	ErrNotEnoughFleetUnits         = errors.New("not enough fleet units on planet")
+	ErrInvalidInput                = errors.New("request fleet has invalid stuct or data")
 )

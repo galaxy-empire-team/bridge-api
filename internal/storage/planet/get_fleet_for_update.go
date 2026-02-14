@@ -9,13 +9,14 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
-func (r *PlanetStorage) GetFleetCount(ctx context.Context, planetID uuid.UUID) ([]models.PlanetFleetUnitCount, error) {
+func (r *PlanetStorage) GetFleetForUpdate(ctx context.Context, planetID uuid.UUID) ([]models.PlanetFleetUnitCount, error) {
 	const getFleetQuery = `
 		SELECT 
 			fleet_id,
 			count 
 		FROM session_beta.planet_fleet 
-		WHERE planet_id = $1;
+		WHERE planet_id = $1
+		FOR UPDATE;
 	`
 
 	rows, err := r.DB.Query(ctx, getFleetQuery, planetID)

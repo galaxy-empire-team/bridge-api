@@ -1,6 +1,11 @@
 package consts
 
 type FleetUnitID uint8
+
+func (b FleetUnitID) ToUint8() uint8 {
+	return uint8(b)
+}
+
 type FleetUnitType string
 
 const (
