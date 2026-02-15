@@ -12,6 +12,7 @@ import (
 	planetservice "github.com/galaxy-empire-team/bridge-api/internal/service/planet"
 	systemservice "github.com/galaxy-empire-team/bridge-api/internal/service/system"
 	userservice "github.com/galaxy-empire-team/bridge-api/internal/service/user"
+	missionstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/mission"
 	planetstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/planet"
 	systemstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/system"
 	"github.com/galaxy-empire-team/bridge-api/internal/storage/txmanager"
@@ -48,6 +49,7 @@ func run() error {
 	userStorage := userstorage.New(db)
 	planetStorage := planetstorage.New(db)
 	systemStorage := systemstorage.New(db)
+	missionStorage := missionstorage.New(db)
 
 	// initialize registry
 	reg, err := registry.New(ctx, db.Pool)
@@ -58,7 +60,7 @@ func run() error {
 	// initialize services
 	userService := userservice.New(userStorage)
 	planetService := planetservice.New(txManager, planetStorage, reg)
-	missionService := missionservice.New(txManager, planetStorage, reg)
+	missionService := missionservice.New(txManager, planetStorage, missionStorage, reg)
 	systemService := systemservice.New(systemStorage)
 
 	// initialize http server

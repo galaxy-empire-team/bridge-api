@@ -13,6 +13,14 @@ func toCoordinatesModel(coordinates Coordinates) models.Coordinates {
 	}
 }
 
+func fromCoordinatesModel(coordinates models.Coordinates) Coordinates {
+	return Coordinates{
+		X: coordinates.X,
+		Y: coordinates.Y,
+		Z: coordinates.Z,
+	}
+}
+
 func toFleetUnits(fleet []FleetUnitCount) []models.PlanetFleetUnitCount {
 	units := make([]models.PlanetFleetUnitCount, 0, len(fleet))
 
@@ -24,4 +32,23 @@ func toFleetUnits(fleet []FleetUnitCount) []models.PlanetFleetUnitCount {
 	}
 
 	return units
+}
+
+func fromUserMissions(userMissions []models.UserMission) UserMissionsResponse {
+	resp := UserMissionsResponse{
+		Missions: make([]Mission, 0, len(userMissions)),
+	}
+
+	for _, m := range userMissions {
+		resp.Missions = append(resp.Missions, Mission{
+			Type:        m.Type,
+			PlanetFrom:  fromCoordinatesModel(m.PlanetFrom),
+			PlanetTo:    fromCoordinatesModel(m.PlanetTo),
+			IsReturning: m.IsReturning,
+			StartedAt:   m.StartedAt,
+			FinishedAt:  m.FinishedAt,
+		})
+	}
+
+	return resp
 }

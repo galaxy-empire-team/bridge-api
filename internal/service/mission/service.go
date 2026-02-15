@@ -14,6 +14,10 @@ type planetStorage interface {
 	CheckPlanetBelongsToUser(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (bool, error)
 }
 
+type missionStorage interface {
+	GetCurrentUserMissions(ctx context.Context, userID uuid.UUID) ([]models.UserMission, error)
+}
+
 type TxStorages interface {
 	// --- planetStorage ---
 	GetFleetForUpdate(ctx context.Context, planetID uuid.UUID) ([]models.PlanetFleetUnitCount, error)
@@ -32,15 +36,17 @@ type registryProvider interface {
 }
 
 type Service struct {
-	txManager     txManager
-	planetStorage planetStorage
-	registry      registryProvider
+	txManager      txManager
+	planetStorage  planetStorage
+	missionStorage missionStorage
+	registry       registryProvider
 }
 
-func New(txManager txManager, planetStorage planetStorage, registry registryProvider) *Service {
+func New(txManager txManager, planetStorage planetStorage, missionStorage missionStorage, registry registryProvider) *Service {
 	return &Service{
-		txManager:     txManager,
-		planetStorage: planetStorage,
-		registry:      registry,
+		txManager:      txManager,
+		planetStorage:  planetStorage,
+		missionStorage: missionStorage,
+		registry:       registry,
 	}
 }

@@ -18,3 +18,12 @@ type MissionEvent struct {
 	StartedAt   time.Time
 	FinishedAt  time.Time
 }
+
+type UserMission struct {
+	Type        string
+	PlanetFrom  Coordinates
+	PlanetTo    Coordinates
+	IsReturning bool
+	StartedAt   time.Time
+	FinishedAt  time.Time
+}

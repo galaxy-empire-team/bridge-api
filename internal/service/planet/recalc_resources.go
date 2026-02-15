@@ -14,7 +14,6 @@ import (
 // recalcResources recalculates the resources of a planet based on the time since the last update.
 // Recalcs using time.Now().UTC(). Use this before any operation that changes resources.
 func (s *Service) recalcResources(ctx context.Context, planetID uuid.UUID) error {
-	fmt.Println(planetID)
 	return s.recalcResourcesWithUpdatedTime(ctx, planetID, time.Now().UTC())
 }
 
