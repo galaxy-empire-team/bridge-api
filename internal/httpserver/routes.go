@@ -18,20 +18,20 @@ func (hs *HttpServer) RegisterRoutes(
 
 	// ----- Planet Routes -----
 	// Rewrite post > get after authorization
-	hs.apiRouter.POST("/planet/get", planethandlers.GetPlanet(planetService))
-	hs.apiRouter.POST("/planet/capitol", planethandlers.GetCapitol(planetService))
-	hs.apiRouter.POST("/planet/all", planethandlers.GetAllUserPlanets(planetService))
+	hs.apiRouter.GET("/planet", planethandlers.GetPlanet(planetService))
+	hs.apiRouter.GET("/planet/capitol", planethandlers.GetCapitol(planetService))
+	hs.apiRouter.GET("/planet/all", planethandlers.GetAllUserPlanets(planetService))
+	hs.apiRouter.GET("/planet/fleet", planethandlers.GetFleet(planetService))
 	hs.apiRouter.POST("/planet/capitol/colonize", planethandlers.CreateCapitol(planetService))
-	hs.apiRouter.POST("/planet/fleet/get", planethandlers.GetFleet(planetService))
 
+	hs.apiRouter.GET("/planet/building/stats", planethandlers.GetBuildingStats(planetService))
 	hs.apiRouter.POST("/planet/building/upgrade", planethandlers.UpgradeBuilding(planetService))
-	hs.apiRouter.POST("/planet/building/stats", planethandlers.GetBuildingStats(planetService))
 
 	// ----- Mission Routes -----
+	hs.apiRouter.GET("/mission/all", missionhandlers.GetCurrentMissions(missionService))
 	hs.apiRouter.POST("/mission/colonize", missionhandlers.Colonize(missionService))
 	hs.apiRouter.POST("/mission/attack", missionhandlers.Attack(missionService))
-	hs.apiRouter.POST("/mission/all/get", missionhandlers.GetCurrentMissions(missionService))
 
 	// ----- System Routes -----
-	hs.apiRouter.POST("/system/planets", systemhandlers.GetSystemPlanets(systemService))
+	hs.apiRouter.GET("/system/planets", systemhandlers.GetSystemPlanets(systemService))
 }

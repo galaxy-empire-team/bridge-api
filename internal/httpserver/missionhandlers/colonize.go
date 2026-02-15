@@ -6,11 +6,21 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/middleware"
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 func Colonize(missionService MissionService) func(c *gin.Context) {
 	return func(c *gin.Context) {
+		userID, err := middleware.RetrieveUserID(c)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{
+				Err: err.Error(),
+			})
+
+			return
+		}
+
 		var req ColonizeRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{
@@ -19,7 +29,7 @@ func Colonize(missionService MissionService) func(c *gin.Context) {
 			return
 		}
 
-		err := missionService.Colonize(c.Request.Context(), req.UserID, req.PlanetFrom, toCoordinatesModel(req.PlanetTo))
+		err = missionService.Colonize(c.Request.Context(), userID, req.PlanetFrom, toCoordinatesModel(req.PlanetTo))
 		if err != nil {
 			handleColonizeError(c, err)
 			return
@@ -43,7 +53,7 @@ func handleColonizeError(c *gin.Context, err error) {
 		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
-			Err: "internal server error",
+			Err: err.Error(),
 		})
 	}
 }

@@ -29,6 +29,7 @@ func New(logger *zap.Logger) *HttpServer {
 
 	server.Use(
 		gin.Recovery(),
+		middleware.Authorization(),
 		middleware.UseCustomWriter(),
 		middleware.HideInternalError(logger),
 		middleware.LoggingMiddleware(logger),

@@ -6,11 +6,21 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/middleware"
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 func Attack(missionService MissionService) func(c *gin.Context) {
 	return func(c *gin.Context) {
+		userID, err := middleware.RetrieveUserID(c)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{
+				Err: err.Error(),
+			})
+
+			return
+		}
+
 		var req AttackRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{
@@ -19,7 +29,13 @@ func Attack(missionService MissionService) func(c *gin.Context) {
 			return
 		}
 
-		err := missionService.Attack(c.Request.Context(), req.UserID, req.PlanetFrom, toCoordinatesModel(req.PlanetTo), toFleetUnits(req.FleetUnitCount))
+		err = missionService.Attack(
+			c.Request.Context(),
+			userID,
+			req.PlanetFrom,
+			toCoordinatesModel(req.PlanetTo),
+			toFleetUnits(req.FleetUnitCount),
+		)
 		if err != nil {
 			handleAttackError(c, err)
 			return
@@ -47,7 +63,7 @@ func handleAttackError(c *gin.Context, err error) {
 		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
-			Err: "internal server error",
+			Err: err.Error(),
 		})
 	}
 }

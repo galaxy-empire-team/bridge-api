@@ -6,11 +6,21 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/middleware"
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 func GetPlanet(planetService PlanetService) func(c *gin.Context) {
 	return func(c *gin.Context) {
+		userID, err := middleware.RetrieveUserID(c)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{
+				Err: err.Error(),
+			})
+
+			return
+		}
+
 		var req PlanetIDRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{
@@ -19,7 +29,7 @@ func GetPlanet(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		planet, err := planetService.GetPlanet(c.Request.Context(), req.PlanetID)
+		planet, err := planetService.GetPlanet(c.Request.Context(), userID, req.PlanetID)
 		if err != nil {
 			handleGetPlanetError(c, err)
 			return

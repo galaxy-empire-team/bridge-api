@@ -6,11 +6,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// Use POST. Change to Get after authorization implementation.
-type UserIDRequest struct {
-	UserID uuid.UUID `json:"userID"`
-}
-
 type PlanetIDRequest struct {
 	PlanetID uuid.UUID `json:"planetID"`
 }

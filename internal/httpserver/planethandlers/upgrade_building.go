@@ -6,11 +6,21 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/middleware"
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 func UpgradeBuilding(planetService PlanetService) func(c *gin.Context) {
 	return func(c *gin.Context) {
+		userID, err := middleware.RetrieveUserID(c)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{
+				Err: err.Error(),
+			})
+
+			return
+		}
+
 		var req UpgradeBuildingRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{
@@ -19,7 +29,7 @@ func UpgradeBuilding(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		err := planetService.UpgradeBuilding(c.Request.Context(), req.PlanetID, req.BuildingType)
+		err = planetService.UpgradeBuilding(c.Request.Context(), userID, req.PlanetID, req.BuildingType)
 		if err != nil {
 			handleUpgradeBuildingError(c, err)
 			return

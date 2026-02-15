@@ -6,9 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// Use POST. Change to Get after authorization implementation.
 type ColonizeRequest struct {
-	UserID     uuid.UUID   `json:"userID"`
 	PlanetFrom uuid.UUID   `json:"planetFrom"`
 	PlanetTo   Coordinates `json:"planetTo"`
 }
@@ -24,7 +22,6 @@ type ErrorResponse struct {
 }
 
 type AttackRequest struct {
-	UserID         uuid.UUID        `json:"userID"`
 	PlanetFrom     uuid.UUID        `json:"planetFrom"`
 	PlanetTo       Coordinates      `json:"planetTo"`
 	FleetUnitCount []FleetUnitCount `json:"fleet"`
@@ -33,10 +30,6 @@ type AttackRequest struct {
 type FleetUnitCount struct {
 	ID    uint8  `json:"id"`
 	Count uint64 `json:"count"`
-}
-
-type UserIDRequest struct {
-	UserID uuid.UUID `json:"userID"`
 }
 
 type UserMissionsResponse struct {

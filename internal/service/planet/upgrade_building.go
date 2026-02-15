@@ -12,9 +12,17 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (s *Service) UpgradeBuilding(ctx context.Context, planetID uuid.UUID, BuildingType string) error {
+func (s *Service) UpgradeBuilding(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, BuildingType string) error {
 	if !consts.IsValidBuildingType(consts.BuildingType(BuildingType)) {
 		return models.ErrBuildTypeInvalid
+	}
+
+	isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, userID, planetID)
+	if err != nil {
+		return fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
+	}
+	if !isUserPlanet {
+		return models.ErrPlanetDoesNotBelongToUser
 	}
 
 	currentBuildsCount, err := s.planetStorage.GetCurrentBuildsCount(ctx, planetID)

@@ -6,20 +6,22 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/middleware"
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 func CreateCapitol(planetService PlanetService) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		var req UserIDRequest
-		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, ErrorResponse{
-				Err: "invalid request body",
+		userID, err := middleware.RetrieveUserID(c)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{
+				Err: err.Error(),
 			})
+
 			return
 		}
 
-		err := planetService.CreateCapitol(c.Request.Context(), req.UserID)
+		err = planetService.CreateCapitol(c.Request.Context(), userID)
 		if err != nil {
 			handleColonizeCapitolError(c, err)
 			return

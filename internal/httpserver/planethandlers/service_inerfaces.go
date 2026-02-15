@@ -11,9 +11,9 @@ import (
 type PlanetService interface {
 	GetCapitol(ctx context.Context, userID uuid.UUID) (models.Planet, error)
 	CreateCapitol(ctx context.Context, userID uuid.UUID) error
-	UpgradeBuilding(ctx context.Context, planetID uuid.UUID, buildingType string) error
+	UpgradeBuilding(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, buildingType string) error
 	GetBuildingStats(ctx context.Context, buildingType string, level uint8) (models.BuildingStats, error)
 	GetAllUserPlanets(ctx context.Context, userID uuid.UUID) ([]models.Planet, error)
-	GetPlanet(ctx context.Context, planetID uuid.UUID) (models.Planet, error)
-	GetFleet(ctx context.Context, planetID uuid.UUID) ([]models.PlanetFleetUnitCount, error)
+	GetPlanet(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (models.Planet, error)
+	GetFleet(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) ([]models.PlanetFleetUnitCount, error)
 }
