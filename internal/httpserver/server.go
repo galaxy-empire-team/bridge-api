@@ -1,7 +1,6 @@
 package httpserver
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -13,6 +12,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/galaxy-empire-team/bridge-api/internal/config"
+	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/middleware"
 )
 
 type HttpServer struct {
@@ -22,58 +22,17 @@ type HttpServer struct {
 	logger *zap.Logger
 }
 
-type bodyWriter struct {
-	gin.ResponseWriter
-	buf *bytes.Buffer
-}
-
-func (w *bodyWriter) Write(b []byte) (int, error) {
-	w.buf.Write(b)
-	return w.ResponseWriter.Write(b)
-}
-
 func New(logger *zap.Logger) *HttpServer {
 	gin.SetMode(gin.ReleaseMode)
 
 	server := gin.New()
 
-	server.Use(gin.Recovery())
-
-	server.Use(func(c *gin.Context) {
-		start := time.Now()
-
-		c.Next()
-
-		logger.Info("transport",
-			zap.String("method", c.Request.Method),
-			zap.String("path", c.Request.URL.Path),
-			zap.String("ip", c.ClientIP()),
-			zap.String("user-agent", c.Request.UserAgent()),
-			zap.Int("status", c.Writer.Status()),
-			zap.Int64("μs", time.Since(start).Microseconds()),
-		)
-	})
-
-	server.Use(func(c *gin.Context) {
-		buf := &bytes.Buffer{}
-		writer := &bodyWriter{
-			ResponseWriter: c.Writer,
-			buf:            buf,
-		}
-
-		c.Writer = writer
-
-		c.Next()
-
-		status := c.Writer.Status()
-		if status >= 500 {
-			logger.Error("error",
-				zap.String("method", c.Request.Method),
-				zap.Int("status", status),
-				zap.String("body", buf.String()),
-			)
-		}
-	})
+	server.Use(
+		gin.Recovery(),
+		middleware.UseCustomWriter(),
+		middleware.HideInternalError(logger),
+		middleware.LoggingMiddleware(logger),
+	)
 
 	return &HttpServer{
 		server:    server,

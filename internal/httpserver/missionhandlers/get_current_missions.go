@@ -19,7 +19,7 @@ func GetCurrentMissions(missionService MissionService) func(c *gin.Context) {
 		missions, err := missionService.GetCurrentMissions(c.Request.Context(), req.UserID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{
-				Err: "internal server error",
+				Err: err.Error(),
 			})
 			return
 		}
