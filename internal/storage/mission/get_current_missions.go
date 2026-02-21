@@ -3,6 +3,7 @@ package mission
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -12,7 +13,7 @@ import (
 func (s *MissionStorage) GetCurrentUserMissions(ctx context.Context, userID uuid.UUID) ([]models.UserMission, error) {
 	const getCurrentMissionsQuery = `
 		SELECT
-			ev.mission_type,
+			ev.mission_id,
 			p.x,
 			p.y,
 			p.z,
@@ -34,6 +35,7 @@ func (s *MissionStorage) GetCurrentUserMissions(ctx context.Context, userID uuid
 	}
 
 	var missions []models.UserMission
+	var startedAt, finishedAt time.Time
 	for rows.Next() {
 		var mission models.UserMission
 		err = rows.Scan(
@@ -45,12 +47,15 @@ func (s *MissionStorage) GetCurrentUserMissions(ctx context.Context, userID uuid
 			&mission.PlanetTo.Y,
 			&mission.PlanetTo.Z,
 			&mission.IsReturning,
-			&mission.StartedAt,
-			&mission.FinishedAt,
+			&startedAt,
+			&finishedAt,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("DB.QueryRow.Scan(): %w", err)
 		}
+
+		mission.StartedAt = startedAt.UTC()
+		mission.FinishedAt = finishedAt.UTC()
 
 		missions = append(missions, mission)
 	}

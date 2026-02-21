@@ -75,12 +75,17 @@ func (s *Service) Attack(ctx context.Context, userID uuid.UUID, planetFrom uuid.
 		}
 
 		startedAt := time.Now().UTC()
-		finishedAt := startedAt.Add(time.Minute * 1)
+		finishedAt := startedAt.Add(missionDuration)
+		missionID, err := s.registry.GetMissionIDByType(consts.MissionTypeAttack)
+		if err != nil {
+			return fmt.Errorf("registry.GetMissionIDByType(): %w", err)
+		}
+
 		attackEvent := models.MissionEvent{
 			UserID:      userID,
 			PlanetFrom:  planetFrom,
 			PlanetTo:    planetTo,
-			Type:        consts.MissionTypeAttack,
+			Type:        missionID,
 			Fleet:       fleet,
 			IsReturning: false,
 			StartedAt:   startedAt,

@@ -12,7 +12,7 @@ type MissionEvent struct {
 	UserID      uuid.UUID
 	PlanetFrom  uuid.UUID
 	PlanetTo    Coordinates
-	Type        consts.MissionType
+	Type        consts.MissionID
 	Fleet       []PlanetFleetUnitCount
 	IsReturning bool
 	StartedAt   time.Time

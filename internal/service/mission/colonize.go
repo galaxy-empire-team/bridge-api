@@ -29,6 +29,11 @@ func (s *Service) Colonize(ctx context.Context, userID uuid.UUID, planetFrom uui
 		return models.ErrPlanetDoesNotBelongToUser
 	}
 
+	missionID, err := s.registry.GetMissionIDByType(consts.MissionTypeColonize)
+	if err != nil {
+		return fmt.Errorf("registry.GetMissionIDByType(): %w", err)
+	}
+
 	return s.txManager.ExecMissionTx(ctx, func(ctx context.Context, storages TxStorages) error {
 		startedAt := time.Now().UTC()
 		finishedAt := startedAt
@@ -36,7 +41,7 @@ func (s *Service) Colonize(ctx context.Context, userID uuid.UUID, planetFrom uui
 			UserID:      userID,
 			PlanetFrom:  planetFrom,
 			PlanetTo:    planetTo,
-			Type:        consts.MissionTypeColonize,
+			Type:        missionID,
 			IsReturning: false,
 			StartedAt:   startedAt,
 			FinishedAt:  finishedAt,

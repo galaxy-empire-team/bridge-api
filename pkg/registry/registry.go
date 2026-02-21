@@ -10,8 +10,10 @@ import (
 )
 
 type Registry struct {
-	buildings map[consts.BuildingID]BuildingStats
-	fleet     map[consts.FleetUnitID]FleetUnitStats
+	buildings     map[consts.BuildingID]BuildingStats
+	fleet         map[consts.FleetUnitID]FleetUnitStats
+	missions      map[consts.MissionID]consts.MissionType
+	notifications map[consts.NotificationID]consts.NotificationType
 }
 
 func New(ctx context.Context, connPool *pgxpool.Pool) (*Registry, error) {
@@ -25,9 +27,21 @@ func New(ctx context.Context, connPool *pgxpool.Pool) (*Registry, error) {
 		return nil, fmt.Errorf("getFleetStats(): %w", err)
 	}
 
+	missionMapping, err := getMissionMapping(ctx, connPool)
+	if err != nil {
+		return nil, fmt.Errorf("getMissionMapping(): %w", err)
+	}
+
+	notificationMapping, err := getNotificationMapping(ctx, connPool)
+	if err != nil {
+		return nil, fmt.Errorf("getNotificationMapping(): %w", err)
+	}
+
 	return &Registry{
-		buildings: buildingStats,
-		fleet:     fleetStats,
+		buildings:     buildingStats,
+		fleet:         fleetStats,
+		missions:      missionMapping,
+		notifications: notificationMapping,
 	}, nil
 }
 
@@ -120,6 +134,76 @@ func getFleetStats(ctx context.Context, pool *pgxpool.Pool) (map[consts.FleetUni
 		}
 
 		result[fleetUnitStats.ID] = fleetUnitStats
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows.Err(): %w", err)
+	}
+
+	return result, nil
+}
+
+func getNotificationMapping(ctx context.Context, pool *pgxpool.Pool) (map[consts.NotificationID]consts.NotificationType, error) {
+	const getNotificationMappingQuery = `
+		SELECT 
+			id,
+			notification_type
+		FROM session_beta.notifications;
+	`
+
+	result := make(map[consts.NotificationID]consts.NotificationType)
+	rows, err := pool.Query(ctx, getNotificationMappingQuery)
+	if err != nil {
+		return nil, fmt.Errorf("pool.Query(): %w", err)
+	}
+
+	for rows.Next() {
+		var id consts.NotificationID
+		var notificationType consts.NotificationType
+		err = rows.Scan(
+			&id,
+			&notificationType,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("rows.Scan(): %w", err)
+		}
+
+		result[id] = notificationType
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows.Err(): %w", err)
+	}
+
+	return result, nil
+}
+
+func getMissionMapping(ctx context.Context, pool *pgxpool.Pool) (map[consts.MissionID]consts.MissionType, error) {
+	const getMissionMappingQuery = `
+		SELECT
+			id,
+			mission_type
+		FROM session_beta.missions;
+	`
+
+	result := make(map[consts.MissionID]consts.MissionType)
+	rows, err := pool.Query(ctx, getMissionMappingQuery)
+	if err != nil {
+		return nil, fmt.Errorf("pool.Query(): %w", err)
+	}
+
+	for rows.Next() {
+		var id consts.MissionID
+		var missionType consts.MissionType
+		err = rows.Scan(
+			&id,
+			&missionType,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("rows.Scan(): %w", err)
+		}
+
+		result[id] = missionType
 	}
 
 	if err = rows.Err(); err != nil {

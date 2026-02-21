@@ -2,12 +2,15 @@ package planet
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
+
+const missionDuration = 1 * time.Second
 
 type planetStorage interface {
 	CheckPlanetExists(ctx context.Context, coordinates models.Coordinates) (bool, error)
@@ -33,6 +36,7 @@ type txManager interface {
 type registryProvider interface {
 	CheckFleetUnitIDExists(fleetUnitID consts.FleetUnitID) bool
 	GetFleetUnitTypeCount() int
+	GetMissionIDByType(missionType consts.MissionType) (consts.MissionID, error)
 }
 
 type Service struct {
