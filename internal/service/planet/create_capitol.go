@@ -17,9 +17,9 @@ func (s *Service) CreateCapitol(ctx context.Context, userID uuid.UUID) error {
 	}
 
 	generatedLocation := models.Coordinates{
-		X: uint8(s.randomGenerator.Uint32() % consts.GalaxyCount),
-		Y: uint8(s.randomGenerator.Uint32() % consts.SystemInGalaxyCount),
-		Z: uint8(s.randomGenerator.Uint32() % consts.PlanetsInSystemCount),
+		X: consts.PlanetPositionX(s.randomGenerator.Uint32() % consts.GalaxyCount),
+		Y: consts.PlanetPositionY(s.randomGenerator.Uint32() % consts.SystemInGalaxyCount),
+		Z: consts.PlanetPositionZ(s.randomGenerator.Uint32() % consts.PlanetsInSystemCount),
 	}
 	planetToColonize := models.Planet{
 		ID:          planetID,

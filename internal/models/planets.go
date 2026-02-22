@@ -28,9 +28,9 @@ type Resources struct {
 }
 
 type Coordinates struct {
-	X uint8
-	Y uint8
-	Z uint8
+	X consts.PlanetPositionX
+	Y consts.PlanetPositionY
+	Z consts.PlanetPositionZ
 }
 
 type PlanetIDWithCapitol struct {

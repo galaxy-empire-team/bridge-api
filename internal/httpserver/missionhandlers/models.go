@@ -12,9 +12,9 @@ type ColonizeRequest struct {
 }
 
 type Coordinates struct {
-	X uint8 `json:"x"`
-	Y uint8 `json:"y"`
-	Z uint8 `json:"z"`
+	X uint8  `json:"x"`
+	Y uint16 `json:"y"`
+	Z uint8  `json:"z"`
 }
 
 type ErrorResponse struct {

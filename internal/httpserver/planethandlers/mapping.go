@@ -16,9 +16,9 @@ func toTransportPlanet(p models.Planet) GetPlanetResponse {
 
 	return GetPlanetResponse{
 		PlanetID: p.ID,
-		X:        p.Coordinates.X,
-		Y:        p.Coordinates.Y,
-		Z:        p.Coordinates.Z,
+		X:        p.Coordinates.X.ToUint8(),
+		Y:        p.Coordinates.Y.ToUint16(),
+		Z:        p.Coordinates.Z.ToUint8(),
 		HasMoon:  p.HasMoon,
 		Resources: PlanetResources{
 			Metal:   p.Resources.Metal,
@@ -51,9 +51,9 @@ func toTransportPlanets(planets []models.Planet) UserPlanetsResponse {
 	for _, p := range planets {
 		resp.Planets = append(resp.Planets, GetShortPlanet{
 			PlanetID:  p.ID,
-			X:         p.Coordinates.X,
-			Y:         p.Coordinates.Y,
-			Z:         p.Coordinates.Z,
+			X:         p.Coordinates.X.ToUint8(),
+			Y:         p.Coordinates.Y.ToUint16(),
+			Z:         p.Coordinates.Z.ToUint8(),
 			IsCapitol: p.IsCapitol,
 			Resources: PlanetResources{
 				Metal:   p.Resources.Metal,

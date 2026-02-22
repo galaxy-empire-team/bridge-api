@@ -11,4 +11,5 @@ type NotificationType string
 const (
 	NotificationTypeColonize NotificationType = "colonize"
 	NotificationTypeAttack   NotificationType = "attack"
+	NotificationTypeReturn   NotificationType = "return"
 )

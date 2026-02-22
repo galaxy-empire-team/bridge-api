@@ -23,7 +23,7 @@ type GetBuildStatsRequest struct {
 type GetPlanetResponse struct {
 	PlanetID  uuid.UUID               `json:"planetID"`
 	X         uint8                   `json:"x"`
-	Y         uint8                   `json:"y"`
+	Y         uint16                  `json:"y"`
 	Z         uint8                   `json:"z"`
 	Resources PlanetResources         `json:"resources"`
 	Buildings map[string]BuildingInfo `json:"buildings"`
@@ -67,7 +67,7 @@ type UserPlanetsResponse struct {
 type GetShortPlanet struct {
 	PlanetID    uuid.UUID       `json:"planetID"`
 	X           uint8           `json:"x"`
-	Y           uint8           `json:"y"`
+	Y           uint16          `json:"y"`
 	Z           uint8           `json:"z"`
 	Resources   PlanetResources `json:"resources"`
 	IsCapitol   bool            `json:"isCapitol"`

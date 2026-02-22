@@ -7,17 +7,17 @@ import (
 
 func toCoordinatesModel(coordinates Coordinates) models.Coordinates {
 	return models.Coordinates{
-		X: coordinates.X,
-		Y: coordinates.Y,
-		Z: coordinates.Z,
+		X: consts.PlanetPositionX(coordinates.X),
+		Y: consts.PlanetPositionY(coordinates.Y),
+		Z: consts.PlanetPositionZ(coordinates.Z),
 	}
 }
 
 func fromCoordinatesModel(coordinates models.Coordinates) Coordinates {
 	return Coordinates{
-		X: coordinates.X,
-		Y: coordinates.Y,
-		Z: coordinates.Z,
+		X: coordinates.X.ToUint8(),
+		Y: coordinates.Y.ToUint16(),
+		Z: coordinates.Z.ToUint8(),
 	}
 }
 

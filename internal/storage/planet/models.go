@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
+	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
 type planetToColonize struct {
@@ -15,9 +17,9 @@ type planetToColonize struct {
 }
 
 type coordinates struct {
-	X uint8
-	Y uint8
-	Z uint8
+	X consts.PlanetPositionX
+	Y consts.PlanetPositionY
+	Z consts.PlanetPositionZ
 }
 
 type finishedBuilding struct {
