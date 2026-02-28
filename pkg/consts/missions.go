@@ -9,6 +9,8 @@ func (b MissionID) ToUint8() uint8 {
 type MissionType string
 
 const (
-	MissionTypeColonize MissionType = "colonize"
-	MissionTypeAttack   MissionType = "attack"
+	MissionTypeColonize  MissionType = "colonize"
+	MissionTypeAttack    MissionType = "attack"
+	MissionTypeSpy       MissionType = "spy"
+	MissionTypeTransport MissionType = "transport"
 )

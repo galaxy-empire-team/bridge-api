@@ -20,7 +20,7 @@ func (s *Service) GetAllUserPlanets(ctx context.Context, userID uuid.UUID) ([]mo
 	}
 
 	for _, pid := range planetIDs {
-		err = s.recalcResources(ctx, pid.PlanetID)
+		err = s.recalcResources(ctx, userID, pid.PlanetID)
 		if err != nil {
 			return nil, fmt.Errorf("recalcResourcesWithUpdatedTime(): %w", err)
 		}

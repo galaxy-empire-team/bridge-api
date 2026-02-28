@@ -12,6 +12,7 @@ import (
 type Registry struct {
 	buildings     map[consts.BuildingID]BuildingStats
 	fleet         map[consts.FleetUnitID]FleetUnitStats
+	researches    map[consts.ResearchID]ResearchStats
 	missions      map[consts.MissionID]consts.MissionType
 	notifications map[consts.NotificationID]consts.NotificationType
 }
@@ -27,6 +28,11 @@ func New(ctx context.Context, connPool *pgxpool.Pool) (*Registry, error) {
 		return nil, fmt.Errorf("getFleetStats(): %w", err)
 	}
 
+	researchStats, err := getResearchStats(ctx, connPool)
+	if err != nil {
+		return nil, fmt.Errorf("getResearchStats(): %w", err)
+	}
+
 	missionMapping, err := getMissionMapping(ctx, connPool)
 	if err != nil {
 		return nil, fmt.Errorf("getMissionMapping(): %w", err)
@@ -40,6 +46,7 @@ func New(ctx context.Context, connPool *pgxpool.Pool) (*Registry, error) {
 	return &Registry{
 		buildings:     buildingStats,
 		fleet:         fleetStats,
+		researches:    researchStats,
 		missions:      missionMapping,
 		notifications: notificationMapping,
 	}, nil
@@ -57,7 +64,7 @@ func getBuildingStats(ctx context.Context, pool *pgxpool.Pool) (map[consts.Build
 			production_s,
 			bonuses,
 			upgrade_time_s
-		FROM session_beta.buildings;
+		FROM session_beta.s_buildings;
 	`
 
 	result := make(map[consts.BuildingID]BuildingStats)
@@ -106,7 +113,7 @@ func getFleetStats(ctx context.Context, pool *pgxpool.Pool) (map[consts.FleetUni
 			crystal_cost,
 			gas_cost,
 			build_time_s
-		FROM session_beta.fleet;
+		FROM session_beta.s_fleet;
 	`
 
 	result := make(map[consts.FleetUnitID]FleetUnitStats)
@@ -143,12 +150,84 @@ func getFleetStats(ctx context.Context, pool *pgxpool.Pool) (map[consts.FleetUni
 	return result, nil
 }
 
+type researchBonuses struct {
+	AvaliableColonizePlanetCount uint8 `json:"availiable_colonize_count"`
+
+	ProductionSpeedImprove   float32 `json:"resource_gain"`
+	FleetCostReduce          float32 `json:"fleet_cost_reduce"`
+	FleetConstructTimeReduce float32 `json:"fleet_construct_time_reduce"`
+	PlanetDefenseImprove     float32 `json:"defense_power"`
+
+	AttackPower          float32 `json:"attack_power"`
+	ArmorPower           float32 `json:"armor_strength"`
+	AttackOnDefensePower float32 `json:"attack_deffence_power"`
+	SpyChanceImprove     float32 `json:"success_spy_chance"`
+}
+
+func getResearchStats(ctx context.Context, pool *pgxpool.Pool) (map[consts.ResearchID]ResearchStats, error) {
+	const getResearchStatsQuery = `
+		SELECT 
+			id,
+			research_type,
+			level,
+			metal_cost,
+			crystal_cost,
+			gas_cost,
+			bonuses,
+			research_time_s
+		FROM session_beta.s_researches;
+	`
+	var bonuses researchBonuses
+	result := make(map[consts.ResearchID]ResearchStats)
+	rows, err := pool.Query(ctx, getResearchStatsQuery)
+	if err != nil {
+		return nil, fmt.Errorf("pool.Query(): %w", err)
+	}
+
+	for rows.Next() {
+		var researchStats ResearchStats
+		err = rows.Scan(
+			&researchStats.ID,
+			&researchStats.Type,
+			&researchStats.Level,
+			&researchStats.MetalCost,
+			&researchStats.CrystalCost,
+			&researchStats.GasCost,
+			&bonuses,
+			&researchStats.ResearchTimeS,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("rows.Scan(): %w", err)
+		}
+
+		researchStats.Bonuses = ResearchBonuses{
+			AvaliableColonizePlanetCount: bonuses.AvaliableColonizePlanetCount,
+			ProductionSpeedImprove:       bonuses.ProductionSpeedImprove,
+			FleetCostReduce:              bonuses.FleetCostReduce,
+			FleetConstructTimeReduce:     bonuses.FleetConstructTimeReduce,
+			PlanetDefense:                bonuses.PlanetDefenseImprove,
+			AttackPower:                  bonuses.AttackPower,
+			ArmorPower:                   bonuses.ArmorPower,
+			AttackOnDefensePower:         bonuses.AttackOnDefensePower,
+			SpyChanceImprove:             bonuses.SpyChanceImprove,
+		}
+
+		result[researchStats.ID] = researchStats
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows.Err(): %w", err)
+	}
+
+	return result, nil
+}
+
 func getNotificationMapping(ctx context.Context, pool *pgxpool.Pool) (map[consts.NotificationID]consts.NotificationType, error) {
 	const getNotificationMappingQuery = `
 		SELECT 
 			id,
 			notification_type
-		FROM session_beta.notifications;
+		FROM session_beta.s_notifications;
 	`
 
 	result := make(map[consts.NotificationID]consts.NotificationType)
@@ -183,7 +262,7 @@ func getMissionMapping(ctx context.Context, pool *pgxpool.Pool) (map[consts.Miss
 		SELECT
 			id,
 			mission_type
-		FROM session_beta.missions;
+		FROM session_beta.s_missions;
 	`
 
 	result := make(map[consts.MissionID]consts.MissionType)

@@ -29,7 +29,14 @@ func Colonize(missionService MissionService) func(c *gin.Context) {
 			return
 		}
 
-		err = missionService.Colonize(c.Request.Context(), userID, req.PlanetFrom, toCoordinatesModel(req.PlanetTo))
+		err = missionService.Colonize(
+			c.Request.Context(),
+			userID,
+			req.PlanetFrom,
+			toCoordinatesModel(req.PlanetTo),
+			toResources(req.Cargo),
+			toFleetUnits(req.FleetUnitCount),
+		)
 		if err != nil {
 			handleColonizeError(c, err)
 			return
@@ -50,6 +57,10 @@ func handleColonizeError(c *gin.Context, err error) {
 	case errors.Is(err, models.ErrPlanetDoesNotBelongToUser):
 		c.JSON(http.StatusForbidden, ErrorResponse{
 			Err: "the planet does not belong to the user",
+		})
+	case errors.Is(err, models.ErrFleetCannotBeEmpty):
+		c.JSON(http.StatusForbidden, ErrorResponse{
+			Err: "fleet cannot be empty for colonize mission",
 		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{

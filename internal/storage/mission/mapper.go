@@ -14,3 +14,11 @@ func toFleetUnits(fleet []models.PlanetFleetUnitCount) []FleetUnit {
 
 	return units
 }
+
+func toResources(res models.Resources) Resources {
+	return Resources{
+		Metal:   res.Metal,
+		Crystal: res.Crystal,
+		Gas:     res.Gas,
+	}
+}

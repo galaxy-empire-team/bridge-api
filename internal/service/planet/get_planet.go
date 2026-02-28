@@ -18,7 +18,7 @@ func (s *Service) GetPlanet(ctx context.Context, userID uuid.UUID, planetID uuid
 		return models.Planet{}, models.ErrPlanetDoesNotBelongToUser
 	}
 
-	planet, err := s.getPlanetByID(ctx, planetID)
+	planet, err := s.getPlanetByID(ctx, userID, planetID)
 	if err != nil {
 		return models.Planet{}, fmt.Errorf("getPlanetByID(): %w", err)
 	}

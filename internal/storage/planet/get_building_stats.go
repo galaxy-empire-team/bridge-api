@@ -20,7 +20,7 @@ func (s *PlanetStorage) GetBuildingStats(ctx context.Context, BuildingType const
 			production_s,
 			bonuses,
 			upgrade_time_s
-		FROM session_beta.buildings
+		FROM session_beta.s_buildings
 		WHERE building_type = $1 AND level = $2;
 	`
 

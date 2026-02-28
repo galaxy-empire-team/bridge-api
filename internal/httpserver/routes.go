@@ -31,6 +31,8 @@ func (hs *HttpServer) RegisterRoutes(
 	hs.apiRouter.GET("/mission/all", missionhandlers.GetCurrentMissions(missionService))
 	hs.apiRouter.POST("/mission/colonize", missionhandlers.Colonize(missionService))
 	hs.apiRouter.POST("/mission/attack", missionhandlers.Attack(missionService))
+	hs.apiRouter.POST("/mission/spy", missionhandlers.Spy(missionService))
+	hs.apiRouter.POST("/mission/transport", missionhandlers.Transport(missionService))
 
 	// ----- System Routes -----
 	hs.apiRouter.GET("/system/planets", systemhandlers.GetSystemPlanets(systemService))

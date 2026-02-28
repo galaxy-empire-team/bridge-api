@@ -24,6 +24,10 @@ type planetStorage interface {
 	CheckPlanetBelongsToUser(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (bool, error)
 }
 
+type researchStorage interface {
+	GetUserResearches(ctx context.Context, userID uuid.UUID) ([]consts.ResearchID, error)
+}
+
 // Separate storage methods that executes inside a transaction
 type TxStorages interface {
 	GetResourcesForUpdate(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
@@ -45,21 +49,24 @@ type registryProvider interface {
 	GetBuildingStatsByType(buildingType consts.BuildingType, level consts.BuildingLevel) (registry.BuildingStats, error)
 	GetBuildingNextLvlStats(buildingID consts.BuildingID) (registry.BuildingStats, error)
 	GetFleetUnitStatsByID(fleetUnitID consts.FleetUnitID) (registry.FleetUnitStats, error)
+	GetResearchStatsByID(researchID consts.ResearchID) (registry.ResearchStats, error)
 }
 
 type Service struct {
 	txManager       txManager
 	planetStorage   planetStorage
+	researchStorage researchStorage
 	registry        registryProvider
 	randomGenerator *rand.Rand
 }
 
-func New(txManager txManager, planetStorage planetStorage, registry registryProvider) *Service {
+func New(txManager txManager, planetStorage planetStorage, researchStorage researchStorage, registry registryProvider) *Service {
 	gen := rand.New(rand.NewSource((time.Now().UnixNano())))
 
 	return &Service{
 		txManager:       txManager,
 		planetStorage:   planetStorage,
+		researchStorage: researchStorage,
 		registry:        registry,
 		randomGenerator: gen,
 	}

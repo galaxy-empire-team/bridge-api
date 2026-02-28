@@ -13,7 +13,7 @@ func (r *Registry) GetBuildingZeroLvlStats(buildingType consts.BuildingType) (Bu
 	}
 
 	for _, stat := range r.buildings {
-		if stat.Type == buildingType && stat.Level == 0 {
+		if stat.Type == buildingType && stat.Level == 1 {
 			return stat, nil
 		}
 	}

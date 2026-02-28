@@ -23,7 +23,7 @@ func (s *MissionStorage) GetCurrentUserMissions(ctx context.Context, userID uuid
 			ev.is_returning,
 			ev.started_at,
 			ev.finished_at
-		FROM session_beta.mission_events ev
+		FROM session_beta.event_missions ev
 		JOIN session_beta.planets p ON
 			ev.planet_from = p.id
 		WHERE ev.user_id = $1;

@@ -13,6 +13,14 @@ func toCoordinatesModel(coordinates Coordinates) models.Coordinates {
 	}
 }
 
+func toResources(res Resources) models.Resources {
+	return models.Resources{
+		Metal:   res.Metal,
+		Crystal: res.Crystal,
+		Gas:     res.Gas,
+	}
+}
+
 func fromCoordinatesModel(coordinates models.Coordinates) Coordinates {
 	return Coordinates{
 		X: coordinates.X.ToUint8(),

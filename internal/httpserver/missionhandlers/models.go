@@ -7,8 +7,10 @@ import (
 )
 
 type ColonizeRequest struct {
-	PlanetFrom uuid.UUID   `json:"planetFrom"`
-	PlanetTo   Coordinates `json:"planetTo"`
+	PlanetFrom     uuid.UUID        `json:"planetFrom"`
+	PlanetTo       Coordinates      `json:"planetTo"`
+	Cargo          Resources        `json:"cargo"`
+	FleetUnitCount []FleetUnitCount `json:"fleet"`
 }
 
 type Coordinates struct {
@@ -25,6 +27,25 @@ type AttackRequest struct {
 	PlanetFrom     uuid.UUID        `json:"planetFrom"`
 	PlanetTo       Coordinates      `json:"planetTo"`
 	FleetUnitCount []FleetUnitCount `json:"fleet"`
+}
+
+type SpyRequest struct {
+	PlanetFrom     uuid.UUID        `json:"planetFrom"`
+	PlanetTo       Coordinates      `json:"planetTo"`
+	FleetUnitCount []FleetUnitCount `json:"fleet"`
+}
+
+type TransportRequest struct {
+	PlanetFrom     uuid.UUID        `json:"planetFrom"`
+	PlanetTo       Coordinates      `json:"planetTo"`
+	Cargo          Resources        `json:"cargo"`
+	FleetUnitCount []FleetUnitCount `json:"fleet"`
+}
+
+type Resources struct {
+	Metal   uint64 `json:"metal"`
+	Crystal uint64 `json:"crystal"`
+	Gas     uint64 `json:"gas"`
 }
 
 type FleetUnitCount struct {

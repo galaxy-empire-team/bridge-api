@@ -10,7 +10,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
-func Attack(missionService MissionService) func(c *gin.Context) {
+func Transport(missionService MissionService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		userID, err := middleware.RetrieveUserID(c)
 		if err != nil {
@@ -21,7 +21,7 @@ func Attack(missionService MissionService) func(c *gin.Context) {
 			return
 		}
 
-		var req AttackRequest
+		var req TransportRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{
 				Err: "invalid request body",
@@ -29,30 +29,27 @@ func Attack(missionService MissionService) func(c *gin.Context) {
 			return
 		}
 
-		err = missionService.Attack(
+		err = missionService.Transport(
 			c.Request.Context(),
 			userID,
 			req.PlanetFrom,
 			toCoordinatesModel(req.PlanetTo),
+			toResources(req.Cargo),
 			toFleetUnits(req.FleetUnitCount),
 		)
 		if err != nil {
-			handleAttackError(c, err)
+			handleTransportError(c, err)
 			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"status": "attack mission started",
+			"status": "transport mission started",
 		})
 	}
 }
 
-func handleAttackError(c *gin.Context, err error) {
+func handleTransportError(c *gin.Context, err error) {
 	switch {
-	case errors.Is(err, models.ErrColonizePlanetAlreadyExists):
-		c.JSON(http.StatusConflict, ErrorResponse{
-			Err: "planet already exists at the target coordinates",
-		})
 	case errors.Is(err, models.ErrPlanetDoesNotBelongToUser):
 		c.JSON(http.StatusForbidden, ErrorResponse{
 			Err: "the planet does not belong to the user",
@@ -60,6 +57,10 @@ func handleAttackError(c *gin.Context, err error) {
 	case errors.Is(err, models.ErrNotEnoughFleetUnits):
 		c.JSON(http.StatusForbidden, ErrorResponse{
 			Err: "not enough fleet units",
+		})
+	case errors.Is(err, models.ErrNotEnoughResources):
+		c.JSON(http.StatusForbidden, ErrorResponse{
+			Err: "not enough resources",
 		})
 	case errors.Is(err, models.ErrFleetCannotBeEmpty):
 		c.JSON(http.StatusForbidden, ErrorResponse{

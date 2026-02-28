@@ -14,6 +14,7 @@ type MissionEvent struct {
 	PlanetTo    Coordinates
 	Type        consts.MissionID
 	Fleet       []PlanetFleetUnitCount
+	Cargo       Resources
 	IsReturning bool
 	StartedAt   time.Time
 	FinishedAt  time.Time

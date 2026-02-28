@@ -22,7 +22,7 @@ func (s *PlanetStorage) GetBuildingsInfo(ctx context.Context, planetID uuid.UUID
 			pb.updated_at,
 			pb.finished_at
 		FROM session_beta.planet_buildings pb
-		JOIN session_beta.buildings b ON pb.building_id = b.id
+		JOIN session_beta.s_buildings b ON pb.building_id = b.id
 		WHERE pb.planet_id = $1 AND b.building_type = ANY($2);
 	`
 

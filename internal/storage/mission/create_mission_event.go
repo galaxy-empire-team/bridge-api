@@ -10,7 +10,7 @@ import (
 
 func (s *MissionStorage) CreateMissionEvent(ctx context.Context, missionEvent models.MissionEvent) error {
 	const createEventQuery = `
-		INSERT INTO session_beta.mission_events (
+		INSERT INTO session_beta.event_missions (
 			mission_id,
 			user_id,
 			planet_from,
@@ -18,6 +18,7 @@ func (s *MissionStorage) CreateMissionEvent(ctx context.Context, missionEvent mo
 			planet_to_y, 
 			planet_to_z, 
 			fleet,
+			cargo,
 			is_returning,
 			started_at,
 			finished_at
@@ -29,13 +30,19 @@ func (s *MissionStorage) CreateMissionEvent(ctx context.Context, missionEvent mo
 			$5,    -- planet_to_y
 			$6,    -- planet_to_z
 			$7,    -- fleet
-			$8,    -- is_returning
-			$9,    -- started_at
-			$10	   -- finished_at
+			$8,    -- cargo
+			$9,    -- is_returning
+			$10,   -- started_at
+			$11	   -- finished_at
 		)  
 	`
 
 	fleetJson, err := json.Marshal(toFleetUnits(missionEvent.Fleet))
+	if err != nil {
+		return fmt.Errorf("json.Marshal(): %w", err)
+	}
+
+	cargoJson, err := json.Marshal(toResources(missionEvent.Cargo))
 	if err != nil {
 		return fmt.Errorf("json.Marshal(): %w", err)
 	}
@@ -48,6 +55,7 @@ func (s *MissionStorage) CreateMissionEvent(ctx context.Context, missionEvent mo
 		missionEvent.PlanetTo.Y,
 		missionEvent.PlanetTo.Z,
 		fleetJson,
+		cargoJson,
 		missionEvent.IsReturning,
 		missionEvent.StartedAt,
 		missionEvent.FinishedAt,

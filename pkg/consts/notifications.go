@@ -9,7 +9,9 @@ func (b NotificationID) ToUint8() uint8 {
 type NotificationType string
 
 const (
-	NotificationTypeColonize NotificationType = "colonize"
-	NotificationTypeAttack   NotificationType = "attack"
-	NotificationTypeReturn   NotificationType = "return"
+	NotificationTypeColonize  NotificationType = "colonize"
+	NotificationTypeAttack    NotificationType = "attack"
+	NotificationTypeReturn    NotificationType = "return"
+	NotificationTypeSpy       NotificationType = "spy"
+	NotificationTypeTransport NotificationType = "transport"
 )

@@ -9,7 +9,7 @@ import (
 
 func (s *PlanetStorage) CreateBuildingEvent(ctx context.Context, buildEvent models.BuildEvent) error {
 	const setBuildLvlQuery = `
-		INSERT INTO session_beta.building_events (
+		INSERT INTO session_beta.event_buildings (
 			planet_id,
 			building_id, 
 			started_at,

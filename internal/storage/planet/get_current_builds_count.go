@@ -10,7 +10,7 @@ import (
 func (r *PlanetStorage) GetCurrentBuildsCount(ctx context.Context, planetID uuid.UUID) (uint8, error) {
 	const getResourcesQuery = `
 		SELECT count(id)
-		FROM session_beta.building_events
+		FROM session_beta.event_buildings
 		WHERE planet_id = $1;
 	`
 

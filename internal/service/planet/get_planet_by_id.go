@@ -11,13 +11,13 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (s *Service) getPlanetByID(ctx context.Context, planetID uuid.UUID) (models.Planet, error) {
+func (s *Service) getPlanetByID(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (models.Planet, error) {
 	if planetID == uuid.Nil {
 		return models.Planet{}, models.ErrCapitolNotFound
 	}
 
 	updatedAt := time.Now().UTC()
-	err := s.recalcResourcesWithUpdatedTime(ctx, planetID, updatedAt)
+	err := s.recalcResourcesWithUpdatedTime(ctx, userID, planetID, updatedAt)
 	if err != nil {
 		return models.Planet{}, fmt.Errorf("recalcResourcesWithUpdatedTime(): %w", err)
 	}

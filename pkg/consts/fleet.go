@@ -9,10 +9,13 @@ func (b FleetUnitID) ToUint8() uint8 {
 type FleetUnitType string
 
 const (
+	FleetUnitTypeScout       FleetUnitType = "scout"
 	FleetUnitTypeFighter     FleetUnitType = "fighter"
 	FleetUnitTypeCorsair     FleetUnitType = "corsair"
 	FleetUnitTypeDestroyer   FleetUnitType = "destroyer"
 	FleetUnitTypeCruiser     FleetUnitType = "cruiser"
 	FleetUnitTypeBattleship  FleetUnitType = "battleship"
 	FleetUnitTypeAnnihilator FleetUnitType = "annihilator"
+	FleetUnitTypeColonyShip  FleetUnitType = "colonyship"
+	FleetUnitTypeRecycler    FleetUnitType = "recycler"
 )

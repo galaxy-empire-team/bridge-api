@@ -10,7 +10,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
-func Attack(missionService MissionService) func(c *gin.Context) {
+func Spy(missionService MissionService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		userID, err := middleware.RetrieveUserID(c)
 		if err != nil {
@@ -21,7 +21,7 @@ func Attack(missionService MissionService) func(c *gin.Context) {
 			return
 		}
 
-		var req AttackRequest
+		var req SpyRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{
 				Err: "invalid request body",
@@ -29,7 +29,7 @@ func Attack(missionService MissionService) func(c *gin.Context) {
 			return
 		}
 
-		err = missionService.Attack(
+		err = missionService.Spy(
 			c.Request.Context(),
 			userID,
 			req.PlanetFrom,
@@ -37,22 +37,18 @@ func Attack(missionService MissionService) func(c *gin.Context) {
 			toFleetUnits(req.FleetUnitCount),
 		)
 		if err != nil {
-			handleAttackError(c, err)
+			handleSpyError(c, err)
 			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"status": "attack mission started",
+			"status": "spy mission started",
 		})
 	}
 }
 
-func handleAttackError(c *gin.Context, err error) {
+func handleSpyError(c *gin.Context, err error) {
 	switch {
-	case errors.Is(err, models.ErrColonizePlanetAlreadyExists):
-		c.JSON(http.StatusConflict, ErrorResponse{
-			Err: "planet already exists at the target coordinates",
-		})
 	case errors.Is(err, models.ErrPlanetDoesNotBelongToUser):
 		c.JSON(http.StatusForbidden, ErrorResponse{
 			Err: "the planet does not belong to the user",

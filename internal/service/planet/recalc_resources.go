@@ -13,13 +13,18 @@ import (
 
 // recalcResources recalculates the resources of a planet based on the time since the last update.
 // Recalcs using time.Now().UTC(). Use this before any operation that changes resources.
-func (s *Service) recalcResources(ctx context.Context, planetID uuid.UUID) error {
-	return s.recalcResourcesWithUpdatedTime(ctx, planetID, time.Now().UTC())
+func (s *Service) recalcResources(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) error {
+	return s.recalcResourcesWithUpdatedTime(ctx, userID, planetID, time.Now().UTC())
 }
 
 // recalcResourcesWithUpdatedTime recalculates the resources of a planet based on the time since the last update.
 // Recalcs using the provided updatedAt time. Use this before any operation that changes resources.
-func (s *Service) recalcResourcesWithUpdatedTime(ctx context.Context, planetID uuid.UUID, updatedAt time.Time) error {
+func (s *Service) recalcResourcesWithUpdatedTime(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, updatedAt time.Time) error {
+	multiplier, err := s.getResearchResourceMultiplier(ctx, userID)
+	if err != nil {
+		return fmt.Errorf("getResearchResourceMultiplier(): %w", err)
+	}
+
 	return s.txManager.ExecPlanetTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
 		planetBuildingsInfo, err := s.getMinesInfo(ctx, planetID)
 		if err != nil {
@@ -36,10 +41,14 @@ func (s *Service) recalcResourcesWithUpdatedTime(ctx context.Context, planetID u
 			return nil
 		}
 
+		metalProductionPerSecond := float32(planetBuildingsInfo[consts.BuildingTypeMetalMine].ProductionS) * multiplier
+		crystalProductionPerSecond := float32(planetBuildingsInfo[consts.BuildingTypeCrystalMine].ProductionS) * multiplier
+		gasProductionPerSecond := float32(planetBuildingsInfo[consts.BuildingTypeGasMine].ProductionS) * multiplier
+
 		updatedResources := models.Resources{
-			Metal:     resources.Metal + uint64(millisecondsSinceLastUpdate)*planetBuildingsInfo[consts.BuildingTypeMetalMine].ProductionS/1000,
-			Crystal:   resources.Crystal + uint64(millisecondsSinceLastUpdate)*planetBuildingsInfo[consts.BuildingTypeCrystalMine].ProductionS/1000,
-			Gas:       resources.Gas + uint64(millisecondsSinceLastUpdate)*planetBuildingsInfo[consts.BuildingTypeGasMine].ProductionS/1000,
+			Metal:     resources.Metal + uint64(millisecondsSinceLastUpdate)*uint64(metalProductionPerSecond)/1000,
+			Crystal:   resources.Crystal + uint64(millisecondsSinceLastUpdate)*uint64(crystalProductionPerSecond)/1000,
+			Gas:       resources.Gas + uint64(millisecondsSinceLastUpdate)*uint64(gasProductionPerSecond)/1000,
 			UpdatedAt: updatedAt,
 		}
 
@@ -75,4 +84,27 @@ func (s *Service) getMinesInfo(ctx context.Context, planetID uuid.UUID) (map[con
 	}
 
 	return mines, nil
+}
+
+func (s *Service) getResearchResourceMultiplier(ctx context.Context, userID uuid.UUID) (float32, error) {
+	researchIDs, err := s.researchStorage.GetUserResearches(ctx, userID)
+	if err != nil {
+		return 0, fmt.Errorf("researchStorage.GetUserResearches(): %w", err)
+	}
+
+	for _, researchID := range researchIDs {
+		research, err := s.registry.GetResearchStatsByID(researchID)
+		if err != nil {
+			return 0, fmt.Errorf("registry.GetResearchStatsByID(): %w", err)
+		}
+
+		if research.Type != consts.ResearchTypeIndustrialTechnology {
+			continue
+		}
+
+		return research.Bonuses.ProductionSpeedImprove, nil
+	}
+
+	// If user has no industrial technology research, return 1
+	return 1, nil
 }

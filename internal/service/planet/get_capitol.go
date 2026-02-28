@@ -23,7 +23,7 @@ func (s *Service) GetCapitol(ctx context.Context, userID uuid.UUID) (models.Plan
 		}
 	}
 
-	planet, err := s.getPlanetByID(ctx, capitolID)
+	planet, err := s.getPlanetByID(ctx, userID, capitolID)
 	if err != nil {
 		return models.Planet{}, fmt.Errorf("getPlanetByID(): %w", err)
 	}

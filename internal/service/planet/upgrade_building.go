@@ -34,7 +34,7 @@ func (s *Service) UpgradeBuilding(ctx context.Context, userID uuid.UUID, planetI
 		return models.ErrTooManyBuildingsInProgress
 	}
 
-	err = s.recalcResources(ctx, planetID)
+	err = s.recalcResources(ctx, userID, planetID)
 	if err != nil {
 		return fmt.Errorf("recalcResources(): %w", err)
 	}
