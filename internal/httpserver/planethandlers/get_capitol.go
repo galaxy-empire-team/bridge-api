@@ -27,7 +27,7 @@ func GetCapitol(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusOK, toTransportPlanet(userCapitolPlanet))
+		c.JSON(http.StatusOK, toPlanetResponse(userCapitolPlanet))
 	}
 }
 
@@ -35,7 +35,7 @@ func handleGetCapitolError(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, models.ErrCapitolNotFound):
 		c.JSON(http.StatusNotFound, ErrorResponse{
-			Err: "capitol planet for user not found",
+			Err: "capitol planet not found",
 		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{

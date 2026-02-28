@@ -1,13 +1,11 @@
 package planethandlers
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/middleware"
-	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 func GetFleet(planetService PlanetService) func(c *gin.Context) {
@@ -31,23 +29,12 @@ func GetFleet(planetService PlanetService) func(c *gin.Context) {
 
 		fleet, err := planetService.GetFleet(c.Request.Context(), userID, req.PlanetID)
 		if err != nil {
-			handleGetFleetError(c, err)
+			c.JSON(http.StatusInternalServerError, ErrorResponse{
+				Err: err.Error(),
+			})
 			return
 		}
 
-		c.JSON(http.StatusOK, toTransportFleet(fleet))
-	}
-}
-
-func handleGetFleetError(c *gin.Context, err error) {
-	switch {
-	case errors.Is(err, models.ErrPlanetNotFound):
-		c.JSON(http.StatusNotFound, ErrorResponse{
-			Err: "fleet not found",
-		})
-	default:
-		c.JSON(http.StatusInternalServerError, ErrorResponse{
-			Err: err.Error(),
-		})
+		c.JSON(http.StatusOK, toFleetResponse(fleet))
 	}
 }

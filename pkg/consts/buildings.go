@@ -1,9 +1,9 @@
 package consts
 
-type BuildingID uint8
+type BuildingID uint16
 
-func (b BuildingID) ToUint8() uint8 {
-	return uint8(b)
+func (b BuildingID) ToUint16() uint16 {
+	return uint16(b)
 }
 
 type BuildingLevel uint8
@@ -36,14 +36,4 @@ func GetBuildingTypes() []BuildingType {
 	buildings = append(buildings, GetMineTypes()...)
 
 	return buildings
-}
-
-func IsValidBuildingType(buildingType BuildingType) bool {
-	for _, bt := range GetBuildingTypes() {
-		if bt == buildingType {
-			return true
-		}
-	}
-
-	return false
 }

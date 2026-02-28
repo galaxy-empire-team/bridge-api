@@ -25,15 +25,15 @@ func (s *Service) recalcResourcesWithUpdatedTime(ctx context.Context, userID uui
 		return fmt.Errorf("getResearchResourceMultiplier(): %w", err)
 	}
 
-	return s.txManager.ExecPlanetTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
-		planetBuildingsInfo, err := s.getMinesInfo(ctx, planetID)
+	return s.txManager.ExecPlanetTx(ctx, func(ctx context.Context, planetStorage TxStorages) error {
+		mines, err := s.planetStorage.GetPlanetMinesProduction(ctx, planetID)
 		if err != nil {
-			return fmt.Errorf("GetMinesInfo(): %w", err)
+			return fmt.Errorf("planetStorage.GetPlanetMinesProduction(): %w", err)
 		}
 
-		resources, err := planetRepo.GetResourcesForUpdate(ctx, planetID)
+		resources, err := s.planetStorage.GetResourcesForUpdate(ctx, planetID)
 		if err != nil {
-			return fmt.Errorf("planetRepo.GetResourcesForUpdate(): %w", err)
+			return fmt.Errorf("planetStorage.GetResourcesForUpdate(): %w", err)
 		}
 
 		millisecondsSinceLastUpdate := updatedAt.Sub(resources.UpdatedAt).Milliseconds()
@@ -41,9 +41,9 @@ func (s *Service) recalcResourcesWithUpdatedTime(ctx context.Context, userID uui
 			return nil
 		}
 
-		metalProductionPerSecond := float32(planetBuildingsInfo[consts.BuildingTypeMetalMine].ProductionS) * multiplier
-		crystalProductionPerSecond := float32(planetBuildingsInfo[consts.BuildingTypeCrystalMine].ProductionS) * multiplier
-		gasProductionPerSecond := float32(planetBuildingsInfo[consts.BuildingTypeGasMine].ProductionS) * multiplier
+		metalProductionPerSecond := float32(mines[consts.BuildingTypeMetalMine]) * multiplier
+		crystalProductionPerSecond := float32(mines[consts.BuildingTypeCrystalMine]) * multiplier
+		gasProductionPerSecond := float32(mines[consts.BuildingTypeGasMine]) * multiplier
 
 		updatedResources := models.Resources{
 			Metal:     resources.Metal + uint64(millisecondsSinceLastUpdate)*uint64(metalProductionPerSecond)/1000,
@@ -52,38 +52,13 @@ func (s *Service) recalcResourcesWithUpdatedTime(ctx context.Context, userID uui
 			UpdatedAt: updatedAt,
 		}
 
-		err = planetRepo.SetResources(ctx, planetID, updatedResources)
+		err = planetStorage.SetResources(ctx, planetID, updatedResources)
 		if err != nil {
-			return fmt.Errorf("planetRepo.SetResources(): %w", err)
+			return fmt.Errorf("planetStorage.SetResources(): %w", err)
 		}
 
 		return nil
 	})
-}
-
-func (s *Service) getMinesInfo(ctx context.Context, planetID uuid.UUID) (map[consts.BuildingType]models.BuildingInfo, error) {
-	mines, err := s.planetStorage.GetBuildingsInfo(ctx, planetID, consts.GetMineTypes())
-	if err != nil {
-		return nil, fmt.Errorf("planetRepo.GetBuildingsInfo(): %w", err)
-	}
-
-	// If mines are not build yet, initialize them with default values
-	for _, mineType := range consts.GetMineTypes() {
-		if _, exists := mines[mineType]; !exists {
-			stat, err := s.registry.GetBuildingZeroLvlStats(mineType)
-			if err != nil {
-				return nil, fmt.Errorf("registry.GetBuildingZeroLvlStats(): %w", err)
-			}
-
-			mines[mineType] = models.BuildingInfo{
-				Type:        stat.Type,
-				Level:       stat.Level,
-				ProductionS: stat.ProductionS,
-			}
-		}
-	}
-
-	return mines, nil
 }
 
 func (s *Service) getResearchResourceMultiplier(ctx context.Context, userID uuid.UUID) (float32, error) {

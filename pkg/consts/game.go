@@ -5,9 +5,6 @@ const (
 	SystemInGalaxyCount  = 3
 	PlanetsInSystemCount = 16
 
-	DefaultBuildingLvl         = 0
-	DefaultBuildingProductionS = 10
-	MaxBuildingLvl             = 5
-
+	MaxBuildingLvl         = 16
 	MaxBuildingsInProgress = 2
 )

@@ -23,17 +23,17 @@ func (s *Service) Transport(ctx context.Context, userID uuid.UUID, planetFrom uu
 		return fmt.Errorf("planetStorage.GetIDByCoordinates(): %w", err)
 	}
 
-	for range []uuid.UUID{planetFrom, planetToID} {
-		isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, userID, planetFrom)
+	for _, planetID := range []uuid.UUID{planetFrom, planetToID} {
+		isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, userID, planetID)
 		if err != nil {
 			return fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
 		}
 		if !isUserPlanet {
 			return models.ErrPlanetDoesNotBelongToUser
 		}
+
 	}
 
-	// To prevent a way to attack I check the length of the fleet. I assume that client always sends the correct data.
 	if len(fleet) > s.registry.GetFleetUnitTypeCount() {
 		return models.ErrInvalidInput
 	}
@@ -65,7 +65,7 @@ func (s *Service) Transport(ctx context.Context, userID uuid.UUID, planetFrom uu
 		}
 
 		startedAt := time.Now().UTC()
-		spyEvent := models.MissionEvent{
+		transportEvent := models.MissionEvent{
 			UserID:      userID,
 			PlanetFrom:  planetFrom,
 			PlanetTo:    planetTo,
@@ -77,7 +77,7 @@ func (s *Service) Transport(ctx context.Context, userID uuid.UUID, planetFrom uu
 			FinishedAt:  startedAt.Add(missionDuration),
 		}
 
-		err = storages.CreateMissionEvent(ctx, spyEvent)
+		err = storages.CreateMissionEvent(ctx, transportEvent)
 		if err != nil {
 			return fmt.Errorf("missionStorage.CreateMissionEvent(): %w", err)
 		}

@@ -60,7 +60,7 @@ func handleColonizeError(c *gin.Context, err error) {
 		})
 	case errors.Is(err, models.ErrFleetCannotBeEmpty):
 		c.JSON(http.StatusForbidden, ErrorResponse{
-			Err: "fleet cannot be empty for colonize mission",
+			Err: "fleet cannot be empty",
 		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{

@@ -2,7 +2,7 @@ package systemhandlers
 
 import "github.com/galaxy-empire-team/bridge-api/internal/models"
 
-func fromModelSystemPlanets(sp models.SystemPlanets) SystemPlanetsResponse {
+func toSystemPlanetsResponse(sp models.SystemPlanets) SystemPlanetsResponse {
 	response := SystemPlanetsResponse{
 		X:       sp.System.X,
 		Y:       sp.System.Y,

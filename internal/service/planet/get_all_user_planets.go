@@ -28,7 +28,7 @@ func (s *Service) GetAllUserPlanets(ctx context.Context, userID uuid.UUID) ([]mo
 
 	userPlanets, err := s.planetStorage.GetAllUserPlanets(ctx, userID)
 	if err != nil {
-		return nil, fmt.Errorf("planetRepo.GetAllUserPlanets(): %w", err)
+		return nil, fmt.Errorf("planetStorage.GetAllUserPlanets(): %w", err)
 	}
 
 	return userPlanets, nil

@@ -31,7 +31,7 @@ func (s *Service) CreateCapitol(ctx context.Context, userID uuid.UUID) error {
 
 	err = s.planetStorage.CreatePlanet(ctx, planetToColonize)
 	if err != nil {
-		return fmt.Errorf("planetRepo.CreatePlanet(): %w", err)
+		return fmt.Errorf("planetStorage.CreatePlanet(): %w", err)
 	}
 
 	return nil

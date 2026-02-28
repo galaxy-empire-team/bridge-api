@@ -33,6 +33,7 @@ func (s *MissionStorage) GetCurrentUserMissions(ctx context.Context, userID uuid
 	if err != nil {
 		return nil, fmt.Errorf("DB.Query(): %w", err)
 	}
+	defer rows.Close()
 
 	var missions []models.UserMission
 	var startedAt, finishedAt time.Time

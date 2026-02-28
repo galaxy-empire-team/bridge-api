@@ -10,9 +10,9 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-// SetFinishedBuildingTime updates updatedAt and finishedAt times. This denormailization
+// SetFinishedBuildingTime updates updatedAt and finishedAt times. This denormalization
 // is needed to optimize common planet queries.
-func (r *PlanetStorage) SetFinishedBuildingTime(ctx context.Context, planetID uuid.UUID, buildinID consts.BuildingID, finishedAt time.Time) error {
+func (r *PlanetStorage) SetFinishedBuildingTime(ctx context.Context, planetID uuid.UUID, buildingID consts.BuildingID, finishedAt time.Time) error {
 	const setFinishedBuildingQuery = `
 		UPDATE session_beta.planet_buildings
 		SET 
@@ -27,7 +27,7 @@ func (r *PlanetStorage) SetFinishedBuildingTime(ctx context.Context, planetID uu
 		ctx,
 		setFinishedBuildingQuery,
 		planetID,
-		buildinID,
+		buildingID,
 		finishedAt,
 	)
 	if err != nil {

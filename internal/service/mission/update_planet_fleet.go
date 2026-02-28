@@ -34,7 +34,7 @@ func (s *Service) updatePlanetFleet(ctx context.Context, planetID uuid.UUID, fle
 
 		planetCount, ok := planetFleetMap[fleetUnitID]
 		if !ok {
-			return fmt.Errorf("%w: fleet unit ID %d", models.ErrFleetNotFound, fleetUnitID)
+			return models.ErrFleetNotFound
 		}
 
 		if planetCount < reqCount {

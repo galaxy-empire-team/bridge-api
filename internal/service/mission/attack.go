@@ -34,7 +34,6 @@ func (s *Service) Attack(ctx context.Context, userID uuid.UUID, planetFrom uuid.
 		return models.ErrPlanetDoesNotBelongToUser
 	}
 
-	// To prevent a way to attack I check the length of the fleet. I assume that client always sends the correct data.
 	if len(fleet) > s.registry.GetFleetUnitTypeCount() {
 		return models.ErrInvalidInput
 	}

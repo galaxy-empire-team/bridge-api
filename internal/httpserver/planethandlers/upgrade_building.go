@@ -29,7 +29,7 @@ func UpgradeBuilding(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		err = planetService.UpgradeBuilding(c.Request.Context(), userID, req.PlanetID, req.BuildingType)
+		err = planetService.UpgradeBuilding(c.Request.Context(), userID, req.PlanetID, req.BuildingID)
 		if err != nil {
 			handleUpgradeBuildingError(c, err)
 			return
@@ -43,13 +43,13 @@ func UpgradeBuilding(planetService PlanetService) func(c *gin.Context) {
 
 func handleUpgradeBuildingError(c *gin.Context, err error) {
 	switch {
-	case errors.Is(err, models.ErrBuildTypeInvalid):
-		c.JSON(http.StatusBadRequest, ErrorResponse{
-			Err: "invalid building type",
-		})
 	case errors.Is(err, models.ErrTooManyBuildingsInProgress):
 		c.JSON(http.StatusBadRequest, ErrorResponse{
-			Err: "too many buildings are already in progress",
+			Err: "too many buildings in progress",
+		})
+	case errors.Is(err, models.ErrBuildingNotFound):
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Err: "building not found",
 		})
 	case errors.Is(err, models.ErrBuildingMaxLevelReached):
 		c.JSON(http.StatusConflict, ErrorResponse{

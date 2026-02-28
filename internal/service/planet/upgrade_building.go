@@ -2,8 +2,8 @@ package planet
 
 import (
 	"context"
-	"errors"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/google/uuid"
@@ -12,11 +12,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (s *Service) UpgradeBuilding(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, BuildingType string) error {
-	if !consts.IsValidBuildingType(consts.BuildingType(BuildingType)) {
-		return models.ErrBuildTypeInvalid
-	}
-
+func (s *Service) UpgradeBuilding(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, buildingID consts.BuildingID) error {
 	isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, userID, planetID)
 	if err != nil {
 		return fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
@@ -25,13 +21,22 @@ func (s *Service) UpgradeBuilding(ctx context.Context, userID uuid.UUID, planetI
 		return models.ErrPlanetDoesNotBelongToUser
 	}
 
-	currentBuildsCount, err := s.planetStorage.GetCurrentBuildsCount(ctx, planetID)
+	currentBuildsCount, err := s.planetStorage.GetBuildsInProgressCount(ctx, planetID)
 	if err != nil {
-		return fmt.Errorf("planetRepo.GetCurrentBuildsCount(): %w", err)
+		return fmt.Errorf("planetStorage.GetBuildsInProgressCount(): %w", err)
 	}
 
 	if currentBuildsCount >= consts.MaxBuildingsInProgress {
 		return models.ErrTooManyBuildingsInProgress
+	}
+
+	planetBuildingIDs, err := s.planetStorage.GetAllPlanetBuildings(ctx, planetID)
+	if err != nil {
+		return fmt.Errorf("planetStorage.GetAllPlanetBuildings(): %w", err)
+	}
+
+	if !slices.Contains(planetBuildingIDs, buildingID) {
+		return models.ErrBuildingNotFound
 	}
 
 	err = s.recalcResources(ctx, userID, planetID)
@@ -40,60 +45,26 @@ func (s *Service) UpgradeBuilding(ctx context.Context, userID uuid.UUID, planetI
 	}
 
 	return s.txManager.ExecPlanetTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
-		var buildEvent models.BuildEvent
-
-		currentBuildingID, err := planetRepo.GetBuildingID(ctx, planetID, consts.BuildingType(BuildingType))
+		buildEvent, err := s.generateEventForExistingBuilding(ctx, planetID, buildingID, planetRepo)
 		if err != nil {
-			if !errors.Is(err, models.ErrBuildingNotFound) {
-				return fmt.Errorf("planetRepo.GetBuildingID(): %w", err)
-			}
-
-			buildEvent, err = s.generateEventForNewBuilding(ctx, planetID, consts.BuildingType(BuildingType), planetRepo)
-			if err != nil {
-				return fmt.Errorf("generateEventForNewBuilding(): %w", err)
-			}
-		} else {
-			buildEvent, err = s.generateEventForExistingBuilding(ctx, planetID, currentBuildingID, planetRepo)
+			return fmt.Errorf("generateEventForExistingBuilding(): %w", err)
 		}
 
 		err = planetRepo.SetFinishedBuildingTime(ctx, planetID, buildEvent.BuildingID, buildEvent.FinishedAt)
 		if err != nil {
-			return fmt.Errorf("planetRepo.SetFinishedBuildingTime(): %w", err)
+			return fmt.Errorf("planetStorage.SetFinishedBuildingTime(): %w", err)
 		}
 
 		err = planetRepo.CreateBuildingEvent(ctx, buildEvent)
 		if err != nil {
-			return fmt.Errorf("planetRepo.CreateBuildingEvent(): %w", err)
+			return fmt.Errorf("planetStorage.CreateBuildingEvent(): %w", err)
 		}
 
 		return nil
 	})
 }
 
-func (s *Service) generateEventForNewBuilding(ctx context.Context, planetID uuid.UUID, buildingType consts.BuildingType, planetRepo TxStorages) (models.BuildEvent, error) {
-	updatedAt := time.Now()
-
-	stats, err := s.registry.GetBuildingZeroLvlStats(buildingType)
-	if err != nil {
-		return models.BuildEvent{}, fmt.Errorf("registry.GetBuildingZeroLvlStats(): %w", err)
-	}
-
-	err = planetRepo.CreateBuilding(ctx, planetID, stats.ID)
-	if err != nil {
-		return models.BuildEvent{}, fmt.Errorf("planetRepo.CreateBuilding(): %w", err)
-	}
-
-	buildEvent := models.BuildEvent{
-		PlanetID:   planetID,
-		BuildingID: stats.ID,
-		StartedAt:  updatedAt,
-		FinishedAt: updatedAt.Add(time.Duration(stats.UpgradeTimeS) * time.Second),
-	}
-
-	return buildEvent, nil
-}
-
-func (s *Service) generateEventForExistingBuilding(ctx context.Context, planetID uuid.UUID, currentBuildingID consts.BuildingID, planetRepo TxStorages) (models.BuildEvent, error) {
+func (s *Service) generateEventForExistingBuilding(ctx context.Context, planetID uuid.UUID, buildingID consts.BuildingID, planetRepo TxStorages) (models.BuildEvent, error) {
 	updatedAt := time.Now()
 
 	// Calculate resources
@@ -102,21 +73,26 @@ func (s *Service) generateEventForExistingBuilding(ctx context.Context, planetID
 		return models.BuildEvent{}, fmt.Errorf("planetRepo.GetResourcesForUpdate(): %w", err)
 	}
 
-	updateBuildingStats, err := s.registry.GetBuildingNextLvlStats(currentBuildingID)
+	nextLvlBuildingID, err := s.registry.GetBuildingNextLvlID(buildingID)
 	if err != nil {
-		return models.BuildEvent{}, fmt.Errorf("registry.GetBuildingStats(): %w", err)
+		return models.BuildEvent{}, fmt.Errorf("registry.GetBuildingNextLvlID(): %w", err)
 	}
 
-	if resources.Metal < updateBuildingStats.MetalCost ||
-		resources.Crystal < updateBuildingStats.CrystalCost ||
-		resources.Gas < updateBuildingStats.GasCost {
+	nextLvlStats, err := s.registry.GetBuildingStatsByID(nextLvlBuildingID)
+	if err != nil {
+		return models.BuildEvent{}, fmt.Errorf("registry.GetBuildingStatsByID(): %w", err)
+	}
+
+	if resources.Metal < nextLvlStats.MetalCost ||
+		resources.Crystal < nextLvlStats.CrystalCost ||
+		resources.Gas < nextLvlStats.GasCost {
 		return models.BuildEvent{}, models.ErrNotEnoughResources
 	}
 
 	leftResources := models.Resources{
-		Metal:     resources.Metal - updateBuildingStats.MetalCost,
-		Crystal:   resources.Crystal - updateBuildingStats.CrystalCost,
-		Gas:       resources.Gas - updateBuildingStats.GasCost,
+		Metal:     resources.Metal - nextLvlStats.MetalCost,
+		Crystal:   resources.Crystal - nextLvlStats.CrystalCost,
+		Gas:       resources.Gas - nextLvlStats.GasCost,
 		UpdatedAt: updatedAt,
 	}
 
@@ -125,17 +101,11 @@ func (s *Service) generateEventForExistingBuilding(ctx context.Context, planetID
 		return models.BuildEvent{}, fmt.Errorf("planetRepo.SetResources(): %w", err)
 	}
 
-	// get time to upgrade from registry
-	currentStat, err := s.registry.GetBuildingStatsByID(currentBuildingID)
-	if err != nil {
-		return models.BuildEvent{}, fmt.Errorf("registry.GetBuildingStatsByID(): %w", err)
-	}
-
 	buildEvent := models.BuildEvent{
 		PlanetID:   planetID,
-		BuildingID: currentBuildingID,
+		BuildingID: buildingID,
 		StartedAt:  updatedAt,
-		FinishedAt: updatedAt.Add(time.Duration(currentStat.UpgradeTimeS) * time.Second),
+		FinishedAt: updatedAt.Add(time.Duration(nextLvlStats.UpgradeTimeS) * time.Second),
 	}
 
 	return buildEvent, nil

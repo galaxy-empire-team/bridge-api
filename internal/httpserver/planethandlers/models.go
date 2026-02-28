@@ -3,55 +3,39 @@ package planethandlers
 import (
 	"time"
 
+	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 	"github.com/google/uuid"
 )
+
+type ErrorResponse struct {
+	Err string `json:"err"`
+}
 
 type PlanetIDRequest struct {
 	PlanetID uuid.UUID `json:"planetID"`
 }
 
 type UpgradeBuildingRequest struct {
-	PlanetID     uuid.UUID `json:"planetID"`
-	BuildingType string    `json:"buildingType"`
+	PlanetID   uuid.UUID         `json:"planetID"`
+	BuildingID consts.BuildingID `json:"buildingID"`
 }
 
-type GetBuildStatsRequest struct {
-	BuildingType string `json:"buildingType"`
-	Level        uint8  `json:"level"`
+type PlanetResponse struct {
+	PlanetID            uuid.UUID            `json:"planetID"`
+	X                   uint8                `json:"x"`
+	Y                   uint16               `json:"y"`
+	Z                   uint8                `json:"z"`
+	Resources           PlanetResources      `json:"resources"`
+	BuildingIDs         []uint16             `json:"buildings"`
+	BuildingsInProgress []BuildingInProgress `json:"buildingsInProgress,omitempty"`
+	IsCapitol           bool                 `json:"isCapitol"`
+	HasMoon             bool                 `json:"hasMoon"`
 }
 
-type GetPlanetResponse struct {
-	PlanetID  uuid.UUID               `json:"planetID"`
-	X         uint8                   `json:"x"`
-	Y         uint16                  `json:"y"`
-	Z         uint8                   `json:"z"`
-	Resources PlanetResources         `json:"resources"`
-	Buildings map[string]BuildingInfo `json:"buildings"`
-	IsCapitol bool                    `json:"isCapitol"`
-	HasMoon   bool                    `json:"hasMoon"`
-}
-
-type GetBuildStatsResponse struct {
-	Type                 string             `json:"type"`
-	Level                uint8              `json:"level"`
-	MetalCost            uint64             `json:"metalCost"`
-	CrystalCost          uint64             `json:"crystalCost"`
-	GasCost              uint64             `json:"gasCost"`
-	ProductionS          uint64             `json:"productionPerSecond"`
-	Bonuses              map[string]float64 `json:"bonuses,omitempty"`
-	UpgradeTimeInSeconds uint64             `json:"upgradeTimeInSeconds"`
-}
-
-type ErrorResponse struct {
-	Err string `json:"err"`
-}
-
-type BuildingInfo struct {
-	Level       uint8              `json:"level"`
-	ProductionS uint64             `json:"productionPerSecond"`
-	Bonuses     map[string]float64 `json:"bonuses,omitempty"`
-	UpdatedAt   time.Time          `json:"updatedAt,omitempty"`
-	FinishedAt  time.Time          `json:"finishedAt,omitempty"`
+type BuildingInProgress struct {
+	BuildingID consts.BuildingID `json:"buildingID"`
+	StartedAt  time.Time         `json:"startedAt"`
+	FinishedAt time.Time         `json:"finishedAt"`
 }
 
 type PlanetResources struct {
@@ -61,10 +45,10 @@ type PlanetResources struct {
 }
 
 type UserPlanetsResponse struct {
-	Planets []GetShortPlanet `json:"planets"`
+	Planets []ShortPlanet `json:"planets"`
 }
 
-type GetShortPlanet struct {
+type ShortPlanet struct {
 	PlanetID    uuid.UUID       `json:"planetID"`
 	X           uint8           `json:"x"`
 	Y           uint16          `json:"y"`

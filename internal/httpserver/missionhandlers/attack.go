@@ -49,21 +49,17 @@ func Attack(missionService MissionService) func(c *gin.Context) {
 
 func handleAttackError(c *gin.Context, err error) {
 	switch {
-	case errors.Is(err, models.ErrColonizePlanetAlreadyExists):
-		c.JSON(http.StatusConflict, ErrorResponse{
-			Err: "planet already exists at the target coordinates",
-		})
-	case errors.Is(err, models.ErrPlanetDoesNotBelongToUser):
+	case errors.Is(err, models.ErrFleetCannotBeEmpty):
 		c.JSON(http.StatusForbidden, ErrorResponse{
-			Err: "the planet does not belong to the user",
+			Err: "fleet cannot be empty for attack mission",
+		})
+	case errors.Is(err, models.ErrPlanetNotFound):
+		c.JSON(http.StatusConflict, ErrorResponse{
+			Err: "planet not found at the target coordinates",
 		})
 	case errors.Is(err, models.ErrNotEnoughFleetUnits):
 		c.JSON(http.StatusForbidden, ErrorResponse{
 			Err: "not enough fleet units",
-		})
-	case errors.Is(err, models.ErrFleetCannotBeEmpty):
-		c.JSON(http.StatusForbidden, ErrorResponse{
-			Err: "fleet cannot be empty for transport mission",
 		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{

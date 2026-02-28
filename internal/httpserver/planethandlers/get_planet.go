@@ -35,7 +35,7 @@ func GetPlanet(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusOK, toTransportPlanet(planet))
+		c.JSON(http.StatusOK, toPlanetResponse(planet))
 	}
 }
 

@@ -66,6 +66,10 @@ func handleTransportError(c *gin.Context, err error) {
 		c.JSON(http.StatusForbidden, ErrorResponse{
 			Err: "fleet cannot be empty for transport mission",
 		})
+	case errors.Is(err, models.ErrTransportCargoExceedsFleetCapacity):
+		c.JSON(http.StatusForbidden, ErrorResponse{
+			Err: "transport cargo exceeds fleet capacity",
+		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
 			Err: err.Error(),

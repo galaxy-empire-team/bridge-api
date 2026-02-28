@@ -23,6 +23,7 @@ func (r *PlanetStorage) GetFleetForUpdate(ctx context.Context, planetID uuid.UUI
 	if err != nil {
 		return nil, fmt.Errorf("DB.Query(): %w", err)
 	}
+	defer rows.Close()
 
 	var fleet []models.PlanetFleetUnitCount
 	for rows.Next() {

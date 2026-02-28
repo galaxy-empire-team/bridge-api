@@ -29,6 +29,6 @@ func GetSystemPlanets(systemService SystemService) func(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusOK, fromModelSystemPlanets(systemPlanets))
+		c.JSON(http.StatusOK, toSystemPlanetsResponse(systemPlanets))
 	}
 }

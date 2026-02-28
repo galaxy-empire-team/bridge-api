@@ -32,6 +32,7 @@ func (r *PlanetStorage) GetAllUserPlanets(ctx context.Context, userID uuid.UUID)
 	if err != nil {
 		return nil, fmt.Errorf("DB.Query.Scan(): %w", err)
 	}
+	defer rows.Close()
 
 	var planets []models.Planet
 	var colonizedAt time.Time

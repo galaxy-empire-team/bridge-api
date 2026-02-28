@@ -15,13 +15,15 @@ import (
 type planetStorage interface {
 	CreatePlanet(ctx context.Context, planet models.Planet) error
 	GetUserPlanetIDs(ctx context.Context, userID uuid.UUID) ([]models.PlanetIDWithCapitol, error)
-	GetResources(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
 	GetCoordinates(ctx context.Context, planetID uuid.UUID) (models.Coordinates, error)
-	GetBuildingsInfo(ctx context.Context, planetID uuid.UUID, BuildingTypes []consts.BuildingType) (map[consts.BuildingType]models.BuildingInfo, error)
-	GetCurrentBuildsCount(ctx context.Context, planetID uuid.UUID) (uint8, error)
+	GetResourcesForUpdate(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
+	GetPlanetMinesProduction(ctx context.Context, planetID uuid.UUID) (map[consts.BuildingType]uint64, error)
+	GetBuildsInProgressCount(ctx context.Context, planetID uuid.UUID) (uint8, error)
+	GetCurrentBuilds(ctx context.Context, planetID uuid.UUID) ([]models.BuildingInProgress, error)
 	GetAllUserPlanets(ctx context.Context, userID uuid.UUID) ([]models.Planet, error)
 	GetFleetForUpdate(ctx context.Context, planetID uuid.UUID) ([]models.PlanetFleetUnitCount, error)
 	CheckPlanetBelongsToUser(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (bool, error)
+	GetAllPlanetBuildings(ctx context.Context, userID uuid.UUID) ([]consts.BuildingID, error)
 }
 
 type researchStorage interface {
@@ -32,11 +34,8 @@ type researchStorage interface {
 type TxStorages interface {
 	GetResourcesForUpdate(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
 	SetResources(ctx context.Context, planetID uuid.UUID, updatedResources models.Resources) error
-	GetBuildingID(ctx context.Context, planetID uuid.UUID, BuildingType consts.BuildingType) (consts.BuildingID, error)
-	GetBuildingsInfo(ctx context.Context, planetID uuid.UUID, BuildingTypes []consts.BuildingType) (map[consts.BuildingType]models.BuildingInfo, error)
 	CreateBuildingEvent(ctx context.Context, buildEvent models.BuildEvent) error
-	SetFinishedBuildingTime(ctx context.Context, planetID uuid.UUID, buildinID consts.BuildingID, finishedAt time.Time) error
-	CreateBuilding(ctx context.Context, planetID uuid.UUID, buildingID consts.BuildingID) error
+	SetFinishedBuildingTime(ctx context.Context, planetID uuid.UUID, buildingID consts.BuildingID, finishedAt time.Time) error
 }
 
 type txManager interface {
@@ -44,10 +43,8 @@ type txManager interface {
 }
 
 type registryProvider interface {
-	GetBuildingZeroLvlStats(buildingType consts.BuildingType) (registry.BuildingStats, error)
 	GetBuildingStatsByID(buildingID consts.BuildingID) (registry.BuildingStats, error)
-	GetBuildingStatsByType(buildingType consts.BuildingType, level consts.BuildingLevel) (registry.BuildingStats, error)
-	GetBuildingNextLvlStats(buildingID consts.BuildingID) (registry.BuildingStats, error)
+	GetBuildingNextLvlID(buildingID consts.BuildingID) (consts.BuildingID, error)
 	GetFleetUnitStatsByID(fleetUnitID consts.FleetUnitID) (registry.FleetUnitStats, error)
 	GetResearchStatsByID(researchID consts.ResearchID) (registry.ResearchStats, error)
 }

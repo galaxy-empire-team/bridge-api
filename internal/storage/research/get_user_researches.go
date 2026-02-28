@@ -9,7 +9,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (r *UserStorage) GetUserResearches(ctx context.Context, userID uuid.UUID) ([]consts.ResearchID, error) {
+func (r *ResearchStorage) GetUserResearches(ctx context.Context, userID uuid.UUID) ([]consts.ResearchID, error) {
 	const getAllUserResearchesQuery = `
 		SELECT 
 			research_id
@@ -22,6 +22,7 @@ func (r *UserStorage) GetUserResearches(ctx context.Context, userID uuid.UUID) (
 	if err != nil {
 		return nil, fmt.Errorf("DB.Query.Scan(): %w", err)
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		var researchID consts.ResearchID
@@ -31,6 +32,10 @@ func (r *UserStorage) GetUserResearches(ctx context.Context, userID uuid.UUID) (
 		}
 
 		researches = append(researches, researchID)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows.Err(): %w", err)
 	}
 
 	return researches, nil

@@ -22,6 +22,7 @@ func (r *PlanetStorage) GetUserPlanetIDs(ctx context.Context, userID uuid.UUID) 
 	if err != nil {
 		return nil, fmt.Errorf("DB.Query.Scan(): %w", err)
 	}
+	defer rows.Close()
 
 	var planetIDs []models.PlanetIDWithCapitol
 	for rows.Next() {

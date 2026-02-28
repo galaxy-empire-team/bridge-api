@@ -27,7 +27,7 @@ func GetAllUserPlanets(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusOK, toTransportPlanets(userPlanets))
+		c.JSON(http.StatusOK, toUserPlanetsResponse(userPlanets))
 	}
 }
 
@@ -35,7 +35,7 @@ func handleGetAllPlanetsError(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, models.ErrNoPlanetsFound):
 		c.JSON(http.StatusNotFound, ErrorResponse{
-			Err: "no planets found for user",
+			Err: "no planets found",
 		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{

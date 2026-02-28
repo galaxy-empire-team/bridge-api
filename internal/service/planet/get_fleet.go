@@ -20,7 +20,7 @@ func (s *Service) GetFleet(ctx context.Context, userID uuid.UUID, planetID uuid.
 
 	fleet, err := s.planetStorage.GetFleetForUpdate(ctx, planetID)
 	if err != nil {
-		return nil, fmt.Errorf("getPlanetFleet(): %w", err)
+		return nil, fmt.Errorf("planetStorage.GetFleetForUpdate(): %w", err)
 	}
 
 	return fleet, nil

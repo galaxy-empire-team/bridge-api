@@ -19,7 +19,7 @@ func (s *PlanetStorage) CheckPlanetBelongsToUser(ctx context.Context, userID uui
 	var exists bool
 	err := s.DB.QueryRow(ctx, getBuildingInfoQuery, planetID, userID).Scan(&exists)
 	if err != nil {
-		return false, fmt.Errorf("DB.QueryRow(): %w", err)
+		return false, fmt.Errorf("DB.QueryRow() %w", err)
 	}
 
 	return exists, nil
