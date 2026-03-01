@@ -52,6 +52,12 @@ func New(ctx context.Context, connPool *pgxpool.Pool) (*Registry, error) {
 	}, nil
 }
 
+type buildingBonuses struct {
+	FleetBuildSpeed float32 `json:"fleet_build_speed,omitempty"`
+	ResearchSpeed   float32 `json:"research_speed,omitempty"`
+	BuildSpeed      float32 `json:"building_speed,omitempty"`
+}
+
 func getBuildingStats(ctx context.Context, pool *pgxpool.Pool) (map[consts.BuildingID]BuildingStats, error) {
 	const getBuildingStatsQuery = `
 		SELECT 
@@ -67,6 +73,7 @@ func getBuildingStats(ctx context.Context, pool *pgxpool.Pool) (map[consts.Build
 		FROM session_beta.s_buildings;
 	`
 
+	var bonuses buildingBonuses
 	result := make(map[consts.BuildingID]BuildingStats)
 	rows, err := pool.Query(ctx, getBuildingStatsQuery)
 	if err != nil {
@@ -83,11 +90,17 @@ func getBuildingStats(ctx context.Context, pool *pgxpool.Pool) (map[consts.Build
 			&BuildingStats.CrystalCost,
 			&BuildingStats.GasCost,
 			&BuildingStats.ProductionS,
-			&BuildingStats.Bonuses,
+			&bonuses,
 			&BuildingStats.UpgradeTimeS,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("rows.Scan(): %w", err)
+		}
+
+		BuildingStats.Bonuses = BuildingBonuses{
+			FleetBuildSpeed: bonuses.FleetBuildSpeed,
+			ResearchSpeed:   bonuses.ResearchSpeed,
+			BuildSpeed:      bonuses.BuildSpeed,
 		}
 
 		result[BuildingStats.ID] = BuildingStats

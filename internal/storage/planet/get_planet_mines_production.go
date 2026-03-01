@@ -14,7 +14,7 @@ import (
 func (s *PlanetStorage) GetPlanetMinesProduction(ctx context.Context, planetID uuid.UUID) (map[consts.BuildingType]uint64, error) {
 	const getMineInfoQuery = `
 		SELECT 
-			b.production_s,
+			b.production_s
 		FROM session_beta.planet_buildings pb
 		JOIN session_beta.s_buildings b ON pb.building_id = b.id
 		WHERE pb.planet_id = $1 AND b.building_type = ANY($2);

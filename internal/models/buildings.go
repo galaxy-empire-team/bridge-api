@@ -16,14 +16,21 @@ type BuildEvent struct {
 }
 
 type BuildingStats struct {
+	ID           consts.BuildingID
 	Level        consts.BuildingLevel
 	Type         consts.BuildingType
 	MetalCost    uint64
 	CrystalCost  uint64
 	GasCost      uint64
 	ProductionS  uint64
-	Bonuses      map[string]float64
+	Bonuses      BuildingBonuses
 	UpgradeTimeS uint64
+}
+
+type BuildingBonuses struct {
+	FleetBuildSpeed float64
+	ResearchSpeed   float64
+	BuildSpeed      float64
 }
 
 type BuildingInfo struct {

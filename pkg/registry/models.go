@@ -12,8 +12,14 @@ type BuildingStats struct {
 	CrystalCost  uint64
 	GasCost      uint64
 	ProductionS  uint64
-	Bonuses      map[string]float64
+	Bonuses      BuildingBonuses
 	UpgradeTimeS uint64
+}
+
+type BuildingBonuses struct {
+	FleetBuildSpeed float32
+	ResearchSpeed   float32
+	BuildSpeed      float32
 }
 
 type FleetUnitStats struct {

@@ -33,7 +33,7 @@ type PlanetResponse struct {
 }
 
 type BuildingInProgress struct {
-	BuildingID consts.BuildingID `json:"buildingID"`
+	BuildingID consts.BuildingID `json:"id"`
 	StartedAt  time.Time         `json:"startedAt"`
 	FinishedAt time.Time         `json:"finishedAt"`
 }

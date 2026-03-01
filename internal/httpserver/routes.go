@@ -3,6 +3,7 @@ package httpserver
 import (
 	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/missionhandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/planethandlers"
+	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/statichandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/systemhandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/userhandlers"
 )
@@ -12,12 +13,12 @@ func (hs *HttpServer) RegisterRoutes(
 	planetService planethandlers.PlanetService,
 	missionService missionhandlers.MissionService,
 	systemService systemhandlers.SystemService,
+	staticsService statichandlers.StaticService,
 ) {
 	// ----- User Routes -----
 	hs.apiRouter.POST("/user/create", userhandlers.CreateUser(userService))
 
 	// ----- Planet Routes -----
-	// Rewrite post > get after authorization
 	hs.apiRouter.GET("/planet", planethandlers.GetPlanet(planetService))
 	hs.apiRouter.GET("/planet/capitol", planethandlers.GetCapitol(planetService))
 	hs.apiRouter.GET("/planet/all", planethandlers.GetAllUserPlanets(planetService))
@@ -34,4 +35,7 @@ func (hs *HttpServer) RegisterRoutes(
 
 	// ----- System Routes -----
 	hs.apiRouter.GET("/system/planets", systemhandlers.GetSystemPlanets(systemService))
+
+	// ----- Static Routes -----
+	hs.apiRouter.GET("/static/buildings", statichandlers.GetBuildingStats(staticsService))
 }

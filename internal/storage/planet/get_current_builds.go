@@ -3,6 +3,7 @@ package planet
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -26,11 +27,15 @@ func (r *PlanetStorage) GetCurrentBuilds(ctx context.Context, planetID uuid.UUID
 	defer rows.Close()
 
 	var builds []models.BuildingInProgress
+	var startedAt, finishedAt time.Time
 	for rows.Next() {
 		var b models.BuildingInProgress
-		if err := rows.Scan(&b.BuildingID, &b.StartedAt, &b.FinishedAt); err != nil {
+		if err := rows.Scan(&b.BuildingID, &startedAt, &finishedAt); err != nil {
 			return nil, fmt.Errorf("rows.Scan(): %w", err)
 		}
+
+		b.StartedAt = startedAt.UTC()
+		b.FinishedAt = finishedAt.UTC()
 
 		builds = append(builds, b)
 	}
