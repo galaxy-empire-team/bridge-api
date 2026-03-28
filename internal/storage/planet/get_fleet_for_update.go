@@ -9,7 +9,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
-func (r *PlanetStorage) GetFleetForUpdate(ctx context.Context, planetID uuid.UUID) ([]models.PlanetFleetUnitCount, error) {
+func (r *PlanetStorage) GetFleetForUpdate(ctx context.Context, planetID uuid.UUID) ([]models.FleetUnitCount, error) {
 	const getFleetQuery = `
 		SELECT 
 			fleet_id,
@@ -25,9 +25,9 @@ func (r *PlanetStorage) GetFleetForUpdate(ctx context.Context, planetID uuid.UUI
 	}
 	defer rows.Close()
 
-	var fleet []models.PlanetFleetUnitCount
+	var fleet []models.FleetUnitCount
 	for rows.Next() {
-		var fleetUnit models.PlanetFleetUnitCount
+		var fleetUnit models.FleetUnitCount
 		err = rows.Scan(
 			&fleetUnit.ID,
 			&fleetUnit.Count,

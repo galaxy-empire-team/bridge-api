@@ -11,8 +11,8 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (s *Service) updatePlanetFleet(ctx context.Context, planetID uuid.UUID, fleet []models.PlanetFleetUnitCount, storage TxStorages) error {
-	reqFleet := lo.Associate(fleet, func(fleetUnit models.PlanetFleetUnitCount) (consts.FleetUnitID, uint64) {
+func (s *Service) updatePlanetFleet(ctx context.Context, planetID uuid.UUID, fleet []models.FleetUnitCount, storage TxStorages) error {
+	reqFleet := lo.Associate(fleet, func(fleetUnit models.FleetUnitCount) (consts.FleetUnitID, uint64) {
 		return fleetUnit.ID, fleetUnit.Count
 	})
 
@@ -21,11 +21,11 @@ func (s *Service) updatePlanetFleet(ctx context.Context, planetID uuid.UUID, fle
 		return fmt.Errorf("planetStorage.GetFleetCountForUpdate(): %w", err)
 	}
 
-	planetFleetMap := lo.Associate(planetFleet, func(fleetUnit models.PlanetFleetUnitCount) (consts.FleetUnitID, uint64) {
+	planetFleetMap := lo.Associate(planetFleet, func(fleetUnit models.FleetUnitCount) (consts.FleetUnitID, uint64) {
 		return fleetUnit.ID, fleetUnit.Count
 	})
 
-	var leftFleetUnits []models.PlanetFleetUnitCount
+	var leftFleetUnits []models.FleetUnitCount
 	for _, fleetUnitID := range s.registry.GetFleetUnitIDs() {
 		reqCount, ok := reqFleet[fleetUnitID]
 		if !ok {
@@ -41,7 +41,7 @@ func (s *Service) updatePlanetFleet(ctx context.Context, planetID uuid.UUID, fle
 			return models.ErrNotEnoughFleetUnits
 		}
 
-		leftFleetUnits = append(leftFleetUnits, models.PlanetFleetUnitCount{
+		leftFleetUnits = append(leftFleetUnits, models.FleetUnitCount{
 			ID:    fleetUnitID,
 			Count: planetCount - reqCount,
 		})

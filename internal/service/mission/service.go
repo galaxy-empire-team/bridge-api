@@ -30,8 +30,8 @@ type researchStorage interface {
 
 type TxStorages interface {
 	// --- planetStorage ---
-	GetFleetForUpdate(ctx context.Context, planetID uuid.UUID) ([]models.PlanetFleetUnitCount, error)
-	SetFleet(ctx context.Context, planetID uuid.UUID, fleet []models.PlanetFleetUnitCount) error
+	GetFleetForUpdate(ctx context.Context, planetID uuid.UUID) ([]models.FleetUnitCount, error)
+	SetFleet(ctx context.Context, planetID uuid.UUID, fleet []models.FleetUnitCount) error
 	GetResourcesForUpdate(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
 	SetResources(ctx context.Context, planetID uuid.UUID, updatedResources models.Resources) error
 	// --- missionStorage ---

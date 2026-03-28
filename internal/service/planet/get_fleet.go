@@ -9,7 +9,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
-func (s *Service) GetFleet(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) ([]models.PlanetFleetUnitCount, error) {
+func (s *Service) GetFleet(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) ([]models.FleetUnitCount, error) {
 	isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, userID, planetID)
 	if err != nil {
 		return nil, fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)

@@ -41,3 +41,9 @@ type BuildingInfo struct {
 	UpdatedAt   time.Time
 	FinishedAt  time.Time
 }
+
+type BuildingInProgress struct {
+	BuildingID consts.BuildingID
+	StartedAt  time.Time
+	FinishedAt time.Time
+}

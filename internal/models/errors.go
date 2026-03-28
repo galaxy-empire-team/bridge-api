@@ -21,6 +21,7 @@ var (
 	ErrPlanetNotFound                = errors.New("planet not found")
 	ErrFleetNotFound                 = errors.New("fleet not found")
 	ErrBuildingAlreadyExists         = errors.New("building already exists on planet")
+	ErrFleetConstructionInProgress   = errors.New("fleet construction is already in progress")
 
 	// Mission errors
 	ErrColonizePlanetAlreadyExists        = errors.New("planet already exists at the target coordinates")
@@ -32,4 +33,8 @@ var (
 	ErrTransportCargoExceedsFleetCapacity = errors.New("transport cargo exceeds fleet capacity")
 	ErrFleetCannotBeEmpty                 = errors.New("fleet cannot be empty for attack mission")
 	ErrColonizationNotAvailable           = errors.New("colonization not available")
+
+	// Research errors
+	ErrResearchInProgress = errors.New("research is already in progress")
+	ErrUserHasNotResearch = errors.New("user has not research id to upgrade")
 )

@@ -12,7 +12,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (s *Service) UpgradeBuilding(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, buildingID consts.BuildingID) error {
+func (s *Service) StartBuildingUpgrade(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, buildingID consts.BuildingID) error {
 	isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, userID, planetID)
 	if err != nil {
 		return fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
@@ -50,11 +50,6 @@ func (s *Service) UpgradeBuilding(ctx context.Context, userID uuid.UUID, planetI
 			return fmt.Errorf("generateEventForExistingBuilding(): %w", err)
 		}
 
-		err = planetRepo.SetFinishedBuildingTime(ctx, planetID, buildEvent.BuildingID, buildEvent.FinishedAt)
-		if err != nil {
-			return fmt.Errorf("planetStorage.SetFinishedBuildingTime(): %w", err)
-		}
-
 		err = planetRepo.CreateBuildingEvent(ctx, buildEvent)
 		if err != nil {
 			return fmt.Errorf("planetStorage.CreateBuildingEvent(): %w", err)
@@ -65,14 +60,6 @@ func (s *Service) UpgradeBuilding(ctx context.Context, userID uuid.UUID, planetI
 }
 
 func (s *Service) generateEventForExistingBuilding(ctx context.Context, planetID uuid.UUID, buildingID consts.BuildingID, planetRepo TxStorages) (models.BuildEvent, error) {
-	updatedAt := time.Now()
-
-	// Calculate resources
-	resources, err := planetRepo.GetResourcesForUpdate(ctx, planetID)
-	if err != nil {
-		return models.BuildEvent{}, fmt.Errorf("planetRepo.GetResourcesForUpdate(): %w", err)
-	}
-
 	nextLvlBuildingID, err := s.registry.GetBuildingNextLvlID(buildingID)
 	if err != nil {
 		return models.BuildEvent{}, fmt.Errorf("registry.GetBuildingNextLvlID(): %w", err)
@@ -81,6 +68,11 @@ func (s *Service) generateEventForExistingBuilding(ctx context.Context, planetID
 	nextLvlStats, err := s.registry.GetBuildingStatsByID(nextLvlBuildingID)
 	if err != nil {
 		return models.BuildEvent{}, fmt.Errorf("registry.GetBuildingStatsByID(): %w", err)
+	}
+
+	resources, err := planetRepo.GetResourcesForUpdate(ctx, planetID)
+	if err != nil {
+		return models.BuildEvent{}, fmt.Errorf("planetRepo.GetResourcesForUpdate(): %w", err)
 	}
 
 	if resources.Metal < nextLvlStats.MetalCost ||
@@ -93,7 +85,7 @@ func (s *Service) generateEventForExistingBuilding(ctx context.Context, planetID
 		Metal:     resources.Metal - nextLvlStats.MetalCost,
 		Crystal:   resources.Crystal - nextLvlStats.CrystalCost,
 		Gas:       resources.Gas - nextLvlStats.GasCost,
-		UpdatedAt: updatedAt,
+		UpdatedAt: resources.UpdatedAt,
 	}
 
 	err = planetRepo.SetResources(ctx, planetID, leftResources)
@@ -101,11 +93,12 @@ func (s *Service) generateEventForExistingBuilding(ctx context.Context, planetID
 		return models.BuildEvent{}, fmt.Errorf("planetRepo.SetResources(): %w", err)
 	}
 
+	startedAt := time.Now()
 	buildEvent := models.BuildEvent{
 		PlanetID:   planetID,
 		BuildingID: buildingID,
-		StartedAt:  updatedAt,
-		FinishedAt: updatedAt.Add(time.Duration(nextLvlStats.UpgradeTimeS) * time.Second),
+		StartedAt:  startedAt,
+		FinishedAt: startedAt.Add(time.Duration(nextLvlStats.UpgradeTimeS) * time.Second),
 	}
 
 	return buildEvent, nil

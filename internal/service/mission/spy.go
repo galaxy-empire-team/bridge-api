@@ -11,7 +11,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (s *Service) Spy(ctx context.Context, userID uuid.UUID, planetFrom uuid.UUID, planetTo models.Coordinates, fleet []models.PlanetFleetUnitCount) error {
+func (s *Service) Spy(ctx context.Context, userID uuid.UUID, planetFrom uuid.UUID, planetTo models.Coordinates, fleet []models.FleetUnitCount) error {
 	fleet = filterZeroCountFleet(fleet)
 
 	if len(fleet) == 0 {

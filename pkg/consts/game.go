@@ -7,4 +7,8 @@ const (
 
 	MaxBuildingLvl         = 16
 	MaxBuildingsInProgress = 2
+
+	MaxResearchLvl             = 16
+	MaxColonizationResearchLvl = 7
+	MaxResearchesInProgress    = 1
 )

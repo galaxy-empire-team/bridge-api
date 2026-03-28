@@ -10,10 +10,12 @@ import (
 )
 
 type PlanetService interface {
+	CreateCapitol(ctx context.Context, userID uuid.UUID) error
 	GetCapitol(ctx context.Context, userID uuid.UUID) (models.Planet, error)
 	GetPlanet(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (models.Planet, error)
 	GetAllUserPlanets(ctx context.Context, userID uuid.UUID) ([]models.Planet, error)
-	CreateCapitol(ctx context.Context, userID uuid.UUID) error
-	UpgradeBuilding(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, buildingID consts.BuildingID) error
-	GetFleet(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) ([]models.PlanetFleetUnitCount, error)
+	GetFleet(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) ([]models.FleetUnitCount, error)
+	StartBuildingUpgrade(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, buildingID consts.BuildingID) error
+	StartResearch(ctx context.Context, userID uuid.UUID, currentPlanet uuid.UUID, currentResearchID consts.ResearchID) error
+	StartFleetConstruction(ctx context.Context, userID uuid.UUID, currentPlanet uuid.UUID, fleet models.FleetUnitCount) error
 }

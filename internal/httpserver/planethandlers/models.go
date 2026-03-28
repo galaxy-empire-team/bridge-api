@@ -3,8 +3,9 @@ package planethandlers
 import (
 	"time"
 
-	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 	"github.com/google/uuid"
+
+	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
 type ErrorResponse struct {
@@ -15,9 +16,20 @@ type PlanetIDRequest struct {
 	PlanetID uuid.UUID `json:"planetID"`
 }
 
-type UpgradeBuildingRequest struct {
+type StartBuildingUpgradeRequest struct {
 	PlanetID   uuid.UUID         `json:"planetID"`
 	BuildingID consts.BuildingID `json:"buildingID"`
+}
+
+type StartResearchRequest struct {
+	PlanetID   uuid.UUID         `json:"planetID"`
+	ResearchID consts.ResearchID `json:"researchID"`
+}
+
+type StartFleetConstructionRequest struct {
+	PlanetID uuid.UUID          `json:"planetID"`
+	FleetID  consts.FleetUnitID `json:"fleetID"`
+	Count    uint64             `json:"count"`
 }
 
 type PlanetResponse struct {

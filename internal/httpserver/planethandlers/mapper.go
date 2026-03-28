@@ -57,7 +57,7 @@ func toUserPlanetsResponse(planets []models.Planet) UserPlanetsResponse {
 	return resp
 }
 
-func toFleetResponse(fleet []models.PlanetFleetUnitCount) FleetPlanetsResponse {
+func toFleetResponse(fleet []models.FleetUnitCount) FleetPlanetsResponse {
 	resp := FleetPlanetsResponse{
 		Fleet: make([]FleetUnitCount, 0, len(fleet)),
 	}

@@ -8,9 +8,10 @@ import (
 
 	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/middleware"
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/pkg/registry"
 )
 
-func UpgradeBuilding(planetService PlanetService) func(c *gin.Context) {
+func StartResearch(planetService PlanetService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		userID, err := middleware.RetrieveUserID(c)
 		if err != nil {
@@ -21,7 +22,7 @@ func UpgradeBuilding(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		var req UpgradeBuildingRequest
+		var req StartResearchRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{
 				Err: "invalid request body",
@@ -29,31 +30,31 @@ func UpgradeBuilding(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		err = planetService.UpgradeBuilding(c.Request.Context(), userID, req.PlanetID, req.BuildingID)
+		err = planetService.StartResearch(c.Request.Context(), userID, req.PlanetID, req.ResearchID)
 		if err != nil {
-			handleUpgradeBuildingError(c, err)
+			handleStartResearchError(c, err)
 			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"status": "build started",
+			"status": "research started",
 		})
 	}
 }
 
-func handleUpgradeBuildingError(c *gin.Context, err error) {
+func handleStartResearchError(c *gin.Context, err error) {
 	switch {
-	case errors.Is(err, models.ErrTooManyBuildingsInProgress):
+	case errors.Is(err, models.ErrPlanetDoesNotBelongToUser):
 		c.JSON(http.StatusBadRequest, ErrorResponse{
-			Err: "too many buildings in progress",
+			Err: "planet does not belong to user",
 		})
-	case errors.Is(err, models.ErrBuildingNotFound):
+	case errors.Is(err, models.ErrResearchInProgress):
 		c.JSON(http.StatusBadRequest, ErrorResponse{
-			Err: "building not found",
+			Err: "research already in progress",
 		})
-	case errors.Is(err, models.ErrBuildingMaxLevelReached):
+	case errors.Is(err, registry.ErrMaxLevelReached):
 		c.JSON(http.StatusConflict, ErrorResponse{
-			Err: "building has reached max level",
+			Err: "research has reached max level",
 		})
 	case errors.Is(err, models.ErrNotEnoughResources):
 		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
@@ -62,6 +63,10 @@ func handleUpgradeBuildingError(c *gin.Context, err error) {
 	case errors.Is(err, models.ErrEventIsAlreadyScheduled):
 		c.JSON(http.StatusConflict, ErrorResponse{
 			Err: "event is already scheduled",
+		})
+	case errors.Is(err, models.ErrUserHasNotResearch):
+		c.JSON(http.StatusConflict, ErrorResponse{
+			Err: "user has not research id to upgrade",
 		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{

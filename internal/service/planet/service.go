@@ -21,13 +21,15 @@ type planetStorage interface {
 	GetBuildsInProgressCount(ctx context.Context, planetID uuid.UUID) (uint8, error)
 	GetCurrentBuilds(ctx context.Context, planetID uuid.UUID) ([]models.BuildingInProgress, error)
 	GetAllUserPlanets(ctx context.Context, userID uuid.UUID) ([]models.Planet, error)
-	GetFleetForUpdate(ctx context.Context, planetID uuid.UUID) ([]models.PlanetFleetUnitCount, error)
-	CheckPlanetBelongsToUser(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (bool, error)
+	GetFleetForUpdate(ctx context.Context, planetID uuid.UUID) ([]models.FleetUnitCount, error)
 	GetAllPlanetBuildings(ctx context.Context, userID uuid.UUID) ([]consts.BuildingID, error)
+	CheckPlanetBelongsToUser(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (bool, error)
+	CheckFleetConstruction(ctx context.Context, planetID uuid.UUID) (bool, error)
 }
 
 type researchStorage interface {
 	GetUserResearches(ctx context.Context, userID uuid.UUID) ([]consts.ResearchID, error)
+	CheckResearchInProgress(ctx context.Context, user_id uuid.UUID) (bool, error)
 }
 
 // Separate storage methods that executes inside a transaction
@@ -35,7 +37,8 @@ type TxStorages interface {
 	GetResourcesForUpdate(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
 	SetResources(ctx context.Context, planetID uuid.UUID, updatedResources models.Resources) error
 	CreateBuildingEvent(ctx context.Context, buildEvent models.BuildEvent) error
-	SetFinishedBuildingTime(ctx context.Context, planetID uuid.UUID, buildingID consts.BuildingID, finishedAt time.Time) error
+	CreateResearchEvent(ctx context.Context, researchEvent models.ResearchEvent) error
+	CreateFleetConstructEvent(ctx context.Context, fleetConstructEvent models.FleetConstructEvent) error
 }
 
 type txManager interface {
@@ -45,6 +48,7 @@ type txManager interface {
 type registryProvider interface {
 	GetBuildingStatsByID(buildingID consts.BuildingID) (registry.BuildingStats, error)
 	GetBuildingNextLvlID(buildingID consts.BuildingID) (consts.BuildingID, error)
+	GetResearchNextLvlID(researchID consts.ResearchID) (consts.ResearchID, error)
 	GetFleetUnitStatsByID(fleetUnitID consts.FleetUnitID) (registry.FleetUnitStats, error)
 	GetResearchStatsByID(researchID consts.ResearchID) (registry.ResearchStats, error)
 }

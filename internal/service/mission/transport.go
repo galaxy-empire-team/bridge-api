@@ -11,7 +11,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (s *Service) Transport(ctx context.Context, userID uuid.UUID, planetFrom uuid.UUID, planetTo models.Coordinates, cargo models.Resources, fleet []models.PlanetFleetUnitCount) error {
+func (s *Service) Transport(ctx context.Context, userID uuid.UUID, planetFrom uuid.UUID, planetTo models.Coordinates, cargo models.Resources, fleet []models.FleetUnitCount) error {
 	fleet = filterZeroCountFleet(fleet)
 
 	if len(fleet) == 0 {
@@ -86,7 +86,7 @@ func (s *Service) Transport(ctx context.Context, userID uuid.UUID, planetFrom uu
 	})
 }
 
-func (s *Service) checkTransportCapacity(cargo models.Resources, fleet []models.PlanetFleetUnitCount, registry registryProvider) bool {
+func (s *Service) checkTransportCapacity(cargo models.Resources, fleet []models.FleetUnitCount, registry registryProvider) bool {
 	var cargoLimit uint64
 	for _, fleetUnit := range fleet {
 		fStats, err := registry.GetFleetUnitStatsByID(fleetUnit.ID)

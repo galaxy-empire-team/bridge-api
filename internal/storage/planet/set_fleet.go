@@ -10,7 +10,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
-func (r *PlanetStorage) SetFleet(ctx context.Context, planetID uuid.UUID, fleet []models.PlanetFleetUnitCount) error {
+func (r *PlanetStorage) SetFleet(ctx context.Context, planetID uuid.UUID, fleet []models.FleetUnitCount) error {
 	const setFleetQuery = `
 		UPDATE session_beta.planet_fleet
 		SET count = $1, updated_at = now()

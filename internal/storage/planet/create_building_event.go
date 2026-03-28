@@ -17,14 +17,15 @@ func (s *PlanetStorage) CreateBuildingEvent(ctx context.Context, buildEvent mode
 		) VALUES (
 			$1,    -- planet_id
 			$2,    -- building_id
-			NOW(), -- started_at
-			$3	   -- finished_at
+			$3,    -- started_at
+			$4	   -- finished_at
 		) ON CONFLICT (planet_id, building_id) DO NOTHING;
 		`
 
 	cmd, err := s.DB.Exec(ctx, setBuildLvlQuery,
 		buildEvent.PlanetID,
 		buildEvent.BuildingID,
+		buildEvent.StartedAt,
 		buildEvent.FinishedAt,
 	)
 	if err != nil {

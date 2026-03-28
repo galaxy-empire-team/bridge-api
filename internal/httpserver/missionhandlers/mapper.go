@@ -29,11 +29,11 @@ func fromCoordinatesModel(coordinates models.Coordinates) Coordinates {
 	}
 }
 
-func toFleetUnits(fleet []FleetUnitCount) []models.PlanetFleetUnitCount {
-	units := make([]models.PlanetFleetUnitCount, 0, len(fleet))
+func toFleetUnits(fleet []FleetUnitCount) []models.FleetUnitCount {
+	units := make([]models.FleetUnitCount, 0, len(fleet))
 
 	for _, f := range fleet {
-		units = append(units, models.PlanetFleetUnitCount{
+		units = append(units, models.FleetUnitCount{
 			ID:    consts.FleetUnitID(f.ID),
 			Count: f.Count,
 		})

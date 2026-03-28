@@ -2,7 +2,7 @@ package mission
 
 import "github.com/galaxy-empire-team/bridge-api/internal/models"
 
-func toFleetUnits(fleet []models.PlanetFleetUnitCount) []FleetUnit {
+func toFleetUnits(fleet []models.FleetUnitCount) []FleetUnit {
 	units := make([]FleetUnit, 0, len(fleet))
 
 	for _, f := range fleet {
