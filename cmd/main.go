@@ -7,7 +7,6 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/app"
 	"github.com/galaxy-empire-team/bridge-api/internal/config"
 	"github.com/galaxy-empire-team/bridge-api/internal/db"
-	"github.com/galaxy-empire-team/bridge-api/internal/httpserver"
 	missionservice "github.com/galaxy-empire-team/bridge-api/internal/service/mission"
 	planetservice "github.com/galaxy-empire-team/bridge-api/internal/service/planet"
 	staticservice "github.com/galaxy-empire-team/bridge-api/internal/service/static"
@@ -19,6 +18,8 @@ import (
 	systemstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/system"
 	"github.com/galaxy-empire-team/bridge-api/internal/storage/txmanager"
 	userstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/user"
+	"github.com/galaxy-empire-team/bridge-api/internal/transport/grpcserver"
+	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver"
 	"github.com/galaxy-empire-team/bridge-api/pkg/registry"
 )
 
@@ -72,10 +73,20 @@ func run() error {
 
 	httpServer.RegisterRoutes(userService, planetService, missionService, systemService, staticService)
 
-	err = httpServer.Start(ctx, cfg.Server)
+	shutdownFunc, err := httpServer.Start(ctx, cfg.HTTPServer)
 	if err != nil {
 		return fmt.Errorf("httpServer.Start(): %w", err)
 	}
+	app.AddGracefulFunc(shutdownFunc)
 
-	return nil
+	// initialize gRPC server
+	grpcServer := grpcserver.New(planetService, app.ComponentLogger("grpcserver"))
+
+	shutdownFunc, err = grpcServer.Start(cfg.GRPCServer)
+	if err != nil {
+		return fmt.Errorf("grpcServer.Start(): %w", err)
+	}
+	app.AddGracefulFunc(shutdownFunc)
+
+	return app.WaitAndShutdown(ctx)
 }

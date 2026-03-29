@@ -6,11 +6,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/middleware"
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/middleware"
 )
 
-func GetAllUserPlanets(planetService PlanetService) func(c *gin.Context) {
+func GetCapitol(planetService PlanetService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		userID, err := middleware.RetrieveUserID(c)
 		if err != nil {
@@ -21,21 +21,21 @@ func GetAllUserPlanets(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		userPlanets, err := planetService.GetAllUserPlanets(c.Request.Context(), userID)
+		userCapitolPlanet, err := planetService.GetCapitol(c.Request.Context(), userID)
 		if err != nil {
-			handleGetAllPlanetsError(c, err)
+			handleGetCapitolError(c, err)
 			return
 		}
 
-		c.JSON(http.StatusOK, toUserPlanetsResponse(userPlanets))
+		c.JSON(http.StatusOK, toPlanetResponse(userCapitolPlanet))
 	}
 }
 
-func handleGetAllPlanetsError(c *gin.Context, err error) {
+func handleGetCapitolError(c *gin.Context, err error) {
 	switch {
-	case errors.Is(err, models.ErrNoPlanetsFound):
+	case errors.Is(err, models.ErrCapitolNotFound):
 		c.JSON(http.StatusNotFound, ErrorResponse{
-			Err: "no planets found",
+			Err: "capitol planet not found",
 		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{

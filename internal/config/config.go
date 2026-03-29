@@ -7,9 +7,10 @@ import (
 )
 
 type Config struct {
-	Server Server `envconfig:"SERVER"`
-	PgConn PgConn `envconfig:"PG"`
-	App    App    `envconfig:"APP"`
+	HTTPServer HTTPServer `envconfig:"HTTP"`
+	GRPCServer GRPCServer `envconfig:"GRPC"`
+	PgConn     PgConn     `envconfig:"PG"`
+	App        App        `envconfig:"APP"`
 }
 
 func New() (Config, error) {

@@ -18,7 +18,7 @@ func (s *Service) recalcResources(ctx context.Context, userID uuid.UUID, planetI
 }
 
 // recalcResourcesWithUpdatedTime recalculates the resources of a planet based on the time since the last update.
-// Recalcs using the provided updatedAt time. Use this before any operation that changes resources.
+// Recalcs using the provided updatedAt time. Use this before any operation that changes resources
 func (s *Service) recalcResourcesWithUpdatedTime(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, updatedAt time.Time) error {
 	multiplier, err := s.getResearchResourceMultiplier(ctx, userID)
 	if err != nil {

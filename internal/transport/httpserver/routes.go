@@ -1,11 +1,11 @@
 package httpserver
 
 import (
-	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/missionhandlers"
-	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/planethandlers"
-	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/statichandlers"
-	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/systemhandlers"
-	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/userhandlers"
+	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/missionhandlers"
+	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/planethandlers"
+	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/statichandlers"
+	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/systemhandlers"
+	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/userhandlers"
 )
 
 func (hs *HttpServer) RegisterRoutes(

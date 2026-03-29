@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package planet.v1;
+
+option go_package = "github.com/galaxy-empire-team/bridge-api/api/gen/go/planet/v1;planetpb";
+
+import "google/protobuf/timestamp.proto";
+
+service PlanetService {
+  rpc UpdatePlanetResources(UpdatePlanetResourcesRequest) returns (UpdatePlanetResourcesResponse);
+}
+
+message UpdatePlanetResourcesRequest {
+  string user_id = 1;
+  string planet_id = 2;
+  google.protobuf.Timestamp time = 3; // optional
+}
+
+message UpdatePlanetResourcesResponse {}

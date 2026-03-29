@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/middleware"
+	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/middleware"
 )
 
 func GetFleet(planetService PlanetService) func(c *gin.Context) {

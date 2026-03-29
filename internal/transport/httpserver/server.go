@@ -12,7 +12,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/galaxy-empire-team/bridge-api/internal/config"
-	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/middleware"
+	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/middleware"
 )
 
 type HttpServer struct {
@@ -42,7 +42,7 @@ func New(logger *zap.Logger) *HttpServer {
 	}
 }
 
-func (s *HttpServer) Start(ctx context.Context, cfg config.Server) error {
+func (s *HttpServer) Start(ctx context.Context, cfg config.HTTPServer) (func(context.Context) error, error) {
 	srv := &http.Server{
 		Addr:              cfg.Endpoint,
 		Handler:           s.server,
@@ -53,22 +53,17 @@ func (s *HttpServer) Start(ctx context.Context, cfg config.Server) error {
 	}
 
 	go func() {
-		s.logger.Info("---  start server  ---")
+		s.logger.Info("---  http server started  ---", zap.String("endpoint", cfg.Endpoint))
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("Failed to start server: %v", err)
 		}
 	}()
 
-	<-ctx.Done()
+	return func(ctx context.Context) error {
+		if err := srv.Shutdown(ctx); err != nil { //nolint:contextcheck
+			return fmt.Errorf("server.Shutdown(): %w", err)
+		}
 
-	s.logger.Info("--- stop server ---")
-
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	if err := srv.Shutdown(shutdownCtx); err != nil { //nolint:contextcheck
-		return fmt.Errorf("server.Shutdown(): %w", err)
-	}
-
-	return nil
+		return nil
+	}, nil
 }

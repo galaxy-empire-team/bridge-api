@@ -6,12 +6,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/galaxy-empire-team/bridge-api/internal/httpserver/middleware"
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
-	"github.com/galaxy-empire-team/bridge-api/pkg/registry"
+	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/middleware"
 )
 
-func StartFleetConstruction(planetService PlanetService) func(c *gin.Context) {
+func StartBuildingUpgrade(planetService PlanetService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		userID, err := middleware.RetrieveUserID(c)
 		if err != nil {
@@ -22,7 +21,7 @@ func StartFleetConstruction(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		var req StartFleetConstructionRequest
+		var req StartBuildingUpgradeRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{
 				Err: "invalid request body",
@@ -30,34 +29,31 @@ func StartFleetConstruction(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		err = planetService.StartFleetConstruction(c.Request.Context(), userID, req.PlanetID, models.FleetUnitCount{
-			ID:    req.FleetID,
-			Count: req.Count,
-		})
+		err = planetService.StartBuildingUpgrade(c.Request.Context(), userID, req.PlanetID, req.BuildingID)
 		if err != nil {
-			handleStartFleetConstructionError(c, err)
+			handleUpgradeBuildingError(c, err)
 			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"status": "fleet construction started",
+			"status": "build started",
 		})
 	}
 }
 
-func handleStartFleetConstructionError(c *gin.Context, err error) {
+func handleUpgradeBuildingError(c *gin.Context, err error) {
 	switch {
-	case errors.Is(err, models.ErrPlanetDoesNotBelongToUser):
+	case errors.Is(err, models.ErrTooManyBuildingsInProgress):
 		c.JSON(http.StatusBadRequest, ErrorResponse{
-			Err: "planet does not belong to user",
+			Err: "too many buildings in progress",
 		})
-	case errors.Is(err, models.ErrResearchInProgress):
+	case errors.Is(err, models.ErrBuildingNotFound):
 		c.JSON(http.StatusBadRequest, ErrorResponse{
-			Err: "research already in progress",
+			Err: "building not found",
 		})
-	case errors.Is(err, registry.ErrMaxLevelReached):
+	case errors.Is(err, models.ErrBuildingMaxLevelReached):
 		c.JSON(http.StatusConflict, ErrorResponse{
-			Err: "research has reached max level",
+			Err: "building has reached max level",
 		})
 	case errors.Is(err, models.ErrNotEnoughResources):
 		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
