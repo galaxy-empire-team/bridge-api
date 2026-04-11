@@ -30,7 +30,7 @@ func StartFleetConstruction(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		err = planetService.StartFleetConstruction(c.Request.Context(), userID, req.PlanetID, models.FleetUnitCount{
+		constructionInfo, err := planetService.StartFleetConstruction(c.Request.Context(), userID, req.PlanetID, models.FleetUnitCount{
 			ID:    req.FleetID,
 			Count: req.Count,
 		})
@@ -39,8 +39,11 @@ func StartFleetConstruction(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"status": "fleet construction started",
+		c.JSON(http.StatusOK, FleetConstructionResponse{
+			FleetID:    constructionInfo.FleetID,
+			Count:      constructionInfo.Count,
+			StartedAt:  constructionInfo.StartedAt.UTC(),
+			FinishedAt: constructionInfo.FinishedAt.UTC(),
 		})
 	}
 }

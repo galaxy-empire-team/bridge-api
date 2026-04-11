@@ -6,7 +6,6 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/galaxy-empire-team/bridge-api/internal/models"
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
@@ -14,6 +13,7 @@ import (
 func (s *PlanetStorage) GetPlanetMinesProduction(ctx context.Context, planetID uuid.UUID) (map[consts.BuildingType]uint64, error) {
 	const getMineInfoQuery = `
 		SELECT 
+			b.building_type,
 			b.production_s
 		FROM session_beta.planet_buildings pb
 		JOIN session_beta.s_buildings b ON pb.building_id = b.id
@@ -32,14 +32,15 @@ func (s *PlanetStorage) GetPlanetMinesProduction(ctx context.Context, planetID u
 
 	minesProduction := make(map[consts.BuildingType]uint64)
 	for rows.Next() {
-		var buildingInfo models.BuildingInfo
+		var buildingType consts.BuildingType
+		var productionS uint64
 
-		err = rows.Scan(&buildingInfo.ProductionS)
+		err = rows.Scan(&buildingType, &productionS)
 		if err != nil {
-			return nil, fmt.Errorf("DB.QueryRow.Scan(): %w", err)
+			return nil, fmt.Errorf("rows.Scan(): %w", err)
 		}
 
-		minesProduction[buildingInfo.Type] = buildingInfo.ProductionS
+		minesProduction[buildingType] = productionS
 	}
 
 	if err = rows.Err(); err != nil {

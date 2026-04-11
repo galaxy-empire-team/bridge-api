@@ -29,14 +29,15 @@ func StartBuildingUpgrade(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		err = planetService.StartBuildingUpgrade(c.Request.Context(), userID, req.PlanetID, req.BuildingID)
+		finishTime, err := planetService.StartBuildingUpgrade(c.Request.Context(), userID, req.PlanetID, req.BuildingID)
 		if err != nil {
 			handleUpgradeBuildingError(c, err)
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"status": "build started",
+		c.JSON(http.StatusOK, FinishTimeResponse{
+			StartedAt:  finishTime.StartedAt.UTC(),
+			FinishedAt: finishTime.FinishedAt.UTC(),
 		})
 	}
 }

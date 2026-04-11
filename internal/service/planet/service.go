@@ -20,6 +20,7 @@ type planetStorage interface {
 	GetPlanetMinesProduction(ctx context.Context, planetID uuid.UUID) (map[consts.BuildingType]uint64, error)
 	GetBuildsInProgressCount(ctx context.Context, planetID uuid.UUID) (uint8, error)
 	GetCurrentBuilds(ctx context.Context, planetID uuid.UUID) ([]models.BuildingInProgress, error)
+	GetCurrentFleetConstruction(ctx context.Context, planetID uuid.UUID) (models.FleetUnitConstructionInfo, error)
 	GetAllUserPlanets(ctx context.Context, userID uuid.UUID) ([]models.Planet, error)
 	GetFleetForUpdate(ctx context.Context, planetID uuid.UUID) ([]models.FleetUnitCount, error)
 	GetAllPlanetBuildings(ctx context.Context, userID uuid.UUID) ([]consts.BuildingID, error)

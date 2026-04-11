@@ -21,9 +21,11 @@ Once the server is running, you can explore its API using the provided [galaxy-e
 ## Env
 An example of environment variables required by an API:
 ```
+// Optional variables
 APP_LOG_LEVEL=info
 APP_LOG_FORMAT=json
 
+// Required variables
 HTTP_ENDPOINT=localhost:8000
 GRPC_ENDPOINT=localhost:8001
 

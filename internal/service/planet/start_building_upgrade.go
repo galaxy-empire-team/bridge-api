@@ -12,39 +12,41 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (s *Service) StartBuildingUpgrade(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, buildingID consts.BuildingID) error {
+func (s *Service) StartBuildingUpgrade(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, buildingID consts.BuildingID) (models.FinishTime, error) {
 	isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, userID, planetID)
 	if err != nil {
-		return fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
+		return models.FinishTime{}, fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
 	}
 	if !isUserPlanet {
-		return models.ErrPlanetDoesNotBelongToUser
+		return models.FinishTime{}, models.ErrPlanetDoesNotBelongToUser
 	}
 
 	currentBuildsCount, err := s.planetStorage.GetBuildsInProgressCount(ctx, planetID)
 	if err != nil {
-		return fmt.Errorf("planetStorage.GetBuildsInProgressCount(): %w", err)
+		return models.FinishTime{}, fmt.Errorf("planetStorage.GetBuildsInProgressCount(): %w", err)
 	}
 
 	if currentBuildsCount >= consts.MaxBuildingsInProgress {
-		return models.ErrTooManyBuildingsInProgress
+		return models.FinishTime{}, models.ErrTooManyBuildingsInProgress
 	}
 
 	planetBuildingIDs, err := s.planetStorage.GetAllPlanetBuildings(ctx, planetID)
 	if err != nil {
-		return fmt.Errorf("planetStorage.GetAllPlanetBuildings(): %w", err)
+		return models.FinishTime{}, fmt.Errorf("planetStorage.GetAllPlanetBuildings(): %w", err)
 	}
 
 	if !slices.Contains(planetBuildingIDs, buildingID) {
-		return models.ErrBuildingNotFound
+		return models.FinishTime{}, models.ErrBuildingNotFound
 	}
 
 	err = s.recalcResources(ctx, userID, planetID)
 	if err != nil {
-		return fmt.Errorf("recalcResources(): %w", err)
+		return models.FinishTime{}, fmt.Errorf("recalcResources(): %w", err)
 	}
 
-	return s.txManager.ExecPlanetTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
+	FinishTime := models.FinishTime{}
+
+	return FinishTime, s.txManager.ExecPlanetTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
 		buildEvent, err := s.generateEventForExistingBuilding(ctx, planetID, buildingID, planetRepo)
 		if err != nil {
 			return fmt.Errorf("generateEventForExistingBuilding(): %w", err)
@@ -54,6 +56,9 @@ func (s *Service) StartBuildingUpgrade(ctx context.Context, userID uuid.UUID, pl
 		if err != nil {
 			return fmt.Errorf("planetStorage.CreateBuildingEvent(): %w", err)
 		}
+
+		FinishTime.StartedAt = buildEvent.StartedAt
+		FinishTime.FinishedAt = buildEvent.FinishedAt
 
 		return nil
 	})

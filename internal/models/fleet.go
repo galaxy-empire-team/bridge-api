@@ -20,3 +20,15 @@ type FleetUnitCount struct {
 	ID    consts.FleetUnitID
 	Count uint64
 }
+
+type FleetUnitConstructionInfo struct {
+	FleetID    consts.FleetUnitID
+	Count      uint64
+	StartedAt  time.Time
+	FinishedAt time.Time
+}
+
+type PlanetFleet struct {
+	Fleet             []FleetUnitCount
+	FleetConstruction FleetUnitConstructionInfo
+}

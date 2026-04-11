@@ -30,6 +30,7 @@ func toPlanetResponse(p models.Planet) PlanetResponse {
 				FinishedAt: b.FinishedAt,
 			}
 		}),
+		UpdatedAt: p.UpdatedAt,
 	}
 }
 
@@ -57,16 +58,23 @@ func toUserPlanetsResponse(planets []models.Planet) UserPlanetsResponse {
 	return resp
 }
 
-func toFleetResponse(fleet []models.FleetUnitCount) FleetPlanetsResponse {
+func toFleetResponse(fleet models.PlanetFleet) FleetPlanetsResponse {
 	resp := FleetPlanetsResponse{
-		Fleet: make([]FleetUnitCount, 0, len(fleet)),
+		Fleet: make([]FleetUnitCount, 0, len(fleet.Fleet)),
 	}
 
-	for _, p := range fleet {
+	for _, p := range fleet.Fleet {
 		resp.Fleet = append(resp.Fleet, FleetUnitCount{
 			ID:    p.ID.ToUint8(),
 			Count: p.Count,
 		})
+	}
+
+	resp.FleetConstruction = FleetConstructionResponse{
+		FleetID:    fleet.FleetConstruction.FleetID,
+		Count:      fleet.FleetConstruction.Count,
+		StartedAt:  fleet.FleetConstruction.StartedAt,
+		FinishedAt: fleet.FleetConstruction.FinishedAt,
 	}
 
 	return resp
