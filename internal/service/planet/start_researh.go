@@ -12,37 +12,48 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (s *Service) StartResearch(ctx context.Context, userID uuid.UUID, planet uuid.UUID, currentResearchID consts.ResearchID) error {
+func (s *Service) StartResearch(ctx context.Context, userID uuid.UUID, planet uuid.UUID, currentResearchID consts.ResearchID) (models.ResearchProgressInfo, error) {
 	isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, userID, planet)
 	if err != nil {
-		return fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
+		return models.ResearchProgressInfo{}, fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
 	}
 	if !isUserPlanet {
-		return models.ErrPlanetDoesNotBelongToUser
+		return models.ResearchProgressInfo{}, models.ErrPlanetDoesNotBelongToUser
 	}
 
 	researchInProgress, err := s.researchStorage.CheckResearchInProgress(ctx, userID)
 	if err != nil {
-		return fmt.Errorf("researchStorage.CheckResearchInProgress(): %w", err)
+		return models.ResearchProgressInfo{}, fmt.Errorf("researchStorage.CheckResearchInProgress(): %w", err)
 	}
 	if researchInProgress {
-		return models.ErrResearchInProgress
+		return models.ResearchProgressInfo{}, models.ErrResearchInProgress
 	}
 
 	userResearches, err := s.researchStorage.GetUserResearches(ctx, userID)
 	if err != nil {
-		return fmt.Errorf("researchStorage.GetUserResearches(): %w", err)
+		return models.ResearchProgressInfo{}, fmt.Errorf("researchStorage.GetUserResearches(): %w", err)
 	}
 	if !slices.Contains(userResearches, currentResearchID) {
-		return models.ErrUserHasNotResearch
+		researchStats, err := s.registry.GetResearchStatsByID(currentResearchID)
+		if err != nil {
+			return models.ResearchProgressInfo{}, fmt.Errorf("registry.GetResearchStatsByID(): %w", err)
+		}
+
+		if researchStats.Level != consts.ZeroResearchLevel {
+			return models.ResearchProgressInfo{}, models.ErrUserHasNotResearch
+		}
 	}
 
 	err = s.recalcResources(ctx, userID, planet)
 	if err != nil {
-		return fmt.Errorf("recalcResources(): %w", err)
+		return models.ResearchProgressInfo{}, fmt.Errorf("recalcResources(): %w", err)
 	}
 
-	return s.txManager.ExecPlanetTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
+	researchProgress := models.ResearchProgressInfo{
+		ResearchID: currentResearchID,
+	}
+
+	return researchProgress, s.txManager.ExecPlanetTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
 		researchEvent, err := s.generateEventForResearch(ctx, userID, planet, currentResearchID, planetRepo)
 		if err != nil {
 			return fmt.Errorf("generateEventForResearch(): %w", err)
@@ -52,6 +63,9 @@ func (s *Service) StartResearch(ctx context.Context, userID uuid.UUID, planet uu
 		if err != nil {
 			return fmt.Errorf("planetStorage.CreateResearchEvent(): %w", err)
 		}
+
+		researchProgress.StartedAt = researchEvent.StartedAt
+		researchProgress.FinishedAt = researchEvent.FinishedAt
 
 		return nil
 	})
@@ -92,12 +106,12 @@ func (s *Service) generateEventForResearch(ctx context.Context, user_id uuid.UUI
 		return models.ResearchEvent{}, fmt.Errorf("planetRepo.SetResources(): %w", err)
 	}
 
-	startedAt := time.Now()
+	startedAt := time.Now().UTC()
 	researchEvent := models.ResearchEvent{
 		UserID:     user_id,
 		ResearchID: currentResearchID,
 		StartedAt:  startedAt,
-		FinishedAt: startedAt.Add(time.Duration(nextLvlResearchStats.ResearchTimeS) * time.Second),
+		FinishedAt: startedAt.Add(time.Duration(nextLvlResearchStats.ResearchTimeS) * time.Second).UTC(),
 	}
 
 	return researchEvent, nil

@@ -53,9 +53,9 @@ func (s *Service) Spy(ctx context.Context, userID uuid.UUID, planetFrom uuid.UUI
 	}
 
 	return s.txManager.ExecMissionTx(ctx, func(ctx context.Context, storages TxStorages) error {
-		err := s.updatePlanetFleet(ctx, planetFrom, fleet, storages)
+		err := s.updateFleet(ctx, planetFrom, fleet, storages)
 		if err != nil {
-			return fmt.Errorf("updatePlanetFleet(): %w", err)
+			return fmt.Errorf("updateFleet(): %w", err)
 		}
 
 		startedAt := time.Now().UTC()

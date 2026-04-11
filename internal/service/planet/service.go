@@ -30,6 +30,7 @@ type planetStorage interface {
 
 type researchStorage interface {
 	GetUserResearches(ctx context.Context, userID uuid.UUID) ([]consts.ResearchID, error)
+	GetUserResearchesProgress(ctx context.Context, userID uuid.UUID) ([]models.ResearchProgressInfo, error)
 	CheckResearchInProgress(ctx context.Context, user_id uuid.UUID) (bool, error)
 }
 

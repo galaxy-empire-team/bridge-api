@@ -30,14 +30,16 @@ func StartResearch(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		err = planetService.StartResearch(c.Request.Context(), userID, req.PlanetID, req.ResearchID)
+		researchProgress, err := planetService.StartResearch(c.Request.Context(), userID, req.PlanetID, req.ResearchID)
 		if err != nil {
 			handleStartResearchError(c, err)
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"status": "research started",
+		c.JSON(http.StatusOK, ResearchProgressResponse{
+			ResearchID: researchProgress.ResearchID,
+			StartedAt:  researchProgress.StartedAt,
+			FinishedAt: researchProgress.FinishedAt,
 		})
 	}
 }

@@ -11,17 +11,17 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (s *Service) updatePlanetFleet(ctx context.Context, planetID uuid.UUID, fleet []models.FleetUnitCount, storage TxStorages) error {
+func (s *Service) updateFleet(ctx context.Context, planetID uuid.UUID, fleet []models.FleetUnitCount, storage TxStorages) error {
 	reqFleet := lo.Associate(fleet, func(fleetUnit models.FleetUnitCount) (consts.FleetUnitID, uint64) {
 		return fleetUnit.ID, fleetUnit.Count
 	})
 
-	planetFleet, err := storage.GetFleetForUpdate(ctx, planetID)
+	Fleet, err := storage.GetFleetForUpdate(ctx, planetID)
 	if err != nil {
 		return fmt.Errorf("planetStorage.GetFleetCountForUpdate(): %w", err)
 	}
 
-	planetFleetMap := lo.Associate(planetFleet, func(fleetUnit models.FleetUnitCount) (consts.FleetUnitID, uint64) {
+	FleetMap := lo.Associate(Fleet, func(fleetUnit models.FleetUnitCount) (consts.FleetUnitID, uint64) {
 		return fleetUnit.ID, fleetUnit.Count
 	})
 
@@ -32,7 +32,7 @@ func (s *Service) updatePlanetFleet(ctx context.Context, planetID uuid.UUID, fle
 			continue
 		}
 
-		planetCount, ok := planetFleetMap[fleetUnitID]
+		planetCount, ok := FleetMap[fleetUnitID]
 		if !ok {
 			return models.ErrFleetNotFound
 		}

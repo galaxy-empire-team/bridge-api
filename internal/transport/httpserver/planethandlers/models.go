@@ -93,3 +93,14 @@ type FleetConstructionResponse struct {
 	StartedAt  time.Time          `json:"startedAt"`
 	FinishedAt time.Time          `json:"finishedAt"`
 }
+
+type ResearchesResponse struct {
+	Researches       []consts.ResearchID        `json:"researches"`
+	ResearchProgress []ResearchProgressResponse `json:"progress"`
+}
+
+type ResearchProgressResponse struct {
+	ResearchID consts.ResearchID `json:"id"`
+	StartedAt  time.Time         `json:"startedAt"`
+	FinishedAt time.Time         `json:"finishedAt"`
+}

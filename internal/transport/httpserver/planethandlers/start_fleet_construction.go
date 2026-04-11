@@ -42,8 +42,8 @@ func StartFleetConstruction(planetService PlanetService) func(c *gin.Context) {
 		c.JSON(http.StatusOK, FleetConstructionResponse{
 			FleetID:    constructionInfo.FleetID,
 			Count:      constructionInfo.Count,
-			StartedAt:  constructionInfo.StartedAt.UTC(),
-			FinishedAt: constructionInfo.FinishedAt.UTC(),
+			StartedAt:  constructionInfo.StartedAt,
+			FinishedAt: constructionInfo.FinishedAt,
 		})
 	}
 }

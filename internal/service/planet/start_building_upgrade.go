@@ -98,12 +98,12 @@ func (s *Service) generateEventForExistingBuilding(ctx context.Context, planetID
 		return models.BuildEvent{}, fmt.Errorf("planetRepo.SetResources(): %w", err)
 	}
 
-	startedAt := time.Now()
+	startedAt := time.Now().UTC()
 	buildEvent := models.BuildEvent{
 		PlanetID:   planetID,
 		BuildingID: buildingID,
 		StartedAt:  startedAt,
-		FinishedAt: startedAt.Add(time.Duration(nextLvlStats.UpgradeTimeS) * time.Second),
+		FinishedAt: startedAt.Add(time.Duration(nextLvlStats.UpgradeTimeS) * time.Second).UTC(),
 	}
 
 	return buildEvent, nil

@@ -16,6 +16,11 @@ type FleetConstructEvent struct {
 	FinishedAt time.Time
 }
 
+type Fleet struct {
+	Fleet             []FleetUnitCount
+	FleetConstruction FleetUnitConstructionInfo
+}
+
 type FleetUnitCount struct {
 	ID    consts.FleetUnitID
 	Count uint64
@@ -26,9 +31,4 @@ type FleetUnitConstructionInfo struct {
 	Count      uint64
 	StartedAt  time.Time
 	FinishedAt time.Time
-}
-
-type PlanetFleet struct {
-	Fleet             []FleetUnitCount
-	FleetConstruction FleetUnitConstructionInfo
 }

@@ -58,7 +58,7 @@ func toUserPlanetsResponse(planets []models.Planet) UserPlanetsResponse {
 	return resp
 }
 
-func toFleetResponse(fleet models.PlanetFleet) FleetPlanetsResponse {
+func toFleetResponse(fleet models.Fleet) FleetPlanetsResponse {
 	resp := FleetPlanetsResponse{
 		Fleet: make([]FleetUnitCount, 0, len(fleet.Fleet)),
 	}
@@ -78,4 +78,19 @@ func toFleetResponse(fleet models.PlanetFleet) FleetPlanetsResponse {
 	}
 
 	return resp
+}
+
+func toResearchesResponse(researches models.UserResearches) ResearchesResponse {
+	return ResearchesResponse{
+		Researches: lo.Map(researches.Research, func(rID consts.ResearchID, _ int) consts.ResearchID {
+			return rID
+		}),
+		ResearchProgress: lo.Map(researches.ResearchProgress, func(rp models.ResearchProgressInfo, _ int) ResearchProgressResponse {
+			return ResearchProgressResponse{
+				ResearchID: rp.ResearchID,
+				StartedAt:  rp.StartedAt,
+				FinishedAt: rp.FinishedAt,
+			}
+		}),
+	}
 }

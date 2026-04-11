@@ -23,6 +23,7 @@ func (hs *HttpServer) RegisterRoutes(
 	hs.apiRouter.GET("/planet/capitol", planethandlers.GetCapitol(planetService))
 	hs.apiRouter.GET("/planet/all", planethandlers.GetAllUserPlanets(planetService))
 	hs.apiRouter.GET("/planet/fleet", planethandlers.GetFleet(planetService))
+	hs.apiRouter.GET("/planet/researches", planethandlers.GetResearches(planetService))
 	hs.apiRouter.POST("/planet/capitol/colonize", planethandlers.CreateCapitol(planetService))
 	hs.apiRouter.POST("/planet/building/upgrade", planethandlers.StartBuildingUpgrade(planetService))
 	hs.apiRouter.POST("/planet/research/start", planethandlers.StartResearch(planetService))

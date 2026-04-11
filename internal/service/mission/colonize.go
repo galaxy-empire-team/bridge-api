@@ -60,9 +60,9 @@ func (s *Service) Colonize(ctx context.Context, userID uuid.UUID, planetFrom uui
 			return fmt.Errorf("updateResources(): %w", err)
 		}
 
-		err = s.updatePlanetFleet(ctx, planetFrom, fleet, storages)
+		err = s.updateFleet(ctx, planetFrom, fleet, storages)
 		if err != nil {
-			return fmt.Errorf("updatePlanetFleet(): %w", err)
+			return fmt.Errorf("updateFleet(): %w", err)
 		}
 
 		var colonizeShipTaken bool

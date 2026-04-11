@@ -89,13 +89,13 @@ func (s *Service) generateEventForFleetConstruct(ctx context.Context, planetID u
 		return models.FleetConstructEvent{}, fmt.Errorf("planetRepo.SetResources(): %w", err)
 	}
 
-	startedAt := time.Now()
+	startedAt := time.Now().UTC()
 	fleetConstructEvent := models.FleetConstructEvent{
 		PlanetID:   planetID,
 		FleetID:    fleet.ID,
 		Count:      fleet.Count,
 		StartedAt:  startedAt,
-		FinishedAt: startedAt.Add(time.Duration(fleetUnitStats.BuildTimeSec*fleet.Count) * time.Second),
+		FinishedAt: startedAt.Add(time.Duration(fleetUnitStats.BuildTimeSec*fleet.Count) * time.Second).UTC(),
 	}
 
 	return fleetConstructEvent, nil
