@@ -5,10 +5,9 @@ const (
 	SystemInGalaxyCount  = 3
 	PlanetsInSystemCount = 16
 
-	MaxBuildingLvl         = 16
-	MaxBuildingsInProgress = 2
+	ZeroResearchLevel       = 0
+	MaxResearchesInProgress = 1
 
-	MaxResearchLvl             = 16
-	MaxColonizationResearchLvl = 7
-	MaxResearchesInProgress    = 1
+	ZeroBuildingLevel      = 0
+	MaxBuildingsInProgress = 2
 )

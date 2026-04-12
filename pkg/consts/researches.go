@@ -10,8 +10,6 @@ type ResearchLevel uint8
 type ResearchType string
 
 const (
-	ZeroResearchLevel ResearchLevel = 0
-
 	ResearchTypeColonizeTechnology ResearchType = "colonize_technology"
 
 	ResearchTypeIndustrialTechnology     ResearchType = "industrial_technology"

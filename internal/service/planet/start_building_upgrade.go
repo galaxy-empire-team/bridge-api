@@ -36,7 +36,14 @@ func (s *Service) StartBuildingUpgrade(ctx context.Context, userID uuid.UUID, pl
 	}
 
 	if !slices.Contains(planetBuildingIDs, buildingID) {
-		return models.FinishTime{}, models.ErrBuildingNotFound
+		buildStats, err := s.registry.GetBuildingStatsByID(buildingID)
+		if err != nil {
+			return models.FinishTime{}, fmt.Errorf("registry.GetBuildingStatsByID(): %w", err)
+		}
+
+		if buildStats.Level != consts.ZeroBuildingLevel {
+			return models.FinishTime{}, models.ErrBuildingNotFound
+		}
 	}
 
 	err = s.recalcResources(ctx, userID, planetID)
