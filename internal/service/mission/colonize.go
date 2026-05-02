@@ -11,8 +11,8 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (s *Service) Colonize(ctx context.Context, userID uuid.UUID, planetFrom uuid.UUID, planetTo models.Coordinates, cargo models.Resources, fleet []models.FleetUnitCount) error {
-	fleet = filterZeroCountFleet(fleet)
+func (s *Service) Colonize(ctx context.Context, mission models.MissionStart) error {
+	fleet := filterZeroCountFleet(mission.Fleet)
 
 	if len(fleet) == 0 {
 		return models.ErrFleetCannotBeEmpty
@@ -28,7 +28,7 @@ func (s *Service) Colonize(ctx context.Context, userID uuid.UUID, planetFrom uui
 		}
 	}
 
-	isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, userID, planetFrom)
+	isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, mission.UserID, mission.PlanetFrom)
 	if err != nil {
 		return fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
 	}
@@ -36,7 +36,7 @@ func (s *Service) Colonize(ctx context.Context, userID uuid.UUID, planetFrom uui
 		return models.ErrPlanetDoesNotBelongToUser
 	}
 
-	planetExists, err := s.planetStorage.CheckPlanetExists(ctx, planetTo)
+	planetExists, err := s.planetStorage.CheckPlanetExists(ctx, mission.PlanetTo)
 	if err != nil {
 		return fmt.Errorf("planetStorage.CheckPlanetExists(): %w", err)
 	}
@@ -44,7 +44,7 @@ func (s *Service) Colonize(ctx context.Context, userID uuid.UUID, planetFrom uui
 		return models.ErrColonizePlanetAlreadyExists
 	}
 
-	err = s.checkColonizationAvailability(ctx, userID)
+	err = s.checkColonizationAvailability(ctx, mission.UserID)
 	if err != nil {
 		return fmt.Errorf("checkColonizationAvailability(): %w", err)
 	}
@@ -54,13 +54,23 @@ func (s *Service) Colonize(ctx context.Context, userID uuid.UUID, planetFrom uui
 		return fmt.Errorf("registry.GetMissionIDByType(): %w", err)
 	}
 
+	planetFromCoordinates, err := s.planetStorage.GetCoordinates(ctx, mission.PlanetFrom)
+	if err != nil {
+		return fmt.Errorf("planetStorage.GetCoordinates(): %w", err)
+	}
+
+	missionDuration, err := s.calculateMissionDuration(planetFromCoordinates, mission.PlanetTo, fleet, mission.SpeedMultiplier)
+	if err != nil {
+		return fmt.Errorf("calculateMissionDuration(): %w", err)
+	}
+
 	return s.txManager.ExecMissionTx(ctx, func(ctx context.Context, storages TxStorages) error {
-		err := s.updateResources(ctx, planetFrom, cargo, storages)
+		err := s.updateResources(ctx, mission.PlanetFrom, mission.Cargo, storages)
 		if err != nil {
 			return fmt.Errorf("updateResources(): %w", err)
 		}
 
-		err = s.updateFleet(ctx, planetFrom, fleet, storages)
+		err = s.updateFleet(ctx, mission.PlanetFrom, fleet, storages)
 		if err != nil {
 			return fmt.Errorf("updateFleet(): %w", err)
 		}
@@ -85,12 +95,12 @@ func (s *Service) Colonize(ctx context.Context, userID uuid.UUID, planetFrom uui
 
 		startedAt := time.Now().UTC()
 		colonizeEvent := models.MissionEvent{
-			UserID:      userID,
-			PlanetFrom:  planetFrom,
-			PlanetTo:    planetTo,
+			UserID:      mission.UserID,
+			PlanetFrom:  mission.PlanetFrom,
+			PlanetTo:    mission.PlanetTo,
 			Type:        missionID,
 			Fleet:       fleet,
-			Cargo:       cargo,
+			Cargo:       mission.Cargo,
 			IsReturning: false,
 			StartedAt:   startedAt,
 			FinishedAt:  startedAt.Add(missionDuration),

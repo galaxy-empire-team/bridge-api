@@ -10,4 +10,10 @@ const (
 
 	ZeroBuildingLevel      = 0
 	MaxBuildingsInProgress = 2
+
+	SpeedMultiplierMin        = 0.3
+	SpeedMultiplierMax        = 1.0
+	TimeToReachNearestPlanetS = 60
+	TimeToReachNearestSystemS = 20
+	TimeToReachNearestGalaxyS = 1200
 )

@@ -31,11 +31,14 @@ func Colonize(missionService MissionService) func(c *gin.Context) {
 
 		err = missionService.Colonize(
 			c.Request.Context(),
-			userID,
-			req.PlanetFrom,
-			toCoordinatesModel(req.PlanetTo),
-			toResources(req.Cargo),
-			toFleetUnits(req.FleetUnitCount),
+			models.MissionStart{
+				UserID:          userID,
+				PlanetFrom:      req.PlanetFrom,
+				PlanetTo:        toCoordinatesModel(req.PlanetTo),
+				Cargo:           toResources(req.Cargo),
+				Fleet:           toFleetUnits(req.FleetUnitCount),
+				SpeedMultiplier: req.SpeedMultiplier,
+			},
 		)
 		if err != nil {
 			handleColonizeError(c, err)

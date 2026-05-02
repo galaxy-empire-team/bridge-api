@@ -2,7 +2,6 @@ package mission
 
 import (
 	"context"
-	"time"
 
 	"github.com/google/uuid"
 
@@ -11,13 +10,12 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/registry"
 )
 
-const missionDuration = 1 * time.Second
-
 type planetStorage interface {
 	GetIDByCoordinates(ctx context.Context, coordinates models.Coordinates) (uuid.UUID, error)
 	CheckPlanetExists(ctx context.Context, coordinates models.Coordinates) (bool, error)
 	CheckPlanetBelongsToUser(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (bool, error)
 	GetUserPlanetsCount(ctx context.Context, userID uuid.UUID) (uint8, error)
+	GetCoordinates(ctx context.Context, planetID uuid.UUID) (models.Coordinates, error)
 }
 
 type missionStorage interface {

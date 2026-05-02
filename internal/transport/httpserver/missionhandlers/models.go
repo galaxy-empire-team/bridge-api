@@ -7,10 +7,11 @@ import (
 )
 
 type ColonizeRequest struct {
-	PlanetFrom     uuid.UUID        `json:"planetFrom"`
-	PlanetTo       Coordinates      `json:"planetTo"`
-	Cargo          Resources        `json:"cargo"`
-	FleetUnitCount []FleetUnitCount `json:"fleet"`
+	PlanetFrom      uuid.UUID        `json:"planetFrom"`
+	PlanetTo        Coordinates      `json:"planetTo"`
+	Cargo           Resources        `json:"cargo"`
+	FleetUnitCount  []FleetUnitCount `json:"fleet"`
+	SpeedMultiplier float64          `json:"speedMultiplier"`
 }
 
 type Coordinates struct {
@@ -24,22 +25,25 @@ type ErrorResponse struct {
 }
 
 type AttackRequest struct {
-	PlanetFrom     uuid.UUID        `json:"planetFrom"`
-	PlanetTo       Coordinates      `json:"planetTo"`
-	FleetUnitCount []FleetUnitCount `json:"fleet"`
+	PlanetFrom      uuid.UUID        `json:"planetFrom"`
+	PlanetTo        Coordinates      `json:"planetTo"`
+	FleetUnitCount  []FleetUnitCount `json:"fleet"`
+	SpeedMultiplier float64          `json:"speedMultiplier"`
 }
 
 type SpyRequest struct {
-	PlanetFrom     uuid.UUID        `json:"planetFrom"`
-	PlanetTo       Coordinates      `json:"planetTo"`
-	FleetUnitCount []FleetUnitCount `json:"fleet"`
+	PlanetFrom      uuid.UUID        `json:"planetFrom"`
+	PlanetTo        Coordinates      `json:"planetTo"`
+	FleetUnitCount  []FleetUnitCount `json:"fleet"`
+	SpeedMultiplier float64          `json:"speedMultiplier"`
 }
 
 type TransportRequest struct {
-	PlanetFrom     uuid.UUID        `json:"planetFrom"`
-	PlanetTo       Coordinates      `json:"planetTo"`
-	Cargo          Resources        `json:"cargo"`
-	FleetUnitCount []FleetUnitCount `json:"fleet"`
+	PlanetFrom      uuid.UUID        `json:"planetFrom"`
+	PlanetTo        Coordinates      `json:"planetTo"`
+	Cargo           Resources        `json:"cargo"`
+	FleetUnitCount  []FleetUnitCount `json:"fleet"`
+	SpeedMultiplier float64          `json:"speedMultiplier"`
 }
 
 type Resources struct {

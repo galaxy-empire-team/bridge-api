@@ -10,8 +10,8 @@ import (
 
 type MissionService interface {
 	GetCurrentMissions(ctx context.Context, userID uuid.UUID) ([]models.UserMission, error)
-	Colonize(ctx context.Context, userID uuid.UUID, planetFrom uuid.UUID, planetTo models.Coordinates, cargo models.Resources, fleet []models.FleetUnitCount) error
-	Attack(ctx context.Context, userID uuid.UUID, planetFrom uuid.UUID, planetTo models.Coordinates, fleet []models.FleetUnitCount) error
-	Spy(ctx context.Context, userID uuid.UUID, planetFrom uuid.UUID, planetTo models.Coordinates, fleet []models.FleetUnitCount) error
-	Transport(ctx context.Context, userID uuid.UUID, planetFrom uuid.UUID, planetTo models.Coordinates, cargo models.Resources, fleet []models.FleetUnitCount) error
+	Colonize(ctx context.Context, mission models.MissionStart) error
+	Attack(ctx context.Context, mission models.MissionStart) error
+	Spy(ctx context.Context, mission models.MissionStart) error
+	Transport(ctx context.Context, mission models.MissionStart) error
 }

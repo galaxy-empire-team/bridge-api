@@ -5,20 +5,18 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
-
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (s *Service) Attack(ctx context.Context, userID uuid.UUID, planetFrom uuid.UUID, planetTo models.Coordinates, fleet []models.FleetUnitCount) error {
-	fleet = filterZeroCountFleet(fleet)
+func (s *Service) Attack(ctx context.Context, mission models.MissionStart) error {
+	fleet := filterZeroCountFleet(mission.Fleet)
 
 	if len(fleet) == 0 {
 		return models.ErrFleetCannotBeEmpty
 	}
 
-	planetExists, err := s.planetStorage.CheckPlanetExists(ctx, planetTo)
+	planetExists, err := s.planetStorage.CheckPlanetExists(ctx, mission.PlanetTo)
 	if err != nil {
 		return fmt.Errorf("planetStorage.CheckPlanetExists(): %w", err)
 	}
@@ -26,7 +24,7 @@ func (s *Service) Attack(ctx context.Context, userID uuid.UUID, planetFrom uuid.
 		return models.ErrPlanetNotFound
 	}
 
-	isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, userID, planetFrom)
+	isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, mission.UserID, mission.PlanetFrom)
 	if err != nil {
 		return fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
 	}
@@ -49,17 +47,27 @@ func (s *Service) Attack(ctx context.Context, userID uuid.UUID, planetFrom uuid.
 		return fmt.Errorf("registry.GetMissionIDByType(): %w", err)
 	}
 
+	planetFromCoordinates, err := s.planetStorage.GetCoordinates(ctx, mission.PlanetFrom)
+	if err != nil {
+		return fmt.Errorf("planetStorage.GetCoordinates(): %w", err)
+	}
+
+	missionDuration, err := s.calculateMissionDuration(planetFromCoordinates, mission.PlanetTo, fleet, mission.SpeedMultiplier)
+	if err != nil {
+		return fmt.Errorf("calculateMissionDuration(): %w", err)
+	}
+
 	return s.txManager.ExecMissionTx(ctx, func(ctx context.Context, storages TxStorages) error {
-		err = s.updateFleet(ctx, planetFrom, fleet, storages)
+		err = s.updateFleet(ctx, mission.PlanetFrom, fleet, storages)
 		if err != nil {
 			return fmt.Errorf("updateFleet(): %w", err)
 		}
 
 		startedAt := time.Now().UTC()
 		attackEvent := models.MissionEvent{
-			UserID:      userID,
-			PlanetFrom:  planetFrom,
-			PlanetTo:    planetTo,
+			UserID:      mission.UserID,
+			PlanetFrom:  mission.PlanetFrom,
+			PlanetTo:    mission.PlanetTo,
 			Type:        missionID,
 			Fleet:       fleet,
 			IsReturning: false,

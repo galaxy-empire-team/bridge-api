@@ -11,20 +11,20 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (s *Service) Transport(ctx context.Context, userID uuid.UUID, planetFrom uuid.UUID, planetTo models.Coordinates, cargo models.Resources, fleet []models.FleetUnitCount) error {
-	fleet = filterZeroCountFleet(fleet)
+func (s *Service) Transport(ctx context.Context, mission models.MissionStart) error {
+	fleet := filterZeroCountFleet(mission.Fleet)
 
 	if len(fleet) == 0 {
 		return models.ErrFleetCannotBeEmpty
 	}
 
-	planetToID, err := s.planetStorage.GetIDByCoordinates(ctx, planetTo)
+	planetToID, err := s.planetStorage.GetIDByCoordinates(ctx, mission.PlanetTo)
 	if err != nil {
 		return fmt.Errorf("planetStorage.GetIDByCoordinates(): %w", err)
 	}
 
-	for _, planetID := range []uuid.UUID{planetFrom, planetToID} {
-		isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, userID, planetID)
+	for _, planetID := range []uuid.UUID{mission.PlanetFrom, planetToID} {
+		isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, mission.UserID, planetID)
 		if err != nil {
 			return fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
 		}
@@ -44,7 +44,7 @@ func (s *Service) Transport(ctx context.Context, userID uuid.UUID, planetFrom uu
 		}
 	}
 
-	if !s.checkTransportCapacity(cargo, fleet, s.registry) {
+	if !s.checkTransportCapacity(mission.Cargo, fleet, s.registry) {
 		return models.ErrTransportCargoExceedsFleetCapacity
 	}
 
@@ -53,25 +53,35 @@ func (s *Service) Transport(ctx context.Context, userID uuid.UUID, planetFrom uu
 		return fmt.Errorf("registry.GetMissionIDByType(): %w", err)
 	}
 
+	planetFromCoordinates, err := s.planetStorage.GetCoordinates(ctx, mission.PlanetFrom)
+	if err != nil {
+		return fmt.Errorf("planetStorage.GetCoordinates(): %w", err)
+	}
+
+	missionDuration, err := s.calculateMissionDuration(planetFromCoordinates, mission.PlanetTo, fleet, mission.SpeedMultiplier)
+	if err != nil {
+		return fmt.Errorf("calculateMissionDuration(): %w", err)
+	}
+
 	return s.txManager.ExecMissionTx(ctx, func(ctx context.Context, storages TxStorages) error {
-		err := s.updateResources(ctx, planetFrom, cargo, storages)
+		err := s.updateResources(ctx, mission.PlanetFrom, mission.Cargo, storages)
 		if err != nil {
 			return fmt.Errorf("updateResources(): %w", err)
 		}
 
-		err = s.updateFleet(ctx, planetFrom, fleet, storages)
+		err = s.updateFleet(ctx, mission.PlanetFrom, fleet, storages)
 		if err != nil {
 			return fmt.Errorf("updateFleet(): %w", err)
 		}
 
 		startedAt := time.Now().UTC()
 		transportEvent := models.MissionEvent{
-			UserID:      userID,
-			PlanetFrom:  planetFrom,
-			PlanetTo:    planetTo,
+			UserID:      mission.UserID,
+			PlanetFrom:  mission.PlanetFrom,
+			PlanetTo:    mission.PlanetTo,
 			Type:        missionID,
 			Fleet:       fleet,
-			Cargo:       cargo,
+			Cargo:       mission.Cargo,
 			IsReturning: false,
 			StartedAt:   startedAt,
 			FinishedAt:  startedAt.Add(missionDuration),

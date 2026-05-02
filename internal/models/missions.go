@@ -28,3 +28,12 @@ type UserMission struct {
 	StartedAt   time.Time
 	FinishedAt  time.Time
 }
+
+type MissionStart struct {
+	UserID          uuid.UUID
+	PlanetFrom      uuid.UUID
+	PlanetTo        Coordinates
+	Fleet           []FleetUnitCount
+	Cargo           Resources
+	SpeedMultiplier float64
+}

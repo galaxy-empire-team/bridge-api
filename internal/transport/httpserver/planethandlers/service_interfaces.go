@@ -13,6 +13,7 @@ type PlanetService interface {
 	CreateCapitol(ctx context.Context, userID uuid.UUID) error
 	GetCapitol(ctx context.Context, userID uuid.UUID) (models.Planet, error)
 	GetPlanet(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (models.Planet, error)
+	GetPlanetResources(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (models.Resources, error)
 	GetAllUserPlanets(ctx context.Context, userID uuid.UUID) ([]models.Planet, error)
 	GetFleet(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (models.Fleet, error)
 	GetResearches(ctx context.Context, userID uuid.UUID) (models.UserResearches, error)

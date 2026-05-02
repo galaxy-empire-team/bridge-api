@@ -31,10 +31,13 @@ func Attack(missionService MissionService) func(c *gin.Context) {
 
 		err = missionService.Attack(
 			c.Request.Context(),
-			userID,
-			req.PlanetFrom,
-			toCoordinatesModel(req.PlanetTo),
-			toFleetUnits(req.FleetUnitCount),
+			models.MissionStart{
+				UserID:          userID,
+				PlanetFrom:      req.PlanetFrom,
+				PlanetTo:        toCoordinatesModel(req.PlanetTo),
+				Fleet:           toFleetUnits(req.FleetUnitCount),
+				SpeedMultiplier: req.SpeedMultiplier,
+			},
 		)
 		if err != nil {
 			handleAttackError(c, err)
