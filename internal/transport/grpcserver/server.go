@@ -12,6 +12,7 @@ import (
 
 	"github.com/galaxy-empire-team/bridge-api/api/gen/go/planet/v1"
 	"github.com/galaxy-empire-team/bridge-api/internal/config"
+	"github.com/galaxy-empire-team/bridge-api/internal/service/planet"
 )
 
 const (
@@ -19,6 +20,7 @@ const (
 )
 
 type PlanetService interface {
+	ColonizePlanet(ctx context.Context, userID uuid.UUID, req planet.CreatePlanetRequest) error
 	UpdatePlanetResources(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, updatedTime *time.Time) error
 }
 

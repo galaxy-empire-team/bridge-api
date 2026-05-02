@@ -31,7 +31,6 @@ func (s *Service) Transport(ctx context.Context, mission models.MissionStart) er
 		if !isUserPlanet {
 			return models.ErrPlanetDoesNotBelongToUser
 		}
-
 	}
 
 	if len(fleet) > s.registry.GetFleetUnitTypeCount() {

@@ -8,12 +8,35 @@ import "google/protobuf/timestamp.proto";
 
 service PlanetService {
   rpc UpdatePlanetResources(UpdatePlanetResourcesRequest) returns (UpdatePlanetResourcesResponse);
+  rpc ColonizePlanet(ColonizePlanetRequest) returns (ColonizePlanetResponse);
 }
 
 message UpdatePlanetResourcesRequest {
-  string user_id = 1;
-  string planet_id = 2;
+  string userID = 1;
+  string planetID = 2;
   google.protobuf.Timestamp time = 3; // optional
 }
 
 message UpdatePlanetResourcesResponse {}
+
+message ColonizePlanetRequest {
+  uint64 operationID = 1;
+  string userID = 2;
+  Coordinates coordinates = 3;
+  Resources resources = 4;
+  bool isCapitol = 5;
+}
+
+message ColonizePlanetResponse {}
+
+message Coordinates {
+  uint32 x = 1;
+  uint32 y = 2;
+  uint32 z = 3;
+}
+
+message Resources {
+  uint64 metal = 1;
+  uint64 crystal = 2;
+  uint64 gas = 3;
+}

@@ -13,6 +13,11 @@ func fromPlanetModel(p models.Planet) planetToColonize {
 			Y: p.Coordinates.Y,
 			Z: p.Coordinates.Z,
 		},
+		Resources: resources{
+			Metal:   p.Resources.Metal,
+			Crystal: p.Resources.Crystal,
+			Gas:     p.Resources.Gas,
+		},
 		HasMoon:   p.HasMoon,
 		IsCapitol: p.IsCapitol,
 	}

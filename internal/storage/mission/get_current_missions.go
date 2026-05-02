@@ -13,6 +13,7 @@ import (
 func (s *MissionStorage) GetCurrentUserMissions(ctx context.Context, userID uuid.UUID) ([]models.UserMission, error) {
 	const getCurrentMissionsQuery = `
 		SELECT
+			ev.id,
 			ev.mission_id,
 			p.x,
 			p.y,
@@ -40,6 +41,7 @@ func (s *MissionStorage) GetCurrentUserMissions(ctx context.Context, userID uuid
 	for rows.Next() {
 		var mission models.UserMission
 		err = rows.Scan(
+			&mission.ID,
 			&mission.Type,
 			&mission.PlanetFrom.X,
 			&mission.PlanetFrom.Y,

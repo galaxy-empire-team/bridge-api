@@ -12,6 +12,7 @@ type planetToColonize struct {
 	ID          uuid.UUID
 	UserID      uuid.UUID
 	Coordinates coordinates
+	Resources   resources
 	HasMoon     bool
 	IsCapitol   bool
 }
@@ -20,6 +21,12 @@ type coordinates struct {
 	X consts.PlanetPositionX
 	Y consts.PlanetPositionY
 	Z consts.PlanetPositionZ
+}
+
+type resources struct {
+	Metal   uint64
+	Crystal uint64
+	Gas     uint64
 }
 
 type finishedBuilding struct {

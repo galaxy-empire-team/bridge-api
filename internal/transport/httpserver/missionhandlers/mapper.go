@@ -49,6 +49,7 @@ func fromUserMissions(userMissions []models.UserMission) UserMissionsResponse {
 
 	for _, m := range userMissions {
 		resp.Missions = append(resp.Missions, Mission{
+			ID:          m.ID,
 			Type:        m.Type,
 			PlanetFrom:  fromCoordinatesModel(m.PlanetFrom),
 			PlanetTo:    fromCoordinatesModel(m.PlanetTo),

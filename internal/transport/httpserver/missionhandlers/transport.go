@@ -46,7 +46,7 @@ func Transport(missionService MissionService) func(c *gin.Context) {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"status": "transport mission started",
+			"success": true,
 		})
 	}
 }

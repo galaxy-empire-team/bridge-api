@@ -10,7 +10,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/middleware"
 )
 
-func CreateCapitol(planetService PlanetService) func(c *gin.Context) {
+func ColonizeCapitol(planetService PlanetService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		userID, err := middleware.RetrieveUserID(c)
 		if err != nil {
@@ -21,14 +21,14 @@ func CreateCapitol(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		err = planetService.CreateCapitol(c.Request.Context(), userID)
+		err = planetService.ColonizeCapitol(c.Request.Context(), userID)
 		if err != nil {
 			handleColonizeCapitolError(c, err)
 			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"status": "capitol colonized successfully",
+			"status": "success",
 		})
 	}
 }

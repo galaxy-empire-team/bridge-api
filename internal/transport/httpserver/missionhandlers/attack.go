@@ -45,7 +45,7 @@ func Attack(missionService MissionService) func(c *gin.Context) {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"status": "attack mission started",
+			"success": true,
 		})
 	}
 }

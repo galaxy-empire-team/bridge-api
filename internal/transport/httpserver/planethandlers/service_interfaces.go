@@ -10,7 +10,7 @@ import (
 )
 
 type PlanetService interface {
-	CreateCapitol(ctx context.Context, userID uuid.UUID) error
+	ColonizeCapitol(ctx context.Context, userID uuid.UUID) error
 	GetCapitol(ctx context.Context, userID uuid.UUID) (models.Planet, error)
 	GetPlanet(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (models.Planet, error)
 	GetPlanetResources(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (models.Resources, error)

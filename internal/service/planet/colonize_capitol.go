@@ -10,7 +10,13 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (s *Service) CreateCapitol(ctx context.Context, userID uuid.UUID) error {
+const (
+	// Public operations operationID equals 0 == is not set.
+	// OperationID is used by event manager to guarantee only once planet creation
+	colonizeOperationID = 0
+)
+
+func (s *Service) ColonizeCapitol(ctx context.Context, userID uuid.UUID) error {
 	planetID, err := uuid.NewV7()
 	if err != nil {
 		return fmt.Errorf("uuid.NewV7(): %w", err)
@@ -29,9 +35,9 @@ func (s *Service) CreateCapitol(ctx context.Context, userID uuid.UUID) error {
 		HasMoon:     false,
 	}
 
-	err = s.planetStorage.CreatePlanet(ctx, planetToColonize)
+	err = s.planetStorage.ColonizePlanet(ctx, planetToColonize, colonizeOperationID)
 	if err != nil {
-		return fmt.Errorf("planetStorage.CreatePlanet(): %w", err)
+		return fmt.Errorf("planetStorage.ColonizePlanet(): %w", err)
 	}
 
 	return nil

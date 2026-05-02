@@ -13,7 +13,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (r *PlanetStorage) CreatePlanet(ctx context.Context, planet models.Planet) error {
+func (r *PlanetStorage) ColonizePlanet(ctx context.Context, planet models.Planet, operationID uint64) error {
 	tx, err := r.DB.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("pool.Begin(): %w", err)
@@ -35,6 +35,17 @@ func (r *PlanetStorage) CreatePlanet(ctx context.Context, planet models.Planet) 
 		err = fmt.Errorf("tx.Rollback(): %w", rollbackErr)
 	}()
 
+	if operationID != 0 {
+		isAvailable, err := r.CheckIsCreationAvailable(ctx, operationID)
+		if err != nil {
+			return fmt.Errorf("CheckIsCreationAvailable(): %w", err)
+		}
+
+		if !isAvailable {
+			return nil
+		}
+	}
+
 	planetToColonize := fromPlanetModel(planet)
 
 	err = r.createPlanetRow(ctx, tx, planetToColonize)
@@ -42,7 +53,7 @@ func (r *PlanetStorage) CreatePlanet(ctx context.Context, planet models.Planet) 
 		return fmt.Errorf("createPlanet(): %w", err)
 	}
 
-	err = r.createResourcesRow(ctx, tx, planetToColonize.ID)
+	err = r.createResourcesRow(ctx, tx, planetToColonize)
 	if err != nil {
 		return fmt.Errorf("createResources(): %w", err)
 	}
@@ -57,6 +68,29 @@ func (r *PlanetStorage) CreatePlanet(ctx context.Context, planet models.Planet) 
 	}
 
 	return nil
+}
+
+const planetCreatedStatus = "created"
+
+func (r *PlanetStorage) CheckIsCreationAvailable(ctx context.Context, operationID uint64) (bool, error) {
+	const tryToInsertNewOperationIDQuery = `
+		INSERT INTO session_beta.em_colonizations (id, status)
+		VALUES ($1, $2);
+	`
+
+	_, err := r.DB.Exec(ctx, tryToInsertNewOperationIDQuery, operationID, planetCreatedStatus)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == uniqueViolationCode {
+				return false, nil
+			}
+		}
+
+		return false, fmt.Errorf("DB.Pool.Exec(): %w", err)
+	}
+
+	return true, nil
 }
 
 func (r *PlanetStorage) createPlanetRow(ctx context.Context, tx pgx.Tx, planet planetToColonize) error {
@@ -97,7 +131,7 @@ func (r *PlanetStorage) createPlanetRow(ctx context.Context, tx pgx.Tx, planet p
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			switch pgErr.Code {
-			case "23505": // unique_violation
+			case uniqueViolationCode:
 				if pgErr.ConstraintName == "planet_have_unique_x_y_z" {
 					return fmt.Errorf("DB.Pool.Exec(): %w", models.ErrPlanetCoordinatesAlreadyTaken)
 				}
@@ -112,7 +146,7 @@ func (r *PlanetStorage) createPlanetRow(ctx context.Context, tx pgx.Tx, planet p
 	return nil
 }
 
-func (r *PlanetStorage) createResourcesRow(ctx context.Context, tx pgx.Tx, planetID uuid.UUID) error {
+func (r *PlanetStorage) createResourcesRow(ctx context.Context, tx pgx.Tx, planet planetToColonize) error {
 	const createResourcesQuery = `
 		INSERT INTO session_beta.planet_resources (
 			planet_id,
@@ -122,9 +156,9 @@ func (r *PlanetStorage) createResourcesRow(ctx context.Context, tx pgx.Tx, plane
 			updated_at
 		) VALUES (
 			$1,    --- planet.ID
-			0,     --- metal
-			0,     --- crystal
-			0,     --- gas
+			$2,     --- metal
+			$3,     --- crystal
+			$4,     --- gas
 			NOW()  --- updated_at
 		);
 	`
@@ -132,7 +166,10 @@ func (r *PlanetStorage) createResourcesRow(ctx context.Context, tx pgx.Tx, plane
 	_, err := tx.Exec(
 		ctx,
 		createResourcesQuery,
-		planetID,
+		planet.ID,
+		planet.Resources.Metal,
+		planet.Resources.Crystal,
+		planet.Resources.Gas,
 	)
 	if err != nil {
 		return fmt.Errorf("DB.Pool.Exec(): %w", err)

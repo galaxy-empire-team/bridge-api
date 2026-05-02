@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	PlanetService_UpdatePlanetResources_FullMethodName = "/planet.v1.PlanetService/UpdatePlanetResources"
+	PlanetService_ColonizePlanet_FullMethodName        = "/planet.v1.PlanetService/ColonizePlanet"
 )
 
 // PlanetServiceClient is the client API for PlanetService service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PlanetServiceClient interface {
 	UpdatePlanetResources(ctx context.Context, in *UpdatePlanetResourcesRequest, opts ...grpc.CallOption) (*UpdatePlanetResourcesResponse, error)
+	ColonizePlanet(ctx context.Context, in *ColonizePlanetRequest, opts ...grpc.CallOption) (*ColonizePlanetResponse, error)
 }
 
 type planetServiceClient struct {
@@ -47,11 +49,22 @@ func (c *planetServiceClient) UpdatePlanetResources(ctx context.Context, in *Upd
 	return out, nil
 }
 
+func (c *planetServiceClient) ColonizePlanet(ctx context.Context, in *ColonizePlanetRequest, opts ...grpc.CallOption) (*ColonizePlanetResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ColonizePlanetResponse)
+	err := c.cc.Invoke(ctx, PlanetService_ColonizePlanet_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PlanetServiceServer is the server API for PlanetService service.
 // All implementations must embed UnimplementedPlanetServiceServer
 // for forward compatibility.
 type PlanetServiceServer interface {
 	UpdatePlanetResources(context.Context, *UpdatePlanetResourcesRequest) (*UpdatePlanetResourcesResponse, error)
+	ColonizePlanet(context.Context, *ColonizePlanetRequest) (*ColonizePlanetResponse, error)
 	mustEmbedUnimplementedPlanetServiceServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedPlanetServiceServer struct{}
 
 func (UnimplementedPlanetServiceServer) UpdatePlanetResources(context.Context, *UpdatePlanetResourcesRequest) (*UpdatePlanetResourcesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdatePlanetResources not implemented")
+}
+func (UnimplementedPlanetServiceServer) ColonizePlanet(context.Context, *ColonizePlanetRequest) (*ColonizePlanetResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ColonizePlanet not implemented")
 }
 func (UnimplementedPlanetServiceServer) mustEmbedUnimplementedPlanetServiceServer() {}
 func (UnimplementedPlanetServiceServer) testEmbeddedByValue()                       {}
@@ -104,6 +120,24 @@ func _PlanetService_UpdatePlanetResources_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PlanetService_ColonizePlanet_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ColonizePlanetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlanetServiceServer).ColonizePlanet(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PlanetService_ColonizePlanet_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlanetServiceServer).ColonizePlanet(ctx, req.(*ColonizePlanetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PlanetService_ServiceDesc is the grpc.ServiceDesc for PlanetService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +148,10 @@ var PlanetService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdatePlanetResources",
 			Handler:    _PlanetService_UpdatePlanetResources_Handler,
+		},
+		{
+			MethodName: "ColonizePlanet",
+			Handler:    _PlanetService_ColonizePlanet_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -21,6 +21,7 @@ type MissionEvent struct {
 }
 
 type UserMission struct {
+	ID          uint64
 	Type        string
 	PlanetFrom  Coordinates
 	PlanetTo    Coordinates

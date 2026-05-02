@@ -46,7 +46,7 @@ func Colonize(missionService MissionService) func(c *gin.Context) {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"status": "colonization mission started",
+			"success": true,
 		})
 	}
 }

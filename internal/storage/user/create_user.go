@@ -30,7 +30,7 @@ func (r *UserStorage) CreateUser(ctx context.Context, user models.User) (models.
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			switch pgErr.Code {
-			case "23505": // unique_violation
+			case uniqueViolationCode:
 				return models.User{}, fmt.Errorf("DB.Pool.QueryRow(): %w", models.ErrUserAlreadyExists)
 			}
 		}

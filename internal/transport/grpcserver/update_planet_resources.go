@@ -12,12 +12,12 @@ import (
 )
 
 func (s *Server) UpdatePlanetResources(ctx context.Context, req *planetpb.UpdatePlanetResourcesRequest) (*planetpb.UpdatePlanetResourcesResponse, error) {
-	userID, err := uuid.Parse(req.GetUserId())
+	userID, err := uuid.Parse(req.GetUserID())
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid user_id")
 	}
 
-	planetID, err := uuid.Parse(req.GetPlanetId())
+	planetID, err := uuid.Parse(req.GetPlanetID())
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid planet_id")
 	}

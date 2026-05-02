@@ -45,7 +45,7 @@ func Spy(missionService MissionService) func(c *gin.Context) {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"status": "spy mission started",
+			"success": true,
 		})
 	}
 }

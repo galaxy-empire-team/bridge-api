@@ -24,8 +24,8 @@ const (
 
 type UpdatePlanetResourcesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	PlanetId      string                 `protobuf:"bytes,2,opt,name=planet_id,json=planetId,proto3" json:"planet_id,omitempty"`
+	UserID        string                 `protobuf:"bytes,1,opt,name=userID,proto3" json:"userID,omitempty"`
+	PlanetID      string                 `protobuf:"bytes,2,opt,name=planetID,proto3" json:"planetID,omitempty"`
 	Time          *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=time,proto3" json:"time,omitempty"` // optional
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -61,16 +61,16 @@ func (*UpdatePlanetResourcesRequest) Descriptor() ([]byte, []int) {
 	return file_planet_v1_planet_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *UpdatePlanetResourcesRequest) GetUserId() string {
+func (x *UpdatePlanetResourcesRequest) GetUserID() string {
 	if x != nil {
-		return x.UserId
+		return x.UserID
 	}
 	return ""
 }
 
-func (x *UpdatePlanetResourcesRequest) GetPlanetId() string {
+func (x *UpdatePlanetResourcesRequest) GetPlanetID() string {
 	if x != nil {
-		return x.PlanetId
+		return x.PlanetID
 	}
 	return ""
 }
@@ -118,18 +118,266 @@ func (*UpdatePlanetResourcesResponse) Descriptor() ([]byte, []int) {
 	return file_planet_v1_planet_proto_rawDescGZIP(), []int{1}
 }
 
+type ColonizePlanetRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	OperationID   uint64                 `protobuf:"varint,1,opt,name=operationID,proto3" json:"operationID,omitempty"`
+	UserID        string                 `protobuf:"bytes,2,opt,name=userID,proto3" json:"userID,omitempty"`
+	Coordinates   *Coordinates           `protobuf:"bytes,3,opt,name=coordinates,proto3" json:"coordinates,omitempty"`
+	Resources     *Resources             `protobuf:"bytes,4,opt,name=resources,proto3" json:"resources,omitempty"`
+	IsCapitol     bool                   `protobuf:"varint,5,opt,name=isCapitol,proto3" json:"isCapitol,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ColonizePlanetRequest) Reset() {
+	*x = ColonizePlanetRequest{}
+	mi := &file_planet_v1_planet_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ColonizePlanetRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ColonizePlanetRequest) ProtoMessage() {}
+
+func (x *ColonizePlanetRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_planet_v1_planet_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ColonizePlanetRequest.ProtoReflect.Descriptor instead.
+func (*ColonizePlanetRequest) Descriptor() ([]byte, []int) {
+	return file_planet_v1_planet_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ColonizePlanetRequest) GetOperationID() uint64 {
+	if x != nil {
+		return x.OperationID
+	}
+	return 0
+}
+
+func (x *ColonizePlanetRequest) GetUserID() string {
+	if x != nil {
+		return x.UserID
+	}
+	return ""
+}
+
+func (x *ColonizePlanetRequest) GetCoordinates() *Coordinates {
+	if x != nil {
+		return x.Coordinates
+	}
+	return nil
+}
+
+func (x *ColonizePlanetRequest) GetResources() *Resources {
+	if x != nil {
+		return x.Resources
+	}
+	return nil
+}
+
+func (x *ColonizePlanetRequest) GetIsCapitol() bool {
+	if x != nil {
+		return x.IsCapitol
+	}
+	return false
+}
+
+type ColonizePlanetResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ColonizePlanetResponse) Reset() {
+	*x = ColonizePlanetResponse{}
+	mi := &file_planet_v1_planet_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ColonizePlanetResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ColonizePlanetResponse) ProtoMessage() {}
+
+func (x *ColonizePlanetResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_planet_v1_planet_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ColonizePlanetResponse.ProtoReflect.Descriptor instead.
+func (*ColonizePlanetResponse) Descriptor() ([]byte, []int) {
+	return file_planet_v1_planet_proto_rawDescGZIP(), []int{3}
+}
+
+type Coordinates struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	X             uint32                 `protobuf:"varint,1,opt,name=x,proto3" json:"x,omitempty"`
+	Y             uint32                 `protobuf:"varint,2,opt,name=y,proto3" json:"y,omitempty"`
+	Z             uint32                 `protobuf:"varint,3,opt,name=z,proto3" json:"z,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Coordinates) Reset() {
+	*x = Coordinates{}
+	mi := &file_planet_v1_planet_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Coordinates) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Coordinates) ProtoMessage() {}
+
+func (x *Coordinates) ProtoReflect() protoreflect.Message {
+	mi := &file_planet_v1_planet_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Coordinates.ProtoReflect.Descriptor instead.
+func (*Coordinates) Descriptor() ([]byte, []int) {
+	return file_planet_v1_planet_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *Coordinates) GetX() uint32 {
+	if x != nil {
+		return x.X
+	}
+	return 0
+}
+
+func (x *Coordinates) GetY() uint32 {
+	if x != nil {
+		return x.Y
+	}
+	return 0
+}
+
+func (x *Coordinates) GetZ() uint32 {
+	if x != nil {
+		return x.Z
+	}
+	return 0
+}
+
+type Resources struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Metal         uint64                 `protobuf:"varint,1,opt,name=metal,proto3" json:"metal,omitempty"`
+	Crystal       uint64                 `protobuf:"varint,2,opt,name=crystal,proto3" json:"crystal,omitempty"`
+	Gas           uint64                 `protobuf:"varint,3,opt,name=gas,proto3" json:"gas,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Resources) Reset() {
+	*x = Resources{}
+	mi := &file_planet_v1_planet_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Resources) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Resources) ProtoMessage() {}
+
+func (x *Resources) ProtoReflect() protoreflect.Message {
+	mi := &file_planet_v1_planet_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Resources.ProtoReflect.Descriptor instead.
+func (*Resources) Descriptor() ([]byte, []int) {
+	return file_planet_v1_planet_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *Resources) GetMetal() uint64 {
+	if x != nil {
+		return x.Metal
+	}
+	return 0
+}
+
+func (x *Resources) GetCrystal() uint64 {
+	if x != nil {
+		return x.Crystal
+	}
+	return 0
+}
+
+func (x *Resources) GetGas() uint64 {
+	if x != nil {
+		return x.Gas
+	}
+	return 0
+}
+
 var File_planet_v1_planet_proto protoreflect.FileDescriptor
 
 const file_planet_v1_planet_proto_rawDesc = "" +
 	"\n" +
-	"\x16planet/v1/planet.proto\x12\tplanet.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\x84\x01\n" +
-	"\x1cUpdatePlanetResourcesRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1b\n" +
-	"\tplanet_id\x18\x02 \x01(\tR\bplanetId\x12.\n" +
+	"\x16planet/v1/planet.proto\x12\tplanet.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\x82\x01\n" +
+	"\x1cUpdatePlanetResourcesRequest\x12\x16\n" +
+	"\x06userID\x18\x01 \x01(\tR\x06userID\x12\x1a\n" +
+	"\bplanetID\x18\x02 \x01(\tR\bplanetID\x12.\n" +
 	"\x04time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\x04time\"\x1f\n" +
-	"\x1dUpdatePlanetResourcesResponse2{\n" +
+	"\x1dUpdatePlanetResourcesResponse\"\xdd\x01\n" +
+	"\x15ColonizePlanetRequest\x12 \n" +
+	"\voperationID\x18\x01 \x01(\x04R\voperationID\x12\x16\n" +
+	"\x06userID\x18\x02 \x01(\tR\x06userID\x128\n" +
+	"\vcoordinates\x18\x03 \x01(\v2\x16.planet.v1.CoordinatesR\vcoordinates\x122\n" +
+	"\tresources\x18\x04 \x01(\v2\x14.planet.v1.ResourcesR\tresources\x12\x1c\n" +
+	"\tisCapitol\x18\x05 \x01(\bR\tisCapitol\"\x18\n" +
+	"\x16ColonizePlanetResponse\"7\n" +
+	"\vCoordinates\x12\f\n" +
+	"\x01x\x18\x01 \x01(\rR\x01x\x12\f\n" +
+	"\x01y\x18\x02 \x01(\rR\x01y\x12\f\n" +
+	"\x01z\x18\x03 \x01(\rR\x01z\"M\n" +
+	"\tResources\x12\x14\n" +
+	"\x05metal\x18\x01 \x01(\x04R\x05metal\x12\x18\n" +
+	"\acrystal\x18\x02 \x01(\x04R\acrystal\x12\x10\n" +
+	"\x03gas\x18\x03 \x01(\x04R\x03gas2\xd2\x01\n" +
 	"\rPlanetService\x12j\n" +
-	"\x15UpdatePlanetResources\x12'.planet.v1.UpdatePlanetResourcesRequest\x1a(.planet.v1.UpdatePlanetResourcesResponseBHZFgithub.com/galaxy-empire-team/bridge-api/api/gen/go/planet/v1;planetpbb\x06proto3"
+	"\x15UpdatePlanetResources\x12'.planet.v1.UpdatePlanetResourcesRequest\x1a(.planet.v1.UpdatePlanetResourcesResponse\x12U\n" +
+	"\x0eColonizePlanet\x12 .planet.v1.ColonizePlanetRequest\x1a!.planet.v1.ColonizePlanetResponseBHZFgithub.com/galaxy-empire-team/bridge-api/api/gen/go/planet/v1;planetpbb\x06proto3"
 
 var (
 	file_planet_v1_planet_proto_rawDescOnce sync.Once
@@ -143,21 +391,29 @@ func file_planet_v1_planet_proto_rawDescGZIP() []byte {
 	return file_planet_v1_planet_proto_rawDescData
 }
 
-var file_planet_v1_planet_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_planet_v1_planet_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_planet_v1_planet_proto_goTypes = []any{
 	(*UpdatePlanetResourcesRequest)(nil),  // 0: planet.v1.UpdatePlanetResourcesRequest
 	(*UpdatePlanetResourcesResponse)(nil), // 1: planet.v1.UpdatePlanetResourcesResponse
-	(*timestamppb.Timestamp)(nil),         // 2: google.protobuf.Timestamp
+	(*ColonizePlanetRequest)(nil),         // 2: planet.v1.ColonizePlanetRequest
+	(*ColonizePlanetResponse)(nil),        // 3: planet.v1.ColonizePlanetResponse
+	(*Coordinates)(nil),                   // 4: planet.v1.Coordinates
+	(*Resources)(nil),                     // 5: planet.v1.Resources
+	(*timestamppb.Timestamp)(nil),         // 6: google.protobuf.Timestamp
 }
 var file_planet_v1_planet_proto_depIdxs = []int32{
-	2, // 0: planet.v1.UpdatePlanetResourcesRequest.time:type_name -> google.protobuf.Timestamp
-	0, // 1: planet.v1.PlanetService.UpdatePlanetResources:input_type -> planet.v1.UpdatePlanetResourcesRequest
-	1, // 2: planet.v1.PlanetService.UpdatePlanetResources:output_type -> planet.v1.UpdatePlanetResourcesResponse
-	2, // [2:3] is the sub-list for method output_type
-	1, // [1:2] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	6, // 0: planet.v1.UpdatePlanetResourcesRequest.time:type_name -> google.protobuf.Timestamp
+	4, // 1: planet.v1.ColonizePlanetRequest.coordinates:type_name -> planet.v1.Coordinates
+	5, // 2: planet.v1.ColonizePlanetRequest.resources:type_name -> planet.v1.Resources
+	0, // 3: planet.v1.PlanetService.UpdatePlanetResources:input_type -> planet.v1.UpdatePlanetResourcesRequest
+	2, // 4: planet.v1.PlanetService.ColonizePlanet:input_type -> planet.v1.ColonizePlanetRequest
+	1, // 5: planet.v1.PlanetService.UpdatePlanetResources:output_type -> planet.v1.UpdatePlanetResourcesResponse
+	3, // 6: planet.v1.PlanetService.ColonizePlanet:output_type -> planet.v1.ColonizePlanetResponse
+	5, // [5:7] is the sub-list for method output_type
+	3, // [3:5] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_planet_v1_planet_proto_init() }
@@ -171,7 +427,7 @@ func file_planet_v1_planet_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_planet_v1_planet_proto_rawDesc), len(file_planet_v1_planet_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

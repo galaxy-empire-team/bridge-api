@@ -13,7 +13,7 @@ import (
 )
 
 type planetStorage interface {
-	CreatePlanet(ctx context.Context, planet models.Planet) error
+	ColonizePlanet(ctx context.Context, planet models.Planet, operationID uint64) error
 	GetUserPlanetIDs(ctx context.Context, userID uuid.UUID) ([]models.PlanetIDWithCapitol, error)
 	GetCoordinates(ctx context.Context, planetID uuid.UUID) (models.Coordinates, error)
 	GetResourcesForUpdate(ctx context.Context, planetID uuid.UUID) (models.Resources, error)

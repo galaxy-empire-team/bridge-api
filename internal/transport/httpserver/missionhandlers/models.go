@@ -62,6 +62,7 @@ type UserMissionsResponse struct {
 }
 
 type Mission struct {
+	ID          uint64      `json:"id"`
 	Type        string      `json:"type"`
 	PlanetFrom  Coordinates `json:"planetFrom"`
 	PlanetTo    Coordinates `json:"planetTo"`
