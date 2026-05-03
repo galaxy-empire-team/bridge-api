@@ -7,6 +7,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/app"
 	"github.com/galaxy-empire-team/bridge-api/internal/config"
 	"github.com/galaxy-empire-team/bridge-api/internal/db"
+	resourcerepository "github.com/galaxy-empire-team/bridge-api/internal/repository/resource"
 	missionservice "github.com/galaxy-empire-team/bridge-api/internal/service/mission"
 	planetservice "github.com/galaxy-empire-team/bridge-api/internal/service/planet"
 	staticservice "github.com/galaxy-empire-team/bridge-api/internal/service/static"
@@ -61,10 +62,13 @@ func run() error {
 		return fmt.Errorf("registry.New(): %w", err)
 	}
 
+	// initialize repositories
+	resourceRepo := resourcerepository.New(txManager, planetStorage, researchStorage, reg)
+
 	// initialize services
 	userService := userservice.New(userStorage)
-	planetService := planetservice.New(txManager, planetStorage, researchStorage, reg)
-	missionService := missionservice.New(txManager, planetStorage, missionStorage, researchStorage, reg)
+	planetService := planetservice.New(txManager, planetStorage, researchStorage, resourceRepo, reg)
+	missionService := missionservice.New(txManager, planetStorage, missionStorage, researchStorage, resourceRepo, reg)
 	systemService := systemservice.New(systemStorage)
 	staticService := staticservice.New(reg)
 

@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 
 	"github.com/galaxy-empire-team/bridge-api/internal/db"
+	resourcerepository "github.com/galaxy-empire-team/bridge-api/internal/repository/resource"
 	missionservice "github.com/galaxy-empire-team/bridge-api/internal/service/mission"
 	planetservice "github.com/galaxy-empire-team/bridge-api/internal/service/planet"
 )
@@ -27,7 +28,7 @@ func (m *TxManager) ExecPlanetTx(
 	handler func(ctx context.Context, storages planetservice.TxStorages) error,
 ) error {
 	return m.exec(ctx, func(tx pgx.Tx) error {
-		return handler(ctx, newStorageSet(tx))
+		return handler(ctx, newPlanetResearchStorageSet(tx))
 	})
 }
 
@@ -38,7 +39,18 @@ func (m *TxManager) ExecMissionTx(
 	handler func(ctx context.Context, storages missionservice.TxStorages) error,
 ) error {
 	return m.exec(ctx, func(tx pgx.Tx) error {
-		return handler(ctx, newStorageSet(tx))
+		return handler(ctx, newPlanetMissionStorageSet(tx))
+	})
+}
+
+// ExecResourceRepoTx implemets methods required by resource repository. I decided to copy func for each service
+// insted of making factories or use empty interfaces.
+func (m *TxManager) ExecResourceRepoTx(
+	ctx context.Context,
+	handler func(ctx context.Context, storages resourcerepository.TxStorages) error,
+) error {
+	return m.exec(ctx, func(tx pgx.Tx) error {
+		return handler(ctx, newPlanetResearchStorageSet(tx))
 	})
 }
 

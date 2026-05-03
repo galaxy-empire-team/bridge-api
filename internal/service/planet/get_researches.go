@@ -10,7 +10,7 @@ import (
 )
 
 func (s *Service) GetResearches(ctx context.Context, userID uuid.UUID) (models.UserResearches, error) {
-	researches, err := s.researchStorage.GetUserResearches(ctx, userID)
+	researches, err := s.researchStorage.GetAllUserResearches(ctx, userID)
 	if err != nil {
 		return models.UserResearches{}, fmt.Errorf("researchStorage.GetUserResearches(): %w", err)
 	}

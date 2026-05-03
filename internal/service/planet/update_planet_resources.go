@@ -13,7 +13,7 @@ import (
 // This method is used by internal gRPC calls.
 func (s *Service) UpdatePlanetResources(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, updatedTime *time.Time) error {
 	if updatedTime == nil {
-		err := s.recalcResources(ctx, userID, planetID)
+		err := s.resourceRepository.RecalcResources(ctx, userID, planetID)
 		if err != nil {
 			return fmt.Errorf("recalcResources(): %w", err)
 		}
@@ -21,7 +21,7 @@ func (s *Service) UpdatePlanetResources(ctx context.Context, userID uuid.UUID, p
 		return nil
 	}
 
-	err := s.recalcResourcesWithUpdatedTime(ctx, userID, planetID, *updatedTime)
+	err := s.resourceRepository.RecalcResourcesWithUpdatedTime(ctx, userID, planetID, *updatedTime)
 	if err != nil {
 		return fmt.Errorf("recalcResourcesWithUpdatedTime(): %w", err)
 	}

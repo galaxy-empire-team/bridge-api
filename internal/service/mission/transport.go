@@ -12,10 +12,13 @@ import (
 )
 
 func (s *Service) Transport(ctx context.Context, mission models.MissionStart) error {
-	fleet := filterZeroCountFleet(mission.Fleet)
+	err := s.checkFleetValid(mission.Fleet)
+	if err != nil {
+		return fmt.Errorf("checkFleetValid(): %w", err)
+	}
 
-	if len(fleet) == 0 {
-		return models.ErrFleetCannotBeEmpty
+	if !s.checkTransportCapacity(mission.Cargo, mission.Fleet, s.registry) {
+		return models.ErrTransportCargoExceedsFleetCapacity
 	}
 
 	planetToID, err := s.planetStorage.GetIDByCoordinates(ctx, mission.PlanetTo)
@@ -33,20 +36,6 @@ func (s *Service) Transport(ctx context.Context, mission models.MissionStart) er
 		}
 	}
 
-	if len(fleet) > s.registry.GetFleetUnitTypeCount() {
-		return models.ErrInvalidInput
-	}
-
-	for _, fleetUnit := range fleet {
-		if !s.registry.CheckFleetUnitIDExists(fleetUnit.ID) {
-			return fmt.Errorf("%w: ID %d", models.ErrFleetIDNotExists, fleetUnit.ID)
-		}
-	}
-
-	if !s.checkTransportCapacity(mission.Cargo, fleet, s.registry) {
-		return models.ErrTransportCargoExceedsFleetCapacity
-	}
-
 	missionID, err := s.registry.GetMissionIDByType(consts.MissionTypeTransport)
 	if err != nil {
 		return fmt.Errorf("registry.GetMissionIDByType(): %w", err)
@@ -57,7 +46,7 @@ func (s *Service) Transport(ctx context.Context, mission models.MissionStart) er
 		return fmt.Errorf("planetStorage.GetCoordinates(): %w", err)
 	}
 
-	missionDuration, err := s.calculateMissionDuration(planetFromCoordinates, mission.PlanetTo, fleet, mission.SpeedMultiplier)
+	missionDuration, err := s.calculateMissionDuration(planetFromCoordinates, mission.PlanetTo, mission.Fleet, mission.SpeedMultiplier)
 	if err != nil {
 		return fmt.Errorf("calculateMissionDuration(): %w", err)
 	}
@@ -68,9 +57,9 @@ func (s *Service) Transport(ctx context.Context, mission models.MissionStart) er
 			return fmt.Errorf("updateResources(): %w", err)
 		}
 
-		err = s.updateFleet(ctx, mission.PlanetFrom, fleet, storages)
+		err = s.removeFleetFromPlanet(ctx, mission.PlanetFrom, mission.Fleet, storages)
 		if err != nil {
-			return fmt.Errorf("updateFleet(): %w", err)
+			return fmt.Errorf("removeFleetFromPlanet(): %w", err)
 		}
 
 		startedAt := time.Now().UTC()
@@ -79,7 +68,7 @@ func (s *Service) Transport(ctx context.Context, mission models.MissionStart) er
 			PlanetFrom:  mission.PlanetFrom,
 			PlanetTo:    mission.PlanetTo,
 			Type:        missionID,
-			Fleet:       fleet,
+			Fleet:       mission.Fleet,
 			Cargo:       mission.Cargo,
 			IsReturning: false,
 			StartedAt:   startedAt,
@@ -93,18 +82,4 @@ func (s *Service) Transport(ctx context.Context, mission models.MissionStart) er
 
 		return nil
 	})
-}
-
-func (s *Service) checkTransportCapacity(cargo models.Resources, fleet []models.FleetUnitCount, registry registryProvider) bool {
-	var cargoLimit uint64
-	for _, fleetUnit := range fleet {
-		fStats, err := registry.GetFleetUnitStatsByID(fleetUnit.ID)
-		if err != nil {
-			return false
-		}
-
-		cargoLimit += fStats.CargoCapacity * fleetUnit.Count
-	}
-
-	return cargo.Metal+cargo.Crystal+cargo.Gas <= cargoLimit
 }

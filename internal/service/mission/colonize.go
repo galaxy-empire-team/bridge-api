@@ -12,20 +12,20 @@ import (
 )
 
 func (s *Service) Colonize(ctx context.Context, mission models.MissionStart) error {
-	fleet := filterZeroCountFleet(mission.Fleet)
-
-	if len(fleet) == 0 {
-		return models.ErrFleetCannotBeEmpty
-	}
-
-	if len(fleet) > s.registry.GetFleetUnitTypeCount() {
+	if len(mission.Fleet) != 1 {
 		return models.ErrInvalidInput
 	}
 
-	for _, fleetUnit := range fleet {
-		if !s.registry.CheckFleetUnitIDExists(fleetUnit.ID) {
-			return fmt.Errorf("%w: ID %d", models.ErrFleetIDNotExists, fleetUnit.ID)
-		}
+	if mission.Fleet[0].Count == 0 {
+		return models.ErrFleetCannotBeEmpty
+	}
+
+	fleetUnitStats, err := s.registry.GetFleetUnitStatsByID(mission.Fleet[0].ID)
+	if err != nil {
+		return fmt.Errorf("registry.GetFleetUnitStatsByID(): %w", err)
+	}
+	if fleetUnitStats.Type != consts.FleetUnitTypeColonyShip {
+		return models.ErrInvalidShipTypeForColonization
 	}
 
 	isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, mission.UserID, mission.PlanetFrom)
@@ -59,7 +59,7 @@ func (s *Service) Colonize(ctx context.Context, mission models.MissionStart) err
 		return fmt.Errorf("planetStorage.GetCoordinates(): %w", err)
 	}
 
-	missionDuration, err := s.calculateMissionDuration(planetFromCoordinates, mission.PlanetTo, fleet, mission.SpeedMultiplier)
+	missionDuration, err := s.calculateMissionDuration(planetFromCoordinates, mission.PlanetTo, mission.Fleet, mission.SpeedMultiplier)
 	if err != nil {
 		return fmt.Errorf("calculateMissionDuration(): %w", err)
 	}
@@ -70,13 +70,13 @@ func (s *Service) Colonize(ctx context.Context, mission models.MissionStart) err
 			return fmt.Errorf("updateResources(): %w", err)
 		}
 
-		err = s.updateFleet(ctx, mission.PlanetFrom, fleet, storages)
+		err = s.removeFleetFromPlanet(ctx, mission.PlanetFrom, mission.Fleet, storages)
 		if err != nil {
-			return fmt.Errorf("updateFleet(): %w", err)
+			return fmt.Errorf("removeFleetFromPlanet(): %w", err)
 		}
 
 		var colonizeShipTaken bool
-		for idx, fleetUnit := range fleet {
+		for idx, fleetUnit := range mission.Fleet {
 			// mission requires at least 1 colonizator that is removed here.
 			stats, err := s.registry.GetFleetUnitStatsByID(fleetUnit.ID)
 			if err != nil {
@@ -84,7 +84,7 @@ func (s *Service) Colonize(ctx context.Context, mission models.MissionStart) err
 			}
 
 			if stats.Type == consts.FleetUnitTypeColonyShip && fleetUnit.Count > 0 {
-				fleet[idx].Count -= 1
+				mission.Fleet[idx].Count -= 1
 				colonizeShipTaken = true
 			}
 		}
@@ -99,7 +99,7 @@ func (s *Service) Colonize(ctx context.Context, mission models.MissionStart) err
 			PlanetFrom:  mission.PlanetFrom,
 			PlanetTo:    mission.PlanetTo,
 			Type:        missionID,
-			Fleet:       fleet,
+			Fleet:       mission.Fleet,
 			Cargo:       mission.Cargo,
 			IsReturning: false,
 			StartedAt:   startedAt,
@@ -121,31 +121,24 @@ func (s *Service) checkColonizationAvailability(ctx context.Context, userID uuid
 		return fmt.Errorf("planetStorage.GetUserPlanetsCount(): %w", err)
 	}
 
-	researchIDs, err := s.researchStorage.GetUserResearches(ctx, userID)
+	userResearches, err := s.researchStorage.GetUserResearchesByTypes(ctx, userID, []consts.ResearchType{consts.ResearchTypeColonizeTechnology})
 	if err != nil {
 		return fmt.Errorf("userStorage.GetUserResearches(): %w", err)
 	}
 
-	for _, researchID := range researchIDs {
-		research, err := s.registry.GetResearchStatsByID(researchID)
-		if err != nil {
-			return fmt.Errorf("registry.GetResearchStatsByID(): %w", err)
-		}
-
-		if research.Type != consts.ResearchTypeColonizeTechnology {
-			continue
-		}
-
-		if research.Bonuses.AvaliableColonizePlanetCount == 0 {
-			continue
-		}
-
-		if research.Bonuses.AvaliableColonizePlanetCount <= planetCount {
-			return fmt.Errorf("planets count %d, availiable %d: %w", planetCount, research.Bonuses.AvaliableColonizePlanetCount, models.ErrColonizationNotAvailable)
-		}
-
-		return nil
+	researchID, ok := userResearches[consts.ResearchTypeColonizeTechnology]
+	if !ok {
+		return models.ErrColonizationNotAvailable
 	}
 
-	return fmt.Errorf("%w", models.ErrColonizationNotAvailable)
+	researchStats, err := s.registry.GetResearchStatsByID(researchID)
+	if err != nil {
+		return fmt.Errorf("registry.GetResearchStatsByID(): %w", err)
+	}
+
+	if planetCount >= researchStats.Bonuses.AvaliableColonizePlanetCount {
+		return models.ErrColonizationNotAvailable
+	}
+
+	return nil
 }

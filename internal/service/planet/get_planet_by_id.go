@@ -16,7 +16,7 @@ func (s *Service) getPlanetByID(ctx context.Context, userID uuid.UUID, planetID 
 	}
 
 	updatedAt := time.Now().UTC()
-	err := s.recalcResourcesWithUpdatedTime(ctx, userID, planetID, updatedAt)
+	err := s.resourceRepository.RecalcResourcesWithUpdatedTime(ctx, userID, planetID, updatedAt)
 	if err != nil {
 		return models.Planet{}, fmt.Errorf("recalcResourcesWithUpdatedTime(): %w", err)
 	}

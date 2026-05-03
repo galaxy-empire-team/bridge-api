@@ -46,7 +46,7 @@ func (s *Service) StartBuildingUpgrade(ctx context.Context, userID uuid.UUID, pl
 		}
 	}
 
-	err = s.recalcResources(ctx, userID, planetID)
+	err = s.resourceRepository.RecalcResources(ctx, userID, planetID)
 	if err != nil {
 		return models.FinishTime{}, fmt.Errorf("recalcResources(): %w", err)
 	}

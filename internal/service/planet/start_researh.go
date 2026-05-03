@@ -29,9 +29,9 @@ func (s *Service) StartResearch(ctx context.Context, userID uuid.UUID, planet uu
 		return models.ResearchProgressInfo{}, models.ErrResearchInProgress
 	}
 
-	userResearches, err := s.researchStorage.GetUserResearches(ctx, userID)
+	userResearches, err := s.researchStorage.GetAllUserResearches(ctx, userID)
 	if err != nil {
-		return models.ResearchProgressInfo{}, fmt.Errorf("researchStorage.GetUserResearches(): %w", err)
+		return models.ResearchProgressInfo{}, fmt.Errorf("researchStorage.GetAllUserResearches(): %w", err)
 	}
 	if !slices.Contains(userResearches, currentResearchID) {
 		researchStats, err := s.registry.GetResearchStatsByID(currentResearchID)
@@ -44,7 +44,7 @@ func (s *Service) StartResearch(ctx context.Context, userID uuid.UUID, planet uu
 		}
 	}
 
-	err = s.recalcResources(ctx, userID, planet)
+	err = s.resourceRepository.RecalcResources(ctx, userID, planet)
 	if err != nil {
 		return models.ResearchProgressInfo{}, fmt.Errorf("recalcResources(): %w", err)
 	}

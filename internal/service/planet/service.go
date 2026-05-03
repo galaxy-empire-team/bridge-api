@@ -17,7 +17,6 @@ type planetStorage interface {
 	GetUserPlanetIDs(ctx context.Context, userID uuid.UUID) ([]models.PlanetIDWithCapitol, error)
 	GetCoordinates(ctx context.Context, planetID uuid.UUID) (models.Coordinates, error)
 	GetResourcesForUpdate(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
-	GetPlanetMinesProduction(ctx context.Context, planetID uuid.UUID) (map[consts.BuildingType]uint64, error)
 	GetBuildsInProgressCount(ctx context.Context, planetID uuid.UUID) (uint8, error)
 	GetCurrentBuilds(ctx context.Context, planetID uuid.UUID) ([]models.BuildingInProgress, error)
 	GetCurrentFleetConstruction(ctx context.Context, planetID uuid.UUID) (models.FleetUnitConstructionInfo, error)
@@ -29,7 +28,7 @@ type planetStorage interface {
 }
 
 type researchStorage interface {
-	GetUserResearches(ctx context.Context, userID uuid.UUID) ([]consts.ResearchID, error)
+	GetAllUserResearches(ctx context.Context, userID uuid.UUID) ([]consts.ResearchID, error)
 	GetUserResearchesProgress(ctx context.Context, userID uuid.UUID) ([]models.ResearchProgressInfo, error)
 	CheckResearchInProgress(ctx context.Context, user_id uuid.UUID) (bool, error)
 }
@@ -47,6 +46,11 @@ type txManager interface {
 	ExecPlanetTx(ctx context.Context, fn func(ctx context.Context, storages TxStorages) error) error
 }
 
+type resourceRepository interface {
+	RecalcResources(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) error
+	RecalcResourcesWithUpdatedTime(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, updatedAt time.Time) error
+}
+
 type registryProvider interface {
 	GetBuildingStatsByID(buildingID consts.BuildingID) (registry.BuildingStats, error)
 	GetBuildingNextLvlID(buildingID consts.BuildingID) (consts.BuildingID, error)
@@ -56,21 +60,29 @@ type registryProvider interface {
 }
 
 type Service struct {
-	txManager       txManager
-	planetStorage   planetStorage
-	researchStorage researchStorage
-	registry        registryProvider
-	randomGenerator *rand.Rand
+	txManager          txManager
+	planetStorage      planetStorage
+	researchStorage    researchStorage
+	resourceRepository resourceRepository
+	registry           registryProvider
+	randomGenerator    *rand.Rand
 }
 
-func New(txManager txManager, planetStorage planetStorage, researchStorage researchStorage, registry registryProvider) *Service {
+func New(
+	txManager txManager,
+	planetStorage planetStorage,
+	researchStorage researchStorage,
+	resourceRepository resourceRepository,
+	registry registryProvider,
+) *Service {
 	gen := rand.New(rand.NewSource((time.Now().UnixNano())))
 
 	return &Service{
-		txManager:       txManager,
-		planetStorage:   planetStorage,
-		researchStorage: researchStorage,
-		registry:        registry,
-		randomGenerator: gen,
+		txManager:          txManager,
+		planetStorage:      planetStorage,
+		researchStorage:    researchStorage,
+		resourceRepository: resourceRepository,
+		registry:           registry,
+		randomGenerator:    gen,
 	}
 }

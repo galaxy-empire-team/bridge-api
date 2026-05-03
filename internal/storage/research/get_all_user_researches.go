@@ -9,7 +9,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (r *ResearchStorage) GetUserResearches(ctx context.Context, userID uuid.UUID) ([]consts.ResearchID, error) {
+func (r *ResearchStorage) GetAllUserResearches(ctx context.Context, userID uuid.UUID) ([]consts.ResearchID, error) {
 	const getAllUserResearchesQuery = `
 		SELECT 
 			research_id

@@ -18,7 +18,7 @@ func (s *Service) GetPlanetResources(ctx context.Context, userID uuid.UUID, plan
 		return models.Resources{}, models.ErrPlanetDoesNotBelongToUser
 	}
 
-	err = s.recalcResources(ctx, userID, planetID)
+	err = s.resourceRepository.RecalcResources(ctx, userID, planetID)
 	if err != nil {
 		return models.Resources{}, fmt.Errorf("recalcResources(): %w", err)
 	}

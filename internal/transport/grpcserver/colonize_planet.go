@@ -28,9 +28,9 @@ func (s *Server) ColonizePlanet(ctx context.Context, req *planetpb.ColonizePlane
 			Z: consts.PlanetPositionZ(req.GetCoordinates().GetZ()),
 		},
 		Resources: models.Resources{
-			Metal:   req.Resources.Metal,
-			Crystal: req.Resources.Crystal,
-			Gas:     req.Resources.Gas,
+			Metal:   req.GetResources().GetMetal(),
+			Crystal: req.GetResources().GetCrystal(),
+			Gas:     req.GetResources().GetGas(),
 		},
 		IsCapitol: req.GetIsCapitol(),
 	})

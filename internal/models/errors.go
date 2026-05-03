@@ -34,6 +34,9 @@ var (
 	ErrTransportCargoExceedsFleetCapacity = errors.New("transport cargo exceeds fleet capacity")
 	ErrFleetCannotBeEmpty                 = errors.New("fleet cannot be empty for attack mission")
 	ErrColonizationNotAvailable           = errors.New("colonization not available")
+	ErrInvalidShipTypeForColonization     = errors.New("invalid ship type for colonization")
+	ErrDuplicateFleetUnitID               = errors.New("duplicate fleet unit ID")
+	ErrFleetUnitCountCannotBeZero         = errors.New("fleet unit count cannot be zero")
 
 	// Research errors
 	ErrResearchInProgress = errors.New("research is already in progress")

@@ -31,7 +31,7 @@ func (s *Service) StartFleetConstruction(ctx context.Context, userID uuid.UUID, 
 		return models.FleetUnitConstructionInfo{}, models.ErrFleetConstructionInProgress
 	}
 
-	err = s.recalcResources(ctx, userID, planet)
+	err = s.resourceRepository.RecalcResources(ctx, userID, planet)
 	if err != nil {
 		return models.FleetUnitConstructionInfo{}, fmt.Errorf("recalcResources(): %w", err)
 	}
@@ -71,9 +71,9 @@ func (s *Service) generateEventForFleetConstruct(ctx context.Context, planetID u
 		return models.FleetConstructEvent{}, fmt.Errorf("planetRepo.GetResourcesForUpdate(): %w", err)
 	}
 
-	if resources.Metal < fleetUnitStats.MetalCost ||
-		resources.Crystal < fleetUnitStats.CrystalCost ||
-		resources.Gas < fleetUnitStats.GasCost {
+	if resources.Metal < fleetUnitStats.MetalCost*fleet.Count ||
+		resources.Crystal < fleetUnitStats.CrystalCost*fleet.Count ||
+		resources.Gas < fleetUnitStats.GasCost*fleet.Count {
 		return models.FleetConstructEvent{}, models.ErrNotEnoughResources
 	}
 

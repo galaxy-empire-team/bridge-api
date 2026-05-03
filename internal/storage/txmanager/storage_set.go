@@ -6,22 +6,29 @@ import (
 	missionstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/mission"
 	planetstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/planet"
 	researchstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/research"
-	userstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/user"
 )
 
 // I don't want to write boilerplate stuff, embed all storages ^_^
-type StorageSet struct {
+type planetMissionStorageSet struct {
 	*planetstorage.PlanetStorage
-	*userstorage.UserStorage
 	*missionstorage.MissionStorage
+}
+
+func newPlanetMissionStorageSet(tx pgx.Tx) planetMissionStorageSet {
+	return planetMissionStorageSet{
+		PlanetStorage:  planetstorage.New(tx),
+		MissionStorage: missionstorage.New(tx),
+	}
+}
+
+type planetResearchStorageSet struct {
+	*planetstorage.PlanetStorage
 	*researchstorage.ResearchStorage
 }
 
-func newStorageSet(tx pgx.Tx) StorageSet {
-	return StorageSet{
+func newPlanetResearchStorageSet(tx pgx.Tx) planetResearchStorageSet {
+	return planetResearchStorageSet{
 		PlanetStorage:   planetstorage.New(tx),
-		UserStorage:     userstorage.New(tx),
-		MissionStorage:  missionstorage.New(tx),
 		ResearchStorage: researchstorage.New(tx),
 	}
 }

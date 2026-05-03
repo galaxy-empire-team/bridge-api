@@ -2,6 +2,7 @@ package mission
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -23,7 +24,7 @@ type missionStorage interface {
 }
 
 type researchStorage interface {
-	GetUserResearches(ctx context.Context, userID uuid.UUID) ([]consts.ResearchID, error)
+	GetUserResearchesByTypes(ctx context.Context, userID uuid.UUID, researchTypes []consts.ResearchType) (map[consts.ResearchType]consts.ResearchID, error)
 }
 
 type TxStorages interface {
@@ -40,6 +41,11 @@ type txManager interface {
 	ExecMissionTx(ctx context.Context, fn func(ctx context.Context, storages TxStorages) error) error
 }
 
+type resourceRepository interface {
+	RecalcResources(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) error
+	RecalcResourcesWithUpdatedTime(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, updatedAt time.Time) error
+}
+
 type registryProvider interface {
 	CheckFleetUnitIDExists(fleetUnitID consts.FleetUnitID) bool
 	GetFleetUnitTypeCount() int
@@ -50,19 +56,28 @@ type registryProvider interface {
 }
 
 type Service struct {
-	txManager       txManager
-	researchStorage researchStorage
-	planetStorage   planetStorage
-	missionStorage  missionStorage
-	registry        registryProvider
+	txManager          txManager
+	researchStorage    researchStorage
+	planetStorage      planetStorage
+	missionStorage     missionStorage
+	resourceRepository resourceRepository
+	registry           registryProvider
 }
 
-func New(txManager txManager, planetStorage planetStorage, missionStorage missionStorage, researchStorage researchStorage, registry registryProvider) *Service {
+func New(
+	txManager txManager,
+	planetStorage planetStorage,
+	missionStorage missionStorage,
+	researchStorage researchStorage,
+	resourceRepository resourceRepository,
+	registry registryProvider,
+) *Service {
 	return &Service{
-		txManager:       txManager,
-		researchStorage: researchStorage,
-		planetStorage:   planetStorage,
-		missionStorage:  missionStorage,
-		registry:        registry,
+		txManager:          txManager,
+		researchStorage:    researchStorage,
+		planetStorage:      planetStorage,
+		missionStorage:     missionStorage,
+		resourceRepository: resourceRepository,
+		registry:           registry,
 	}
 }
