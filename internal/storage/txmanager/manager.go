@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 
 	"github.com/galaxy-empire-team/bridge-api/internal/db"
-	resourcerepository "github.com/galaxy-empire-team/bridge-api/internal/repository/resource"
+	repository "github.com/galaxy-empire-team/bridge-api/internal/repository"
 	missionservice "github.com/galaxy-empire-team/bridge-api/internal/service/mission"
 	planetservice "github.com/galaxy-empire-team/bridge-api/internal/service/planet"
 )
@@ -47,7 +47,7 @@ func (m *TxManager) ExecMissionTx(
 // insted of making factories or use empty interfaces.
 func (m *TxManager) ExecResourceRepoTx(
 	ctx context.Context,
-	handler func(ctx context.Context, storages resourcerepository.TxStorages) error,
+	handler func(ctx context.Context, storages repository.TxStorages) error,
 ) error {
 	return m.exec(ctx, func(tx pgx.Tx) error {
 		return handler(ctx, newPlanetResearchStorageSet(tx))

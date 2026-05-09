@@ -7,7 +7,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/app"
 	"github.com/galaxy-empire-team/bridge-api/internal/config"
 	"github.com/galaxy-empire-team/bridge-api/internal/db"
-	resourcerepository "github.com/galaxy-empire-team/bridge-api/internal/repository/resource"
+	repository "github.com/galaxy-empire-team/bridge-api/internal/repository"
 	missionservice "github.com/galaxy-empire-team/bridge-api/internal/service/mission"
 	planetservice "github.com/galaxy-empire-team/bridge-api/internal/service/planet"
 	staticservice "github.com/galaxy-empire-team/bridge-api/internal/service/static"
@@ -63,7 +63,7 @@ func run() error {
 	}
 
 	// initialize repositories
-	resourceRepo := resourcerepository.New(txManager, planetStorage, researchStorage, reg)
+	resourceRepo := repository.New(txManager, planetStorage, researchStorage, reg)
 
 	// initialize services
 	userService := userservice.New(userStorage)

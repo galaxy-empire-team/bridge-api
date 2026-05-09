@@ -15,41 +15,40 @@ type Registry struct {
 	researches    map[consts.ResearchID]ResearchStats
 	missions      map[consts.MissionID]consts.MissionType
 	notifications map[consts.NotificationID]consts.NotificationType
+
+	zeroLvlBuildings  map[consts.BuildingType]consts.BuildingID
+	zeroLvlResearches map[consts.ResearchType]consts.ResearchID
 }
 
 func New(ctx context.Context, connPool *pgxpool.Pool) (*Registry, error) {
-	buildingStats, err := getBuildingStats(ctx, connPool)
+	r := &Registry{}
+
+	err := r.fillBuildingStats(ctx, connPool)
 	if err != nil {
-		return nil, fmt.Errorf("getBuildingStats(): %w", err)
+		return nil, fmt.Errorf("fillBuildingStats(): %w", err)
 	}
 
-	fleetStats, err := getFleetStats(ctx, connPool)
+	err = r.fillFleetStats(ctx, connPool)
 	if err != nil {
 		return nil, fmt.Errorf("getFleetStats(): %w", err)
 	}
 
-	researchStats, err := getResearchStats(ctx, connPool)
+	err = r.fillResearchStats(ctx, connPool)
 	if err != nil {
-		return nil, fmt.Errorf("getResearchStats(): %w", err)
+		return nil, fmt.Errorf("fillResearchStats(): %w", err)
 	}
 
-	missionMapping, err := getMissionMapping(ctx, connPool)
+	err = r.fillMissionMapping(ctx, connPool)
 	if err != nil {
-		return nil, fmt.Errorf("getMissionMapping(): %w", err)
+		return nil, fmt.Errorf("fillMissionMapping(): %w", err)
 	}
 
-	notificationMapping, err := getNotificationMapping(ctx, connPool)
+	err = r.fillNotificationMapping(ctx, connPool)
 	if err != nil {
-		return nil, fmt.Errorf("getNotificationMapping(): %w", err)
+		return nil, fmt.Errorf("fillNotificationMapping(): %w", err)
 	}
 
-	return &Registry{
-		buildings:     buildingStats,
-		fleet:         fleetStats,
-		researches:    researchStats,
-		missions:      missionMapping,
-		notifications: notificationMapping,
-	}, nil
+	return r, nil
 }
 
 type buildingBonuses struct {
@@ -58,7 +57,7 @@ type buildingBonuses struct {
 	BuildSpeed      float32 `json:"building_speed,omitempty"`
 }
 
-func getBuildingStats(ctx context.Context, pool *pgxpool.Pool) (map[consts.BuildingID]BuildingStats, error) {
+func (r *Registry) fillBuildingStats(ctx context.Context, pool *pgxpool.Pool) error {
 	const getBuildingStatsQuery = `
 		SELECT 
 			id,
@@ -74,10 +73,11 @@ func getBuildingStats(ctx context.Context, pool *pgxpool.Pool) (map[consts.Build
 	`
 
 	var bonuses buildingBonuses
-	result := make(map[consts.BuildingID]BuildingStats)
+	r.buildings = make(map[consts.BuildingID]BuildingStats)
+	r.zeroLvlBuildings = make(map[consts.BuildingType]consts.BuildingID)
 	rows, err := pool.Query(ctx, getBuildingStatsQuery)
 	if err != nil {
-		return nil, fmt.Errorf("pool.Query(): %w", err)
+		return fmt.Errorf("pool.Query(): %w", err)
 	}
 
 	for rows.Next() {
@@ -94,7 +94,11 @@ func getBuildingStats(ctx context.Context, pool *pgxpool.Pool) (map[consts.Build
 			&BuildingStats.UpgradeTimeS,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("rows.Scan(): %w", err)
+			return fmt.Errorf("rows.Scan(): %w", err)
+		}
+
+		if BuildingStats.Level == 0 {
+			r.zeroLvlBuildings[BuildingStats.Type] = BuildingStats.ID
 		}
 
 		BuildingStats.Bonuses = BuildingBonuses{
@@ -103,17 +107,17 @@ func getBuildingStats(ctx context.Context, pool *pgxpool.Pool) (map[consts.Build
 			BuildSpeed:      bonuses.BuildSpeed,
 		}
 
-		result[BuildingStats.ID] = BuildingStats
+		r.buildings[BuildingStats.ID] = BuildingStats
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, fmt.Errorf("rows.Err(): %w", err)
+		return fmt.Errorf("rows.Err(): %w", err)
 	}
 
-	return result, nil
+	return nil
 }
 
-func getFleetStats(ctx context.Context, pool *pgxpool.Pool) (map[consts.FleetUnitID]FleetUnitStats, error) {
+func (r *Registry) fillFleetStats(ctx context.Context, pool *pgxpool.Pool) error {
 	const getFleetStatsQuery = `
 		SELECT 
 			id,
@@ -129,10 +133,10 @@ func getFleetStats(ctx context.Context, pool *pgxpool.Pool) (map[consts.FleetUni
 		FROM session_beta.s_fleet;
 	`
 
-	result := make(map[consts.FleetUnitID]FleetUnitStats)
+	r.fleet = make(map[consts.FleetUnitID]FleetUnitStats)
 	rows, err := pool.Query(ctx, getFleetStatsQuery)
 	if err != nil {
-		return nil, fmt.Errorf("pool.Query(): %w", err)
+		return fmt.Errorf("pool.Query(): %w", err)
 	}
 
 	for rows.Next() {
@@ -150,17 +154,17 @@ func getFleetStats(ctx context.Context, pool *pgxpool.Pool) (map[consts.FleetUni
 			&fleetUnitStats.BuildTimeSec,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("rows.Scan(): %w", err)
+			return fmt.Errorf("rows.Scan(): %w", err)
 		}
 
-		result[fleetUnitStats.ID] = fleetUnitStats
+		r.fleet[fleetUnitStats.ID] = fleetUnitStats
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, fmt.Errorf("rows.Err(): %w", err)
+		return fmt.Errorf("rows.Err(): %w", err)
 	}
 
-	return result, nil
+	return nil
 }
 
 type researchBonuses struct {
@@ -177,7 +181,7 @@ type researchBonuses struct {
 	SpyChanceImprove     float32 `json:"success_spy_chance"`
 }
 
-func getResearchStats(ctx context.Context, pool *pgxpool.Pool) (map[consts.ResearchID]ResearchStats, error) {
+func (r *Registry) fillResearchStats(ctx context.Context, pool *pgxpool.Pool) error {
 	const getResearchStatsQuery = `
 		SELECT 
 			id,
@@ -191,10 +195,11 @@ func getResearchStats(ctx context.Context, pool *pgxpool.Pool) (map[consts.Resea
 		FROM session_beta.s_researches;
 	`
 	var bonuses researchBonuses
-	result := make(map[consts.ResearchID]ResearchStats)
+	r.researches = make(map[consts.ResearchID]ResearchStats)
+	r.zeroLvlResearches = make(map[consts.ResearchType]consts.ResearchID)
 	rows, err := pool.Query(ctx, getResearchStatsQuery)
 	if err != nil {
-		return nil, fmt.Errorf("pool.Query(): %w", err)
+		return fmt.Errorf("pool.Query(): %w", err)
 	}
 
 	for rows.Next() {
@@ -210,7 +215,11 @@ func getResearchStats(ctx context.Context, pool *pgxpool.Pool) (map[consts.Resea
 			&researchStats.ResearchTimeS,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("rows.Scan(): %w", err)
+			return fmt.Errorf("rows.Scan(): %w", err)
+		}
+
+		if researchStats.Level == 0 {
+			r.zeroLvlResearches[researchStats.Type] = researchStats.ID
 		}
 
 		researchStats.Bonuses = ResearchBonuses{
@@ -225,17 +234,17 @@ func getResearchStats(ctx context.Context, pool *pgxpool.Pool) (map[consts.Resea
 			SpyChanceImprove:             bonuses.SpyChanceImprove,
 		}
 
-		result[researchStats.ID] = researchStats
+		r.researches[researchStats.ID] = researchStats
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, fmt.Errorf("rows.Err(): %w", err)
+		return fmt.Errorf("rows.Err(): %w", err)
 	}
 
-	return result, nil
+	return nil
 }
 
-func getNotificationMapping(ctx context.Context, pool *pgxpool.Pool) (map[consts.NotificationID]consts.NotificationType, error) {
+func (r *Registry) fillNotificationMapping(ctx context.Context, pool *pgxpool.Pool) error {
 	const getNotificationMappingQuery = `
 		SELECT 
 			id,
@@ -243,10 +252,10 @@ func getNotificationMapping(ctx context.Context, pool *pgxpool.Pool) (map[consts
 		FROM session_beta.s_notifications;
 	`
 
-	result := make(map[consts.NotificationID]consts.NotificationType)
+	r.notifications = make(map[consts.NotificationID]consts.NotificationType)
 	rows, err := pool.Query(ctx, getNotificationMappingQuery)
 	if err != nil {
-		return nil, fmt.Errorf("pool.Query(): %w", err)
+		return fmt.Errorf("pool.Query(): %w", err)
 	}
 
 	for rows.Next() {
@@ -257,20 +266,20 @@ func getNotificationMapping(ctx context.Context, pool *pgxpool.Pool) (map[consts
 			&notificationType,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("rows.Scan(): %w", err)
+			return fmt.Errorf("rows.Scan(): %w", err)
 		}
 
-		result[id] = notificationType
+		r.notifications[id] = notificationType
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, fmt.Errorf("rows.Err(): %w", err)
+		return fmt.Errorf("rows.Err(): %w", err)
 	}
 
-	return result, nil
+	return nil
 }
 
-func getMissionMapping(ctx context.Context, pool *pgxpool.Pool) (map[consts.MissionID]consts.MissionType, error) {
+func (r *Registry) fillMissionMapping(ctx context.Context, pool *pgxpool.Pool) error {
 	const getMissionMappingQuery = `
 		SELECT
 			id,
@@ -278,10 +287,10 @@ func getMissionMapping(ctx context.Context, pool *pgxpool.Pool) (map[consts.Miss
 		FROM session_beta.s_missions;
 	`
 
-	result := make(map[consts.MissionID]consts.MissionType)
+	r.missions = make(map[consts.MissionID]consts.MissionType)
 	rows, err := pool.Query(ctx, getMissionMappingQuery)
 	if err != nil {
-		return nil, fmt.Errorf("pool.Query(): %w", err)
+		return fmt.Errorf("pool.Query(): %w", err)
 	}
 
 	for rows.Next() {
@@ -292,15 +301,15 @@ func getMissionMapping(ctx context.Context, pool *pgxpool.Pool) (map[consts.Miss
 			&missionType,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("rows.Scan(): %w", err)
+			return fmt.Errorf("rows.Scan(): %w", err)
 		}
 
-		result[id] = missionType
+		r.missions[id] = missionType
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, fmt.Errorf("rows.Err(): %w", err)
+		return fmt.Errorf("rows.Err(): %w", err)
 	}
 
-	return result, nil
+	return nil
 }

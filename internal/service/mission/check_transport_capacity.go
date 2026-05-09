@@ -15,5 +15,5 @@ func (s *Service) checkTransportCapacity(cargo models.Resources, fleet []models.
 		cargoLimit += fStats.CargoCapacity * fleetUnit.Count
 	}
 
-	return cargo.Metal + cargo.Crystal + cargo.Gas <= cargoLimit
+	return cargo.Metal+cargo.Crystal+cargo.Gas <= cargoLimit
 }

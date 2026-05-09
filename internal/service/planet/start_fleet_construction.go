@@ -31,7 +31,7 @@ func (s *Service) StartFleetConstruction(ctx context.Context, userID uuid.UUID, 
 		return models.FleetUnitConstructionInfo{}, models.ErrFleetConstructionInProgress
 	}
 
-	err = s.resourceRepository.RecalcResources(ctx, userID, planet)
+	err = s.repository.RecalcResources(ctx, userID, planet)
 	if err != nil {
 		return models.FleetUnitConstructionInfo{}, fmt.Errorf("recalcResources(): %w", err)
 	}

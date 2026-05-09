@@ -11,7 +11,7 @@ const (
 	ZeroBuildingLevel      = 0
 	MaxBuildingsInProgress = 2
 
-	BaseResourceGenerationSpeed = 1.0
+	MinProductionSpeedMultiplier = 1.0
 
 	SpeedMultiplierMin        = 0.3
 	SpeedMultiplierMax        = 1.0

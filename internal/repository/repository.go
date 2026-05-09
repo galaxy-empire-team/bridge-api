@@ -1,4 +1,4 @@
-package planet
+package repository
 
 import (
 	"context"
@@ -29,6 +29,9 @@ type txManager interface {
 }
 
 type registryProvider interface {
+	GetBuildingStatsByID(buildingID consts.BuildingID) (registry.BuildingStats, error)
+	GetBuildingZeroLvlIDByType(buildingType consts.BuildingType) (consts.BuildingID, error)
+	GetResearchZeroLvlIDByType(researchType consts.ResearchType) (consts.ResearchID, error)
 	GetResearchStatsByID(researchID consts.ResearchID) (registry.ResearchStats, error)
 }
 

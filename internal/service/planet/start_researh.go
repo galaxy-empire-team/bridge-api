@@ -44,7 +44,7 @@ func (s *Service) StartResearch(ctx context.Context, userID uuid.UUID, planet uu
 		}
 	}
 
-	err = s.resourceRepository.RecalcResources(ctx, userID, planet)
+	err = s.repository.RecalcResources(ctx, userID, planet)
 	if err != nil {
 		return models.ResearchProgressInfo{}, fmt.Errorf("recalcResources(): %w", err)
 	}

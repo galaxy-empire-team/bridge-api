@@ -121,22 +121,12 @@ func (s *Service) checkColonizationAvailability(ctx context.Context, userID uuid
 		return fmt.Errorf("planetStorage.GetUserPlanetsCount(): %w", err)
 	}
 
-	userResearches, err := s.researchStorage.GetUserResearchesByTypes(ctx, userID, []consts.ResearchType{consts.ResearchTypeColonizeTechnology})
+	colonizeResearchStats, err := s.repository.GetResearchByType(ctx, userID, consts.ResearchTypeColonizeTechnology)
 	if err != nil {
-		return fmt.Errorf("userStorage.GetUserResearches(): %w", err)
+		return fmt.Errorf("repository.GetResearchByType(): %w", err)
 	}
 
-	researchID, ok := userResearches[consts.ResearchTypeColonizeTechnology]
-	if !ok {
-		return models.ErrColonizationNotAvailable
-	}
-
-	researchStats, err := s.registry.GetResearchStatsByID(researchID)
-	if err != nil {
-		return fmt.Errorf("registry.GetResearchStatsByID(): %w", err)
-	}
-
-	if planetCount >= researchStats.Bonuses.AvaliableColonizePlanetCount {
+	if planetCount >= colonizeResearchStats.Bonuses.AvaliableColonizePlanetCount {
 		return models.ErrColonizationNotAvailable
 	}
 

@@ -41,7 +41,8 @@ type txManager interface {
 	ExecMissionTx(ctx context.Context, fn func(ctx context.Context, storages TxStorages) error) error
 }
 
-type resourceRepository interface {
+type repository interface {
+	GetResearchByType(ctx context.Context, userID uuid.UUID, researchType consts.ResearchType) (registry.ResearchStats, error)
 	RecalcResources(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) error
 	RecalcResourcesWithUpdatedTime(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, updatedAt time.Time) error
 }
@@ -56,12 +57,12 @@ type registryProvider interface {
 }
 
 type Service struct {
-	txManager          txManager
-	researchStorage    researchStorage
-	planetStorage      planetStorage
-	missionStorage     missionStorage
-	resourceRepository resourceRepository
-	registry           registryProvider
+	txManager       txManager
+	researchStorage researchStorage
+	planetStorage   planetStorage
+	missionStorage  missionStorage
+	repository      repository
+	registry        registryProvider
 }
 
 func New(
@@ -69,15 +70,15 @@ func New(
 	planetStorage planetStorage,
 	missionStorage missionStorage,
 	researchStorage researchStorage,
-	resourceRepository resourceRepository,
+	repository repository,
 	registry registryProvider,
 ) *Service {
 	return &Service{
-		txManager:          txManager,
-		researchStorage:    researchStorage,
-		planetStorage:      planetStorage,
-		missionStorage:     missionStorage,
-		resourceRepository: resourceRepository,
-		registry:           registry,
+		txManager:       txManager,
+		researchStorage: researchStorage,
+		planetStorage:   planetStorage,
+		missionStorage:  missionStorage,
+		repository:      repository,
+		registry:        registry,
 	}
 }

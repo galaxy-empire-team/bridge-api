@@ -46,7 +46,7 @@ type txManager interface {
 	ExecPlanetTx(ctx context.Context, fn func(ctx context.Context, storages TxStorages) error) error
 }
 
-type resourceRepository interface {
+type repository interface {
 	RecalcResources(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) error
 	RecalcResourcesWithUpdatedTime(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, updatedAt time.Time) error
 }
@@ -60,29 +60,29 @@ type registryProvider interface {
 }
 
 type Service struct {
-	txManager          txManager
-	planetStorage      planetStorage
-	researchStorage    researchStorage
-	resourceRepository resourceRepository
-	registry           registryProvider
-	randomGenerator    *rand.Rand
+	txManager       txManager
+	planetStorage   planetStorage
+	researchStorage researchStorage
+	repository      repository
+	registry        registryProvider
+	randomGenerator *rand.Rand
 }
 
 func New(
 	txManager txManager,
 	planetStorage planetStorage,
 	researchStorage researchStorage,
-	resourceRepository resourceRepository,
+	repository repository,
 	registry registryProvider,
 ) *Service {
 	gen := rand.New(rand.NewSource((time.Now().UnixNano())))
 
 	return &Service{
-		txManager:          txManager,
-		planetStorage:      planetStorage,
-		researchStorage:    researchStorage,
-		resourceRepository: resourceRepository,
-		registry:           registry,
-		randomGenerator:    gen,
+		txManager:       txManager,
+		planetStorage:   planetStorage,
+		researchStorage: researchStorage,
+		repository:      repository,
+		registry:        registry,
+		randomGenerator: gen,
 	}
 }
