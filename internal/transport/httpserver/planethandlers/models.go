@@ -39,7 +39,7 @@ type PlanetResponse struct {
 	Z                   uint8                `json:"z"`
 	Resources           PlanetResources      `json:"resources"`
 	BuildingIDs         []uint16             `json:"buildings"`
-	BuildingsInProgress []BuildingInProgress `json:"buildingsInProgress,omitempty"`
+	BuildingsInProgress []BuildingInProgress `json:"progress,omitempty"`
 	IsCapitol           bool                 `json:"isCapitol"`
 	HasMoon             bool                 `json:"hasMoon"`
 	UpdatedAt           time.Time            `json:"updatedAt"`
@@ -49,6 +49,11 @@ type BuildingInProgress struct {
 	BuildingID consts.BuildingID `json:"id"`
 	StartedAt  time.Time         `json:"startedAt"`
 	FinishedAt time.Time         `json:"finishedAt"`
+}
+
+type PlanetBuildingsResponse struct {
+	Buildings          []consts.BuildingID  `json:"buildings"`
+	BuildingInProgress []BuildingInProgress `json:"progress,omitempty"`
 }
 
 type PlanetResources struct {
@@ -74,7 +79,7 @@ type ShortPlanet struct {
 
 type FleetPlanetsResponse struct {
 	Fleet             []FleetUnitCount          `json:"fleet"`
-	FleetConstruction FleetConstructionResponse `json:"construction"`
+	FleetConstruction FleetConstructionResponse `json:"construction,omitzero"`
 }
 
 type FleetUnitCount struct {

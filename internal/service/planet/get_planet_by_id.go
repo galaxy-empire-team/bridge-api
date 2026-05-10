@@ -42,13 +42,15 @@ func (s *Service) getPlanetByID(ctx context.Context, userID uuid.UUID, planetID 
 	}
 
 	return models.Planet{
-		ID:                  planetID,
-		Coordinates:         capitolCoordinates,
-		Resources:           resources,
-		Buildings:           planetBuildingIDs,
-		BuildingsInProgress: buildingsInProgress,
-		IsCapitol:           true,
-		HasMoon:             false,
-		UpdatedAt:           updatedAt,
+		ID:          planetID,
+		Coordinates: capitolCoordinates,
+		Resources:   resources,
+		Buildings: models.Buildings{
+			BuildingIDs:         planetBuildingIDs,
+			BuildingsInProgress: buildingsInProgress,
+		},
+		IsCapitol: true,
+		HasMoon:   false,
+		UpdatedAt: updatedAt,
 	}, nil
 }

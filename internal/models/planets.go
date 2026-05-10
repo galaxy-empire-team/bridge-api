@@ -9,16 +9,15 @@ import (
 )
 
 type Planet struct {
-	ID                  uuid.UUID
-	UserID              uuid.UUID
-	Coordinates         Coordinates
-	Resources           Resources
-	Buildings           []consts.BuildingID
-	BuildingsInProgress []BuildingInProgress
-	HasMoon             bool
-	IsCapitol           bool
-	ColonizedAt         time.Time
-	UpdatedAt           time.Time
+	ID          uuid.UUID
+	UserID      uuid.UUID
+	Coordinates Coordinates
+	Resources   Resources
+	Buildings   Buildings
+	HasMoon     bool
+	IsCapitol   bool
+	ColonizedAt time.Time
+	UpdatedAt   time.Time
 }
 
 type Resources struct {

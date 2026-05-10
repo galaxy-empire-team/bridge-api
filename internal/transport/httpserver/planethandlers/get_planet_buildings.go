@@ -10,7 +10,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/middleware"
 )
 
-func GetPlanetResources(planetService PlanetService) func(c *gin.Context) {
+func GetPlanetBuildings(planetService PlanetService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		userID, err := middleware.RetrieveUserID(c)
 		if err != nil {
@@ -29,21 +29,17 @@ func GetPlanetResources(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		resources, err := planetService.GetPlanetResources(c.Request.Context(), userID, req.PlanetID)
+		buildings, err := planetService.GetBuildings(c.Request.Context(), userID, req.PlanetID)
 		if err != nil {
-			handleGetPlanetResourcesError(c, err)
+			handleGetPlanetBuildingsError(c, err)
 			return
 		}
 
-		c.JSON(http.StatusOK, PlanetResources{
-			Metal:   resources.Metal,
-			Crystal: resources.Crystal,
-			Gas:     resources.Gas,
-		})
+		c.JSON(http.StatusOK, toPlaneBuildingsResponse(buildings))
 	}
 }
 
-func handleGetPlanetResourcesError(c *gin.Context, err error) {
+func handleGetPlanetBuildingsError(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, models.ErrPlanetNotFound):
 		c.JSON(http.StatusNotFound, ErrorResponse{

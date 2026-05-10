@@ -20,10 +20,10 @@ func toPlanetResponse(p models.Planet) PlanetResponse {
 			Gas:     p.Resources.Gas,
 		},
 		IsCapitol: p.IsCapitol,
-		BuildingIDs: lo.Map(p.Buildings, func(b consts.BuildingID, _ int) uint16 {
+		BuildingIDs: lo.Map(p.Buildings.BuildingIDs, func(b consts.BuildingID, _ int) uint16 {
 			return b.ToUint16()
 		}),
-		BuildingsInProgress: lo.Map(p.BuildingsInProgress, func(b models.BuildingInProgress, _ int) BuildingInProgress {
+		BuildingsInProgress: lo.Map(p.Buildings.BuildingsInProgress, func(b models.BuildingInProgress, _ int) BuildingInProgress {
 			return BuildingInProgress{
 				BuildingID: b.BuildingID,
 				StartedAt:  b.StartedAt,
@@ -31,6 +31,19 @@ func toPlanetResponse(p models.Planet) PlanetResponse {
 			}
 		}),
 		UpdatedAt: p.UpdatedAt,
+	}
+}
+
+func toPlaneBuildingsResponse(b models.Buildings) PlanetBuildingsResponse {
+	return PlanetBuildingsResponse{
+		Buildings: b.BuildingIDs,
+		BuildingInProgress: lo.Map(b.BuildingsInProgress, func(b models.BuildingInProgress, _ int) BuildingInProgress {
+			return BuildingInProgress{
+				BuildingID: b.BuildingID,
+				StartedAt:  b.StartedAt,
+				FinishedAt: b.FinishedAt,
+			}
+		}),
 	}
 }
 

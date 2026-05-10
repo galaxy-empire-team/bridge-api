@@ -42,6 +42,11 @@ type BuildingInfo struct {
 	FinishedAt  time.Time
 }
 
+type Buildings struct {
+	BuildingIDs         []consts.BuildingID
+	BuildingsInProgress []BuildingInProgress
+}
+
 type BuildingInProgress struct {
 	BuildingID consts.BuildingID
 	StartedAt  time.Time

@@ -25,15 +25,19 @@ func (r *Repository) RecalcResourcesWithUpdatedTime(ctx context.Context, userID 
 		return fmt.Errorf("r.GetResearchByType(): %w", err)
 	}
 
-	mines, err := r.planetStorage.GetPlanetMinesProduction(ctx, planetID)
+	minesProduction, err := r.planetStorage.GetPlanetMinesProduction(ctx, planetID)
 	if err != nil {
 		return fmt.Errorf("planetStorage.GetPlanetMinesProduction(): %w", err)
 	}
 
 	// If building is not build yet I fill it with zero level production speed from registry
 	const mineTypesCount = 3
-	if len(mines) != mineTypesCount {
+	if len(minesProduction) != mineTypesCount {
 		for _, buildingType := range []consts.BuildingType{consts.BuildingTypeMetalMine, consts.BuildingTypeCrystalMine, consts.BuildingTypeGasMine} {
+			if _, ok := minesProduction[buildingType]; ok {
+				continue
+			}
+
 			id, err := r.registry.GetBuildingZeroLvlIDByType(buildingType)
 			if err != nil {
 				return fmt.Errorf("registry.GetBuildingZeroLvlIDByType(): %w", err)
@@ -44,7 +48,7 @@ func (r *Repository) RecalcResourcesWithUpdatedTime(ctx context.Context, userID 
 				return fmt.Errorf("registry.GetBuildingStatsByID(): %w", err)
 			}
 
-			mines[buildingType] = bStat.ProductionS
+			minesProduction[buildingType] = bStat.ProductionS
 		}
 	}
 
@@ -60,9 +64,9 @@ func (r *Repository) RecalcResourcesWithUpdatedTime(ctx context.Context, userID 
 		}
 
 		// If production is lower than 1 I set it to default production/s
-		metalMineProduction := float32(mines[consts.BuildingTypeMetalMine]) * industrialTechStat.Bonuses.ProductionSpeedImprove
-		crystalMineProduction := float32(mines[consts.BuildingTypeCrystalMine]) * industrialTechStat.Bonuses.ProductionSpeedImprove
-		gasMineProduction := float32(mines[consts.BuildingTypeGasMine]) * industrialTechStat.Bonuses.ProductionSpeedImprove
+		metalMineProduction := float32(minesProduction[consts.BuildingTypeMetalMine]) * industrialTechStat.Bonuses.ProductionSpeedImprove
+		crystalMineProduction := float32(minesProduction[consts.BuildingTypeCrystalMine]) * industrialTechStat.Bonuses.ProductionSpeedImprove
+		gasMineProduction := float32(minesProduction[consts.BuildingTypeGasMine]) * industrialTechStat.Bonuses.ProductionSpeedImprove
 
 		metalProductionPerSecond := max(metalMineProduction, consts.MinProductionSpeedMultiplier)
 		crystalProductionPerSecond := max(crystalMineProduction, consts.MinProductionSpeedMultiplier)
