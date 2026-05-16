@@ -11,7 +11,7 @@ import (
 
 type PlanetService interface {
 	ColonizeCapitol(ctx context.Context, userID uuid.UUID) error
-	GetCapitol(ctx context.Context, userID uuid.UUID) (models.Planet, error)
+	GetCapitolID(ctx context.Context, userID uuid.UUID) (uuid.UUID, error)
 	GetPlanet(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (models.Planet, error)
 	GetPlanetResources(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (models.Resources, error)
 	GetAllUserPlanets(ctx context.Context, userID uuid.UUID) ([]models.Planet, error)

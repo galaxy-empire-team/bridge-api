@@ -9,7 +9,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
-func (r *PlanetStorage) GetUserPlanetIDs(ctx context.Context, userID uuid.UUID) ([]models.PlanetIDWithCapitol, error) {
+func (r *PlanetStorage) GetUserPlanetIDs(ctx context.Context, userID uuid.UUID) ([]models.PlanetIDCapitol, error) {
 	const getPlanetIDsQuery = `
 		SELECT 
 			id, 
@@ -24,9 +24,9 @@ func (r *PlanetStorage) GetUserPlanetIDs(ctx context.Context, userID uuid.UUID) 
 	}
 	defer rows.Close()
 
-	var planetIDs []models.PlanetIDWithCapitol
+	var planetIDs []models.PlanetIDCapitol
 	for rows.Next() {
-		var planetID models.PlanetIDWithCapitol
+		var planetID models.PlanetIDCapitol
 		err = rows.Scan(
 			&planetID.PlanetID,
 			&planetID.IsCapitol,

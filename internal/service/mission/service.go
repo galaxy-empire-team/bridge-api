@@ -42,6 +42,7 @@ type txManager interface {
 }
 
 type repository interface {
+	CheckPlanetOwner(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) error
 	GetResearchByType(ctx context.Context, userID uuid.UUID, researchType consts.ResearchType) (registry.ResearchStats, error)
 	RecalcResources(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) error
 	RecalcResourcesWithUpdatedTime(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, updatedAt time.Time) error

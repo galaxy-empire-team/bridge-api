@@ -13,12 +13,8 @@ import (
 )
 
 func (s *Service) StartResearch(ctx context.Context, userID uuid.UUID, planet uuid.UUID, currentResearchID consts.ResearchID) (models.ResearchProgressInfo, error) {
-	isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, userID, planet)
-	if err != nil {
-		return models.ResearchProgressInfo{}, fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
-	}
-	if !isUserPlanet {
-		return models.ResearchProgressInfo{}, models.ErrPlanetDoesNotBelongToUser
+	if err := s.repository.CheckPlanetOwner(ctx, userID, planet); err != nil {
+		return models.ResearchProgressInfo{}, fmt.Errorf("CheckPlanetOwner(): %w", err)
 	}
 
 	researchInProgress, err := s.researchStorage.CheckResearchInProgress(ctx, userID)

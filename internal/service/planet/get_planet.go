@@ -10,18 +10,27 @@ import (
 )
 
 func (s *Service) GetPlanet(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (models.Planet, error) {
-	isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, userID, planetID)
-	if err != nil {
-		return models.Planet{}, fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
-	}
-	if !isUserPlanet {
-		return models.Planet{}, models.ErrPlanetDoesNotBelongToUser
+	if err := s.repository.CheckPlanetOwner(ctx, userID, planetID); err != nil {
+		return models.Planet{}, fmt.Errorf("CheckPlanetOwner(): %w", err)
 	}
 
-	planet, err := s.getPlanetByID(ctx, userID, planetID)
+	err := s.repository.RecalcResources(ctx, userID, planetID)
 	if err != nil {
-		return models.Planet{}, fmt.Errorf("getPlanetByID(): %w", err)
+		return models.Planet{}, fmt.Errorf("recalcResourcesWithUpdatedTime(): %w", err)
 	}
 
-	return planet, nil
+	planet, err := s.planetStorage.GetPlanet(ctx, planetID)
+	if err != nil {
+		return models.Planet{}, fmt.Errorf("planetStorage.GetPlanet(): %w", err)
+	}
+
+	return models.Planet{
+		ID:          planetID,
+		Coordinates: planet.Coordinates,
+		Resources:   planet.Resources,
+		IsCapitol:   planet.IsCapitol,
+		HasMoon:     planet.HasMoon,
+		ColonizedAt: planet.ColonizedAt,
+		UpdatedAt:   planet.UpdatedAt,
+	}, nil
 }

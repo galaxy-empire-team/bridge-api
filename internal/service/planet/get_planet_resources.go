@@ -10,15 +10,11 @@ import (
 )
 
 func (s *Service) GetPlanetResources(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (models.Resources, error) {
-	isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, userID, planetID)
-	if err != nil {
-		return models.Resources{}, fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
-	}
-	if !isUserPlanet {
-		return models.Resources{}, models.ErrPlanetDoesNotBelongToUser
+	if err := s.repository.CheckPlanetOwner(ctx, userID, planetID); err != nil {
+		return models.Resources{}, fmt.Errorf("CheckPlanetOwner(): %w", err)
 	}
 
-	err = s.repository.RecalcResources(ctx, userID, planetID)
+	err := s.repository.RecalcResources(ctx, userID, planetID)
 	if err != nil {
 		return models.Resources{}, fmt.Errorf("recalcResources(): %w", err)
 	}

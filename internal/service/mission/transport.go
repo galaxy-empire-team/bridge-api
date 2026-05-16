@@ -27,12 +27,8 @@ func (s *Service) Transport(ctx context.Context, mission models.MissionStart) er
 	}
 
 	for _, planetID := range []uuid.UUID{mission.PlanetFrom, planetToID} {
-		isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, mission.UserID, planetID)
-		if err != nil {
-			return fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
-		}
-		if !isUserPlanet {
-			return models.ErrPlanetDoesNotBelongToUser
+		if err := s.repository.CheckPlanetOwner(ctx, mission.UserID, planetID); err != nil {
+			return fmt.Errorf("CheckPlanetOwner(): %w", err)
 		}
 	}
 

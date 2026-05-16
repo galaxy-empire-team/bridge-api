@@ -63,19 +63,18 @@ func (r *Repository) RecalcResourcesWithUpdatedTime(ctx context.Context, userID 
 			return nil
 		}
 
-		// If production is lower than 1 I set it to default production/s
-		metalMineProduction := float32(minesProduction[consts.BuildingTypeMetalMine]) * industrialTechStat.Bonuses.ProductionSpeedImprove
-		crystalMineProduction := float32(minesProduction[consts.BuildingTypeCrystalMine]) * industrialTechStat.Bonuses.ProductionSpeedImprove
-		gasMineProduction := float32(minesProduction[consts.BuildingTypeGasMine]) * industrialTechStat.Bonuses.ProductionSpeedImprove
+		metalProductionPerSecond := float32(minesProduction[consts.BuildingTypeMetalMine]) * industrialTechStat.Bonuses.ProductionSpeedImprove
+		crystalProductionPerSecond := float32(minesProduction[consts.BuildingTypeCrystalMine]) * industrialTechStat.Bonuses.ProductionSpeedImprove
+		gasProductionPerSecond := float32(minesProduction[consts.BuildingTypeGasMine]) * industrialTechStat.Bonuses.ProductionSpeedImprove
 
-		metalProductionPerSecond := max(metalMineProduction, consts.MinProductionSpeedMultiplier)
-		crystalProductionPerSecond := max(crystalMineProduction, consts.MinProductionSpeedMultiplier)
-		gasProductionPerSecond := max(gasMineProduction, consts.MinProductionSpeedMultiplier)
+		metalIncrease := float64(millisecondsSinceLastUpdate) * float64(metalProductionPerSecond) / 1000
+		crystalIncrease := float64(millisecondsSinceLastUpdate) * float64(crystalProductionPerSecond) / 1000
+		gasIncrease := float64(millisecondsSinceLastUpdate) * float64(gasProductionPerSecond) / 1000
 
 		updatedResources := models.Resources{
-			Metal:     resources.Metal + uint64(millisecondsSinceLastUpdate)*uint64(metalProductionPerSecond)/1000,
-			Crystal:   resources.Crystal + uint64(millisecondsSinceLastUpdate)*uint64(crystalProductionPerSecond)/1000,
-			Gas:       resources.Gas + uint64(millisecondsSinceLastUpdate)*uint64(gasProductionPerSecond)/1000,
+			Metal:     resources.Metal + uint64(metalIncrease),
+			Crystal:   resources.Crystal + uint64(crystalIncrease),
+			Gas:       resources.Gas + uint64(gasIncrease),
 			UpdatedAt: updatedAt,
 		}
 

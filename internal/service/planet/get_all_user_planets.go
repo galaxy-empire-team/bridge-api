@@ -19,13 +19,6 @@ func (s *Service) GetAllUserPlanets(ctx context.Context, userID uuid.UUID) ([]mo
 		return nil, models.ErrNoPlanetsFound
 	}
 
-	for _, pid := range planetIDs {
-		err = s.repository.RecalcResources(ctx, userID, pid.PlanetID)
-		if err != nil {
-			return nil, fmt.Errorf("recalcResourcesWithUpdatedTime(): %w", err)
-		}
-	}
-
 	userPlanets, err := s.planetStorage.GetAllUserPlanets(ctx, userID)
 	if err != nil {
 		return nil, fmt.Errorf("planetStorage.GetAllUserPlanets(): %w", err)

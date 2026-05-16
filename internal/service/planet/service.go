@@ -13,8 +13,9 @@ import (
 )
 
 type planetStorage interface {
-	ColonizePlanet(ctx context.Context, planet models.Planet, operationID uint64) error
-	GetUserPlanetIDs(ctx context.Context, userID uuid.UUID) ([]models.PlanetIDWithCapitol, error)
+	GetCapitolID(ctx context.Context, userID uuid.UUID) (uuid.UUID, error)
+	GetPlanet(ctx context.Context, planetID uuid.UUID) (models.Planet, error)
+	GetUserPlanetIDs(ctx context.Context, userID uuid.UUID) ([]models.PlanetIDCapitol, error)
 	GetCoordinates(ctx context.Context, planetID uuid.UUID) (models.Coordinates, error)
 	GetResourcesForUpdate(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
 	GetBuildsInProgressCount(ctx context.Context, planetID uuid.UUID) (uint8, error)
@@ -25,6 +26,7 @@ type planetStorage interface {
 	GetAllPlanetBuildings(ctx context.Context, userID uuid.UUID) ([]consts.BuildingID, error)
 	CheckPlanetBelongsToUser(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (bool, error)
 	CheckFleetConstruction(ctx context.Context, planetID uuid.UUID) (bool, error)
+	ColonizePlanet(ctx context.Context, planet models.Planet, operationID uint64) error
 }
 
 type researchStorage interface {
@@ -47,6 +49,7 @@ type txManager interface {
 }
 
 type repository interface {
+	CheckPlanetOwner(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) error
 	RecalcResources(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) error
 	RecalcResourcesWithUpdatedTime(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, updatedAt time.Time) error
 }

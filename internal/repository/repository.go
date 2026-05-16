@@ -16,6 +16,7 @@ type researchStorage interface {
 
 type planetStorage interface {
 	GetPlanetMinesProduction(ctx context.Context, planetID uuid.UUID) (map[consts.BuildingType]uint64, error)
+	CheckPlanetBelongsToUser(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (bool, error)
 }
 
 // Separate storage methods that executes inside a transaction

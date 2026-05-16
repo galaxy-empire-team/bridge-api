@@ -15,12 +15,8 @@ func (s *Service) StartFleetConstruction(ctx context.Context, userID uuid.UUID, 
 		return models.FleetUnitConstructionInfo{}, models.ErrInvalidFleetConstructionRequest
 	}
 
-	isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, userID, planet)
-	if err != nil {
-		return models.FleetUnitConstructionInfo{}, fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
-	}
-	if !isUserPlanet {
-		return models.FleetUnitConstructionInfo{}, models.ErrPlanetDoesNotBelongToUser
+	if err := s.repository.CheckPlanetOwner(ctx, userID, planet); err != nil {
+		return models.FleetUnitConstructionInfo{}, fmt.Errorf("CheckPlanetOwner(): %w", err)
 	}
 
 	fleetConstructionInProgress, err := s.planetStorage.CheckFleetConstruction(ctx, planet)

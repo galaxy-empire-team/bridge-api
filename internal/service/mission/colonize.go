@@ -28,12 +28,8 @@ func (s *Service) Colonize(ctx context.Context, mission models.MissionStart) err
 		return models.ErrInvalidShipTypeForColonization
 	}
 
-	isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, mission.UserID, mission.PlanetFrom)
-	if err != nil {
-		return fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
-	}
-	if !isUserPlanet {
-		return models.ErrPlanetDoesNotBelongToUser
+	if err := s.repository.CheckPlanetOwner(ctx, mission.UserID, mission.PlanetFrom); err != nil {
+		return fmt.Errorf("CheckPlanetOwner(): %w", err)
 	}
 
 	planetExists, err := s.planetStorage.CheckPlanetExists(ctx, mission.PlanetTo)

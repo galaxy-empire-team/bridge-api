@@ -23,12 +23,8 @@ func (s *Service) Attack(ctx context.Context, mission models.MissionStart) error
 		return models.ErrPlanetNotFound
 	}
 
-	isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, mission.UserID, mission.PlanetFrom)
-	if err != nil {
-		return fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
-	}
-	if !isUserPlanet {
-		return models.ErrPlanetDoesNotBelongToUser
+	if err := s.repository.CheckPlanetOwner(ctx, mission.UserID, mission.PlanetFrom); err != nil {
+		return fmt.Errorf("CheckPlanetOwner(): %w", err)
 	}
 
 	missionID, err := s.registry.GetMissionIDByType(consts.MissionTypeAttack)

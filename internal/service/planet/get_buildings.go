@@ -10,16 +10,8 @@ import (
 )
 
 func (s *Service) GetBuildings(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (models.Buildings, error) {
-	if planetID == uuid.Nil {
-		return models.Buildings{}, models.ErrCapitolNotFound
-	}
-
-	isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, userID, planetID)
-	if err != nil {
-		return models.Buildings{}, fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
-	}
-	if !isUserPlanet {
-		return models.Buildings{}, models.ErrPlanetDoesNotBelongToUser
+	if err := s.repository.CheckPlanetOwner(ctx, userID, planetID); err != nil {
+		return models.Buildings{}, fmt.Errorf("CheckPlanetOwner(): %w", err)
 	}
 
 	planetBuildingIDs, err := s.planetStorage.GetAllPlanetBuildings(ctx, planetID)

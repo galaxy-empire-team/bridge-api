@@ -23,6 +23,8 @@ var (
 	ErrBuildingAlreadyExists           = errors.New("building already exists on planet")
 	ErrFleetConstructionInProgress     = errors.New("fleet construction is already in progress")
 	ErrInvalidFleetConstructionRequest = errors.New("invalid fleet construction request")
+	ErrNoPlanetIDProvided              = errors.New("no planet ID provided")
+	ErrNoUserIDProvided                = errors.New("no user ID provided")
 
 	// Mission errors
 	ErrColonizePlanetAlreadyExists        = errors.New("planet already exists at the target coordinates")

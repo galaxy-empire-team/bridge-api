@@ -13,19 +13,15 @@ import (
 func (r *PlanetStorage) GetAllUserPlanets(ctx context.Context, userID uuid.UUID) ([]models.Planet, error) {
 	const getAllUserPlanetsQuery = `
 		SELECT 
-			p.id, 
-			p.x,
-			p.y,
-			p.z,
-			r.metal,
-			r.crystal,
-			r.gas,
-			p.has_moon,
-			p.is_capitol,
-			p.colonized_at
-		FROM session_beta.planets p
-		JOIN session_beta.planet_resources r ON p.id = r.planet_id
-		WHERE p.user_id = $1;
+			id, 
+			x,
+			y,
+			z,
+			has_moon,
+			is_capitol,
+			colonized_at
+		FROM session_beta.planets
+		WHERE user_id = $1;
 	`
 
 	rows, err := r.DB.Query(ctx, getAllUserPlanetsQuery, userID)
@@ -43,9 +39,6 @@ func (r *PlanetStorage) GetAllUserPlanets(ctx context.Context, userID uuid.UUID)
 			&planet.Coordinates.X,
 			&planet.Coordinates.Y,
 			&planet.Coordinates.Z,
-			&planet.Resources.Metal,
-			&planet.Resources.Crystal,
-			&planet.Resources.Gas,
 			&planet.HasMoon,
 			&planet.IsCapitol,
 			&colonizedAt,

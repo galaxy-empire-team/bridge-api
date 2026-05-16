@@ -16,6 +16,10 @@ type PlanetIDRequest struct {
 	PlanetID uuid.UUID `json:"planetID"`
 }
 
+type CapitolIDResponse struct {
+	CapitolPlanetID uuid.UUID `json:"capitolID"`
+}
+
 type StartBuildingUpgradeRequest struct {
 	PlanetID   uuid.UUID         `json:"planetID"`
 	BuildingID consts.BuildingID `json:"buildingID"`
@@ -33,16 +37,15 @@ type StartFleetConstructionRequest struct {
 }
 
 type PlanetResponse struct {
-	PlanetID            uuid.UUID            `json:"planetID"`
-	X                   uint8                `json:"x"`
-	Y                   uint16               `json:"y"`
-	Z                   uint8                `json:"z"`
-	Resources           PlanetResources      `json:"resources"`
-	BuildingIDs         []uint16             `json:"buildings"`
-	BuildingsInProgress []BuildingInProgress `json:"progress,omitempty"`
-	IsCapitol           bool                 `json:"isCapitol"`
-	HasMoon             bool                 `json:"hasMoon"`
-	UpdatedAt           time.Time            `json:"updatedAt"`
+	PlanetID    uuid.UUID       `json:"planetID"`
+	X           uint8           `json:"x"`
+	Y           uint16          `json:"y"`
+	Z           uint8           `json:"z"`
+	Resources   PlanetResources `json:"resources"`
+	IsCapitol   bool            `json:"isCapitol"`
+	HasMoon     bool            `json:"hasMoon"`
+	ColonizedAt time.Time       `json:"colonizedAt"`
+	UpdatedAt   time.Time       `json:"updatedAt"`
 }
 
 type BuildingInProgress struct {
@@ -67,14 +70,13 @@ type UserPlanetsResponse struct {
 }
 
 type ShortPlanet struct {
-	PlanetID    uuid.UUID       `json:"planetID"`
-	X           uint8           `json:"x"`
-	Y           uint16          `json:"y"`
-	Z           uint8           `json:"z"`
-	Resources   PlanetResources `json:"resources"`
-	IsCapitol   bool            `json:"isCapitol"`
-	HasMoon     bool            `json:"hasMoon"`
-	ColonizedAt time.Time       `json:"colonizedAt"`
+	PlanetID    uuid.UUID `json:"planetID"`
+	X           uint8     `json:"x"`
+	Y           uint16    `json:"y"`
+	Z           uint8     `json:"z"`
+	IsCapitol   bool      `json:"isCapitol"`
+	HasMoon     bool      `json:"hasMoon"`
+	ColonizedAt time.Time `json:"colonizedAt"`
 }
 
 type FleetPlanetsResponse struct {

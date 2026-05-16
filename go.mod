@@ -9,6 +9,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/samber/lo v1.52.0
 	go.uber.org/zap v1.27.1
+	gonum.org/v1/gonum v0.16.0
 	google.golang.org/grpc v1.79.3
 	google.golang.org/protobuf v1.36.10
 )

@@ -13,12 +13,8 @@ import (
 )
 
 func (s *Service) StartBuildingUpgrade(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, buildingID consts.BuildingID) (models.FinishTime, error) {
-	isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, userID, planetID)
-	if err != nil {
-		return models.FinishTime{}, fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
-	}
-	if !isUserPlanet {
-		return models.FinishTime{}, models.ErrPlanetDoesNotBelongToUser
+	if err := s.repository.CheckPlanetOwner(ctx, userID, planetID); err != nil {
+		return models.FinishTime{}, fmt.Errorf("CheckPlanetOwner(): %w", err)
 	}
 
 	currentBuildsCount, err := s.planetStorage.GetBuildsInProgressCount(ctx, planetID)

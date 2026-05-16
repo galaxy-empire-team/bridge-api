@@ -21,13 +21,15 @@ func GetCapitol(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		userCapitolPlanet, err := planetService.GetCapitol(c.Request.Context(), userID)
+		capitolID, err := planetService.GetCapitolID(c.Request.Context(), userID)
 		if err != nil {
 			handleGetCapitolError(c, err)
 			return
 		}
 
-		c.JSON(http.StatusOK, toPlanetResponse(userCapitolPlanet))
+		c.JSON(http.StatusOK, CapitolIDResponse{
+			CapitolPlanetID: capitolID,
+		})
 	}
 }
 

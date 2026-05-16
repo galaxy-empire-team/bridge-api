@@ -19,18 +19,9 @@ func toPlanetResponse(p models.Planet) PlanetResponse {
 			Crystal: p.Resources.Crystal,
 			Gas:     p.Resources.Gas,
 		},
-		IsCapitol: p.IsCapitol,
-		BuildingIDs: lo.Map(p.Buildings.BuildingIDs, func(b consts.BuildingID, _ int) uint16 {
-			return b.ToUint16()
-		}),
-		BuildingsInProgress: lo.Map(p.Buildings.BuildingsInProgress, func(b models.BuildingInProgress, _ int) BuildingInProgress {
-			return BuildingInProgress{
-				BuildingID: b.BuildingID,
-				StartedAt:  b.StartedAt,
-				FinishedAt: b.FinishedAt,
-			}
-		}),
-		UpdatedAt: p.UpdatedAt,
+		IsCapitol:   p.IsCapitol,
+		ColonizedAt: p.ColonizedAt,
+		UpdatedAt:   p.UpdatedAt,
 	}
 }
 
@@ -54,16 +45,11 @@ func toUserPlanetsResponse(planets []models.Planet) UserPlanetsResponse {
 
 	for _, p := range planets {
 		resp.Planets = append(resp.Planets, ShortPlanet{
-			PlanetID:  p.ID,
-			X:         p.Coordinates.X.ToUint8(),
-			Y:         p.Coordinates.Y.ToUint16(),
-			Z:         p.Coordinates.Z.ToUint8(),
-			IsCapitol: p.IsCapitol,
-			Resources: PlanetResources{
-				Metal:   p.Resources.Metal,
-				Crystal: p.Resources.Crystal,
-				Gas:     p.Resources.Gas,
-			},
+			PlanetID:    p.ID,
+			X:           p.Coordinates.X.ToUint8(),
+			Y:           p.Coordinates.Y.ToUint16(),
+			Z:           p.Coordinates.Z.ToUint8(),
+			IsCapitol:   p.IsCapitol,
 			ColonizedAt: p.ColonizedAt,
 		})
 	}

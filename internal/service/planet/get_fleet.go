@@ -10,12 +10,8 @@ import (
 )
 
 func (s *Service) GetFleet(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (models.Fleet, error) {
-	isUserPlanet, err := s.planetStorage.CheckPlanetBelongsToUser(ctx, userID, planetID)
-	if err != nil {
-		return models.Fleet{}, fmt.Errorf("planetStorage.CheckPlanetBelongsToUser(): %w", err)
-	}
-	if !isUserPlanet {
-		return models.Fleet{}, models.ErrPlanetDoesNotBelongToUser
+	if err := s.repository.CheckPlanetOwner(ctx, userID, planetID); err != nil {
+		return models.Fleet{}, fmt.Errorf("CheckPlanetOwner(): %w", err)
 	}
 
 	fleet, err := s.planetStorage.GetFleetForUpdate(ctx, planetID)
