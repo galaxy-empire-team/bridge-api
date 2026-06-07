@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/samber/lo"
 
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
@@ -15,6 +16,7 @@ type Registry struct {
 	researches    map[consts.ResearchID]ResearchStats
 	missions      map[consts.MissionID]consts.MissionType
 	notifications map[consts.NotificationID]consts.NotificationType
+	npcStats      map[consts.PlanetPositionZ]NPCStats
 
 	zeroLvlBuildings  map[consts.BuildingType]consts.BuildingID
 	zeroLvlResearches map[consts.ResearchType]consts.ResearchID
@@ -46,6 +48,11 @@ func New(ctx context.Context, connPool *pgxpool.Pool) (*Registry, error) {
 	err = r.fillNotificationMapping(ctx, connPool)
 	if err != nil {
 		return nil, fmt.Errorf("fillNotificationMapping(): %w", err)
+	}
+
+	err = r.fillNPCStats(ctx, connPool)
+	if err != nil {
+		return nil, fmt.Errorf("fillNPCStats(): %w", err)
 	}
 
 	return r, nil
@@ -168,17 +175,15 @@ func (r *Registry) fillFleetStats(ctx context.Context, pool *pgxpool.Pool) error
 }
 
 type researchBonuses struct {
-	AvaliableColonizePlanetCount uint8 `json:"availiable_colonize_count"`
+	AvaliableColonizePlanetCount uint8   `json:"availiable_colonize_count"`
+	ProductionSpeedMuliplier     float32 `json:"resource_gain_multiplier"`
+	FleetCostReduce              float32 `json:"fleet_cost_reduce_percent"`
+	FleetConstructTimeReduce     float32 `json:"fleet_construct_time_reduce_percent"`
 
-	ProductionSpeedImprove   float32 `json:"resource_gain"`
-	FleetCostReduce          float32 `json:"fleet_cost_reduce"`
-	FleetConstructTimeReduce float32 `json:"fleet_construct_time_reduce"`
-	PlanetDefenseImprove     float32 `json:"defense_power"`
-
-	AttackPower          float32 `json:"attack_power"`
-	ArmorPower           float32 `json:"armor_strength"`
-	AttackOnDefensePower float32 `json:"attack_deffence_power"`
-	SpyChanceImprove     float32 `json:"success_spy_chance"`
+	AttackPower        float32 `json:"attack_power_multiplier"`
+	ArmorPower         float32 `json:"armor_strength_multiplier"`
+	LootNPCMuliplier   float32 `json:"npc_loot_multiplier"`
+	SpyChanceMuliplier float32 `json:"success_spy_chance_multiplier"`
 }
 
 func (r *Registry) fillResearchStats(ctx context.Context, pool *pgxpool.Pool) error {
@@ -224,14 +229,13 @@ func (r *Registry) fillResearchStats(ctx context.Context, pool *pgxpool.Pool) er
 
 		researchStats.Bonuses = ResearchBonuses{
 			AvaliableColonizePlanetCount: bonuses.AvaliableColonizePlanetCount,
-			ProductionSpeedImprove:       bonuses.ProductionSpeedImprove,
+			ProductionSpeedMuliplier:     bonuses.ProductionSpeedMuliplier,
 			FleetCostReduce:              bonuses.FleetCostReduce,
 			FleetConstructTimeReduce:     bonuses.FleetConstructTimeReduce,
-			PlanetDefense:                bonuses.PlanetDefenseImprove,
 			AttackPower:                  bonuses.AttackPower,
 			ArmorPower:                   bonuses.ArmorPower,
-			AttackOnDefensePower:         bonuses.AttackOnDefensePower,
-			SpyChanceImprove:             bonuses.SpyChanceImprove,
+			LootingNPCMuliplier:          bonuses.LootNPCMuliplier,
+			SpyChanceMuliplier:           bonuses.SpyChanceMuliplier,
 		}
 
 		r.researches[researchStats.ID] = researchStats
@@ -305,6 +309,86 @@ func (r *Registry) fillMissionMapping(ctx context.Context, pool *pgxpool.Pool) e
 		}
 
 		r.missions[id] = missionType
+	}
+
+	if err = rows.Err(); err != nil {
+		return fmt.Errorf("rows.Err(): %w", err)
+	}
+
+	return nil
+}
+
+type fleetCount struct {
+	ID    consts.FleetUnitID `json:"id"`
+	Count uint64             `json:"count"`
+}
+
+type resources struct {
+	Metal   uint64 `json:"metal"`
+	Crystal uint64 `json:"crystal"`
+	Gas     uint64 `json:"gas"`
+}
+
+func (r *Registry) fillNPCStats(ctx context.Context, pool *pgxpool.Pool) error {
+	const getMissionMappingQuery = `
+		SELECT
+			tier,
+			name,
+			coordinate,
+			fleet,
+			loot_fleet,
+			researches,
+			resources
+		FROM session_beta.s_npc;
+	`
+
+	r.npcStats = make(map[consts.PlanetPositionZ]NPCStats)
+	rows, err := pool.Query(ctx, getMissionMappingQuery)
+	if err != nil {
+		return fmt.Errorf("pool.Query(): %w", err)
+	}
+
+	var (
+		fleet     []fleetCount
+		lootFleet []fleetCount
+		resources resources
+	)
+	for rows.Next() {
+		var stat NPCStats
+		err = rows.Scan(
+			&stat.Tier,
+			&stat.Name,
+			&stat.PositionZ,
+			&fleet,
+			&lootFleet,
+			&stat.Researches,
+			&resources,
+		)
+		if err != nil {
+			return fmt.Errorf("rows.Scan(): %w", err)
+		}
+
+		stat.Fleet = lo.Map(fleet, func(f fleetCount, _ int) FleetUnitCount {
+			return FleetUnitCount{
+				ID:    f.ID,
+				Count: f.Count,
+			}
+		})
+
+		stat.LootFleet = lo.Map(lootFleet, func(f fleetCount, _ int) FleetUnitCount {
+			return FleetUnitCount{
+				ID:    f.ID,
+				Count: f.Count,
+			}
+		})
+
+		stat.Resources = Resources{
+			Metal:   resources.Metal,
+			Crystal: resources.Crystal,
+			Gas:     resources.Gas,
+		}
+
+		r.npcStats[stat.PositionZ] = stat
 	}
 
 	if err = rows.Err(); err != nil {

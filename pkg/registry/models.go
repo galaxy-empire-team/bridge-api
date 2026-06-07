@@ -48,14 +48,33 @@ type ResearchStats struct {
 
 type ResearchBonuses struct {
 	AvaliableColonizePlanetCount uint8
+	ProductionSpeedMuliplier     float32
+	FleetCostReduce              float32
+	FleetConstructTimeReduce     float32
 
-	ProductionSpeedImprove   float32
-	FleetCostReduce          float32
-	FleetConstructTimeReduce float32
-	PlanetDefense            float32
+	AttackPower         float32
+	ArmorPower          float32
+	LootingNPCMuliplier float32
+	SpyChanceMuliplier  float32
+}
 
-	AttackPower          float32
-	ArmorPower           float32
-	AttackOnDefensePower float32
-	SpyChanceImprove     float32
+type Resources struct {
+	Metal   uint64
+	Crystal uint64
+	Gas     uint64
+}
+
+type FleetUnitCount struct {
+	ID    consts.FleetUnitID
+	Count uint64
+}
+
+type NPCStats struct {
+	Tier       uint8
+	Name       string
+	PositionZ  consts.PlanetPositionZ
+	Researches []consts.ResearchID
+	Resources  Resources
+	Fleet      []FleetUnitCount
+	LootFleet  []FleetUnitCount
 }

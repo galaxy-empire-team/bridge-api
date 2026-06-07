@@ -63,9 +63,9 @@ func (r *Repository) RecalcResourcesWithUpdatedTime(ctx context.Context, userID 
 			return nil
 		}
 
-		metalProductionPerSecond := float32(minesProduction[consts.BuildingTypeMetalMine]) * industrialTechStat.Bonuses.ProductionSpeedImprove
-		crystalProductionPerSecond := float32(minesProduction[consts.BuildingTypeCrystalMine]) * industrialTechStat.Bonuses.ProductionSpeedImprove
-		gasProductionPerSecond := float32(minesProduction[consts.BuildingTypeGasMine]) * industrialTechStat.Bonuses.ProductionSpeedImprove
+		metalProductionPerSecond := float32(minesProduction[consts.BuildingTypeMetalMine]) * industrialTechStat.Bonuses.ProductionSpeedMuliplier
+		crystalProductionPerSecond := float32(minesProduction[consts.BuildingTypeCrystalMine]) * industrialTechStat.Bonuses.ProductionSpeedMuliplier
+		gasProductionPerSecond := float32(minesProduction[consts.BuildingTypeGasMine]) * industrialTechStat.Bonuses.ProductionSpeedMuliplier
 
 		metalIncrease := float64(millisecondsSinceLastUpdate) * float64(metalProductionPerSecond) / 1000
 		crystalIncrease := float64(millisecondsSinceLastUpdate) * float64(crystalProductionPerSecond) / 1000

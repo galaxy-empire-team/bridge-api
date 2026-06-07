@@ -30,7 +30,7 @@ func (s *Service) Spy(ctx context.Context, mission models.MissionStart) error {
 	if err != nil {
 		return fmt.Errorf("planetStorage.CheckPlanetExists(): %w", err)
 	}
-	if !planetExists {
+	if !planetExists && !s.isPlanetNPC(mission.PlanetTo.Z) {
 		return models.ErrPlanetNotFound
 	}
 
