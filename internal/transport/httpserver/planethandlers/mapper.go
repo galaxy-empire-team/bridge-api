@@ -15,13 +15,13 @@ func toPlanetResponse(p models.Planet) PlanetResponse {
 		Z:        p.Coordinates.Z.ToUint8(),
 		HasMoon:  p.HasMoon,
 		Resources: PlanetResources{
-			Metal:   p.Resources.Metal,
-			Crystal: p.Resources.Crystal,
-			Gas:     p.Resources.Gas,
+			Metal:     p.Resources.Metal,
+			Crystal:   p.Resources.Crystal,
+			Gas:       p.Resources.Gas,
+			UpdatedAt: p.Resources.UpdatedAt.UTC(),
 		},
 		IsCapitol:   p.IsCapitol,
 		ColonizedAt: p.ColonizedAt,
-		UpdatedAt:   p.UpdatedAt,
 	}
 }
 

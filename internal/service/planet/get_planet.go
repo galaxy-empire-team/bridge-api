@@ -31,6 +31,5 @@ func (s *Service) GetPlanet(ctx context.Context, userID uuid.UUID, planetID uuid
 		IsCapitol:   planet.IsCapitol,
 		HasMoon:     planet.HasMoon,
 		ColonizedAt: planet.ColonizedAt,
-		UpdatedAt:   planet.UpdatedAt,
 	}, nil
 }

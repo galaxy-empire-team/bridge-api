@@ -36,9 +36,10 @@ func GetPlanetResources(planetService PlanetService) func(c *gin.Context) {
 		}
 
 		c.JSON(http.StatusOK, PlanetResources{
-			Metal:   resources.Metal,
-			Crystal: resources.Crystal,
-			Gas:     resources.Gas,
+			Metal:     resources.Metal,
+			Crystal:   resources.Crystal,
+			Gas:       resources.Gas,
+			UpdatedAt: resources.UpdatedAt.UTC(),
 		})
 	}
 }

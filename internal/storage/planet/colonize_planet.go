@@ -5,12 +5,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
-	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
 func (r *PlanetStorage) ColonizePlanet(ctx context.Context, planet models.Planet, operationID uint64) error {
@@ -58,10 +56,6 @@ func (r *PlanetStorage) ColonizePlanet(ctx context.Context, planet models.Planet
 		return fmt.Errorf("createResources(): %w", err)
 	}
 
-	err = r.createMineRows(ctx, tx, planetToColonize.ID)
-	if err != nil {
-		return fmt.Errorf("createMineRows(): %w", err)
-	}
 	err = tx.Commit(ctx)
 	if err != nil {
 		return fmt.Errorf("tx.Commit(): %w", err)
@@ -170,30 +164,6 @@ func (r *PlanetStorage) createResourcesRow(ctx context.Context, tx pgx.Tx, plane
 		planet.Resources.Metal,
 		planet.Resources.Crystal,
 		planet.Resources.Gas,
-	)
-	if err != nil {
-		return fmt.Errorf("DB.Pool.Exec(): %w", err)
-	}
-
-	return nil
-}
-
-func (r *PlanetStorage) createMineRows(ctx context.Context, tx pgx.Tx, planetID uuid.UUID) error {
-	const createMinesQuery = `
-		INSERT INTO session_beta.planet_buildings (
-			planet_id,
-			building_id
-		)
-		SELECT $1, id
-		FROM session_beta.s_buildings sb
-		WHERE sb.building_type = ANY($2) AND sb.level = 1;
-	`
-
-	_, err := tx.Exec(
-		ctx,
-		createMinesQuery,
-		planetID,
-		[]consts.BuildingType{consts.BuildingTypeMetalMine, consts.BuildingTypeCrystalMine, consts.BuildingTypeGasMine},
 	)
 	if err != nil {
 		return fmt.Errorf("DB.Pool.Exec(): %w", err)

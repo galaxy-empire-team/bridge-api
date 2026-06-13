@@ -45,7 +45,6 @@ type PlanetResponse struct {
 	IsCapitol   bool            `json:"isCapitol"`
 	HasMoon     bool            `json:"hasMoon"`
 	ColonizedAt time.Time       `json:"colonizedAt"`
-	UpdatedAt   time.Time       `json:"updatedAt"`
 }
 
 type BuildingInProgress struct {
@@ -60,9 +59,10 @@ type PlanetBuildingsResponse struct {
 }
 
 type PlanetResources struct {
-	Metal   uint64 `json:"metal"`
-	Crystal uint64 `json:"crystal"`
-	Gas     uint64 `json:"gas"`
+	Metal     uint64    `json:"metal"`
+	Crystal   uint64    `json:"crystal"`
+	Gas       uint64    `json:"gas"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type UserPlanetsResponse struct {
