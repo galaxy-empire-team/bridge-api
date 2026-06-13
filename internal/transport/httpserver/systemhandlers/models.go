@@ -18,8 +18,14 @@ type PlanetInfo struct {
 	Type      string    `json:"type"`
 	UserLogin string    `json:"userLogin"`
 	HasMoon   bool      `json:"hasMoon"`
+	Debris    Debris    `json:"debris"`
 }
 
 type ErrorResponse struct {
 	Err string `json:"err"`
+}
+
+type Debris struct {
+	Metal   uint64 `json:"metal"`
+	Crystal uint64 `json:"crystal"`
 }

@@ -70,3 +70,10 @@ type Mission struct {
 	StartedAt   time.Time   `json:"startedAt"`
 	FinishedAt  time.Time   `json:"finishedAt"`
 }
+
+type RecycleRequest struct {
+	PlanetFrom      uuid.UUID        `json:"planetFrom"`
+	PlanetTo        Coordinates      `json:"planetTo"`
+	FleetUnitCount  []FleetUnitCount `json:"fleet"`
+	SpeedMultiplier float64          `json:"speedMultiplier"`
+}

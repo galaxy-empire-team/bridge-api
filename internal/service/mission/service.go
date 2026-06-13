@@ -12,6 +12,7 @@ import (
 )
 
 type planetStorage interface {
+	GetDebris(ctx context.Context, coordinates models.Coordinates) (models.Resources, error)
 	GetIDByCoordinates(ctx context.Context, coordinates models.Coordinates) (uuid.UUID, error)
 	CheckPlanetExists(ctx context.Context, coordinates models.Coordinates) (bool, error)
 	CheckPlanetBelongsToUser(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (bool, error)

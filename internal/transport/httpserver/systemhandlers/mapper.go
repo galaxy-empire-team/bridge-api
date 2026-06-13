@@ -15,6 +15,10 @@ func toSystemPlanetsResponse(sp models.SystemPlanets) SystemPlanetsResponse {
 			Type:      planet.Type,
 			UserLogin: planet.UserLogin,
 			HasMoon:   planet.HasMoon,
+			Debris: Debris{
+				Metal:   planet.Debris.Metal,
+				Crystal: planet.Debris.Crystal,
+			},
 		}
 	}
 

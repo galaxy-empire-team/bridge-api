@@ -13,9 +13,12 @@ func (s *MissionStorage) GetSystemPlanets(ctx context.Context, system models.Sys
 				p.id, 
 				p.z,
 				u.login,
-				p.has_moon
+				p.has_moon,
+				COALESCE(d.metal, 0),
+				COALESCE(d.crystal, 0)
 			FROM session_beta.planets p
 			JOIN session_beta.users u ON p.user_id = u.id
+			LEFT JOIN session_beta.planet_debris d ON p.id = d.planet_id
 			WHERE p.x = $1 AND p.y = $2;
 		`
 
@@ -33,6 +36,8 @@ func (s *MissionStorage) GetSystemPlanets(ctx context.Context, system models.Sys
 			&planet.Z,
 			&planet.UserLogin,
 			&planet.HasMoon,
+			&planet.Debris.Metal,
+			&planet.Debris.Crystal,
 		)
 		if err != nil {
 			return models.SystemPlanets{}, fmt.Errorf("rows.Scan(): %w", err)

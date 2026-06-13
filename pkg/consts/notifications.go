@@ -14,4 +14,5 @@ const (
 	NotificationTypeReturn    NotificationType = "return"
 	NotificationTypeSpy       NotificationType = "spy"
 	NotificationTypeTransport NotificationType = "transport"
+	NotificationTypeRecycle   NotificationType = "recycle"
 )

@@ -14,4 +14,5 @@ type MissionService interface {
 	Attack(ctx context.Context, mission models.MissionStart) error
 	Spy(ctx context.Context, mission models.MissionStart) error
 	Transport(ctx context.Context, mission models.MissionStart) error
+	Recycle(ctx context.Context, mission models.MissionStart) error
 }

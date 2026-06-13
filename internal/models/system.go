@@ -18,4 +18,5 @@ type PlanetInfo struct {
 	Type      string
 	UserLogin string
 	HasMoon   bool
+	Debris    Resources
 }

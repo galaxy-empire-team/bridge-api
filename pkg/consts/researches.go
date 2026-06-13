@@ -10,15 +10,13 @@ type ResearchLevel uint8
 type ResearchType string
 
 const (
-	ResearchTypeColonizeTechnology ResearchType = "colonize_technology"
+	ResearchTypeColonizeTechnology                 ResearchType = "colonize_technology"
+	ResearchTypeIndustrialTechnology               ResearchType = "industrial_technology"
+	ResearchTypeLogisticsTechnology                ResearchType = "logistics"
+	ResearchTypeConstructionOptimizationTechnology ResearchType = "construction_optimization"
 
-	ResearchTypeIndustrialTechnology     ResearchType = "industrial_technology"
-	ResearchTypeLogistics                ResearchType = "logistics"
-	ResearchTypeConstructionOptimization ResearchType = "construction_optimization"
-	ResearchTypePlanetDefense            ResearchType = "planet_defense"
-
-	ResearchTypeWeaponTech      ResearchType = "weapon_tech"
-	ResearchTypeArmorTech       ResearchType = "armor_tech"
-	ResearchTypeCombatProtocols ResearchType = "combat_protocols"
-	ResearchTypeSpyTechnology   ResearchType = "spy_technology"
+	ResearchTypeLootingTechnology ResearchType = "looting_technology"
+	ResearchTypeWeaponTechnology  ResearchType = "weapon_tech"
+	ResearchTypeArmorTechnology   ResearchType = "armor_tech"
+	ResearchTypeSpyTechnology     ResearchType = "spy_technology"
 )
