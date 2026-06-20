@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
@@ -17,6 +18,7 @@ type planetStorage interface {
 	GetPlanet(ctx context.Context, planetID uuid.UUID) (models.Planet, error)
 	GetUserPlanetIDs(ctx context.Context, userID uuid.UUID) ([]models.PlanetIDCapitol, error)
 	GetCoordinates(ctx context.Context, planetID uuid.UUID) (models.Coordinates, error)
+	GetColonizedCoordinates(ctx context.Context, system models.Coordinates) ([]consts.PlanetPositionZ, error)
 	GetResourcesForUpdate(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
 	GetBuildsInProgressCount(ctx context.Context, planetID uuid.UUID) (uint8, error)
 	GetCurrentBuilds(ctx context.Context, planetID uuid.UUID) ([]models.BuildingInProgress, error)
@@ -62,13 +64,19 @@ type registryProvider interface {
 	GetResearchStatsByID(researchID consts.ResearchID) (registry.ResearchStats, error)
 }
 
+//go:generate mockery --name=randGenerator --filename=rand_generator.go --exported --with-expecter
+type randGenerator interface {
+	Uint32() uint32
+}
+
 type Service struct {
 	txManager       txManager
 	planetStorage   planetStorage
 	researchStorage researchStorage
 	repository      repository
 	registry        registryProvider
-	randomGenerator *rand.Rand
+	randomGenerator randGenerator
+	log             *zap.Logger
 }
 
 func New(
@@ -77,6 +85,7 @@ func New(
 	researchStorage researchStorage,
 	repository repository,
 	registry registryProvider,
+	log *zap.Logger,
 ) *Service {
 	gen := rand.New(rand.NewSource((time.Now().UnixNano())))
 
@@ -87,5 +96,6 @@ func New(
 		repository:      repository,
 		registry:        registry,
 		randomGenerator: gen,
+		log:             log,
 	}
 }

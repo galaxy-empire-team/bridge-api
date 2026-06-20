@@ -67,7 +67,7 @@ func run() error {
 
 	// initialize services
 	userService := userservice.New(userStorage)
-	planetService := planetservice.New(txManager, planetStorage, researchStorage, resourceRepo, reg)
+	planetService := planetservice.New(txManager, planetStorage, researchStorage, resourceRepo, reg, app.ComponentLogger("planetService"))
 	missionService := missionservice.New(txManager, planetStorage, missionStorage, researchStorage, resourceRepo, reg)
 	systemService := systemservice.New(systemStorage)
 	staticService := staticservice.New(reg)
