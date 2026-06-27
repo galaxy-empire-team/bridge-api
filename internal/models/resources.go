@@ -14,3 +14,8 @@ type Resources struct {
 func (r Resources) IsEmpty() bool {
 	return r == Resources{}
 }
+
+type UserResources struct {
+	Matter uint64
+	Doreye uint64
+}

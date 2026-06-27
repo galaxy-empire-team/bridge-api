@@ -125,3 +125,18 @@ type ResearchProgressResponse struct {
 	StartedAt  time.Time         `json:"startedAt"`
 	FinishedAt time.Time         `json:"finishedAt"`
 }
+
+type UserResourcesResponse struct {
+	UserResources UserResources `json:"resources"`
+	Boosts        []UserBoost   `json:"boosts"`
+}
+
+type UserResources struct {
+	Matter uint64 `json:"matter"`
+	Doreye uint64 `json:"doreye"`
+}
+
+type UserBoost struct {
+	ID    consts.BoostID `json:"id"`
+	Count uint64         `json:"count"`
+}

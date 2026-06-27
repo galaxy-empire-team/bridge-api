@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
+	planetservice "github.com/galaxy-empire-team/bridge-api/internal/service/planet"
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
@@ -24,4 +25,5 @@ type PlanetService interface {
 	CancelBuildingUpgrade(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, buildingID consts.BuildingID) error
 	CancelResearch(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, researchID consts.ResearchID) error
 	CancelFleetConstruction(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) error
+	GetUserResources(ctx context.Context, userID uuid.UUID) (planetservice.GetUserResourcesResponse, error)
 }

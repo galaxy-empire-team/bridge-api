@@ -4,6 +4,7 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
+	planetservice "github.com/galaxy-empire-team/bridge-api/internal/service/planet"
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
@@ -89,6 +90,21 @@ func toResearchesResponse(researches models.UserResearches) ResearchesResponse {
 				ResearchID: rp.ResearchID,
 				StartedAt:  rp.StartedAt,
 				FinishedAt: rp.FinishedAt,
+			}
+		}),
+	}
+}
+
+func toUserResourcesResponse(resources planetservice.GetUserResourcesResponse) UserResourcesResponse {
+	return UserResourcesResponse{
+		UserResources: UserResources{
+			Matter: resources.UserResources.Matter,
+			Doreye: resources.UserResources.Doreye,
+		},
+		Boosts: lo.Map(resources.Boosts, func(b models.UserBoost, _ int) UserBoost {
+			return UserBoost{
+				ID:    b.ID,
+				Count: b.Count,
 			}
 		}),
 	}

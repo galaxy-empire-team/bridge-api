@@ -10,3 +10,8 @@ type CreatePlanetRequest struct {
 	Resources   models.Resources
 	IsCapitol   bool
 }
+
+type GetUserResourcesResponse struct {
+	models.UserResources
+	Boosts []models.UserBoost
+}

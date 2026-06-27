@@ -29,6 +29,8 @@ type planetStorage interface {
 	CheckPlanetBelongsToUser(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (bool, error)
 	CheckFleetConstruction(ctx context.Context, planetID uuid.UUID) (bool, error)
 	ColonizePlanet(ctx context.Context, planet models.Planet, operationID uint64) error
+	GetUserResources(ctx context.Context, userID uuid.UUID) (models.UserResources, error)
+	GetUserBoosts(ctx context.Context, userID uuid.UUID) ([]models.UserBoost, error)
 }
 
 type researchStorage interface {

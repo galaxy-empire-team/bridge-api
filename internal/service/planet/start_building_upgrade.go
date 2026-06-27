@@ -47,9 +47,9 @@ func (s *Service) StartBuildingUpgrade(ctx context.Context, userID uuid.UUID, pl
 		return models.FinishTime{}, fmt.Errorf("recalcResources(): %w", err)
 	}
 
-	FinishTime := models.FinishTime{}
+	finishTime := models.FinishTime{}
 
-	return FinishTime, s.txManager.ExecPlanetTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
+	return finishTime, s.txManager.ExecPlanetTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
 		buildEvent, err := s.generateEventForExistingBuilding(ctx, planetID, buildingID, planetRepo)
 		if err != nil {
 			return fmt.Errorf("generateEventForExistingBuilding(): %w", err)
@@ -60,8 +60,8 @@ func (s *Service) StartBuildingUpgrade(ctx context.Context, userID uuid.UUID, pl
 			return fmt.Errorf("planetStorage.CreateBuildingEvent(): %w", err)
 		}
 
-		FinishTime.StartedAt = buildEvent.StartedAt
-		FinishTime.FinishedAt = buildEvent.FinishedAt
+		finishTime.StartedAt = buildEvent.StartedAt
+		finishTime.FinishedAt = buildEvent.FinishedAt
 
 		return nil
 	})
