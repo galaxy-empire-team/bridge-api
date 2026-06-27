@@ -38,6 +38,13 @@ type SpyRequest struct {
 	SpeedMultiplier float64          `json:"speedMultiplier"`
 }
 
+type MistRequest struct {
+	PlanetFrom      uuid.UUID        `json:"planetFrom"`
+	PlanetTo        Coordinates      `json:"planetTo"`
+	FleetUnitCount  []FleetUnitCount `json:"fleet"`
+	SpeedMultiplier float64          `json:"speedMultiplier"`
+}
+
 type TransportRequest struct {
 	PlanetFrom      uuid.UUID        `json:"planetFrom"`
 	PlanetTo        Coordinates      `json:"planetTo"`
@@ -76,4 +83,15 @@ type RecycleRequest struct {
 	PlanetTo        Coordinates      `json:"planetTo"`
 	FleetUnitCount  []FleetUnitCount `json:"fleet"`
 	SpeedMultiplier float64          `json:"speedMultiplier"`
+}
+
+type CancelMissionEventRequest struct {
+	MissionDBID uint64 `json:"id"`
+}
+
+type CancelMissionEventResponse struct {
+	ID          uint64    `json:"id"`
+	IsReturning bool      `json:"isReturning"`
+	StartedAt   time.Time `json:"startedAt"`
+	FinishedAt  time.Time `json:"finishedAt"`
 }

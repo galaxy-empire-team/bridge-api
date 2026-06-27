@@ -17,6 +17,7 @@ var (
 	ErrNotEnoughResources              = errors.New("not enough resources")
 	ErrNoDebrisFound                   = errors.New("no debris found on planet")
 	ErrEventIsAlreadyScheduled         = errors.New("event is already scheduled")
+	ErrEventIsNotScheduled             = errors.New("event is not scheduled")
 	ErrTooManyBuildingsInProgress      = errors.New("too many buildings are already in progress")
 	ErrNoPlanetsFound                  = errors.New("no planets found for user")
 	ErrPlanetNotFound                  = errors.New("planet not found")
@@ -41,6 +42,10 @@ var (
 	ErrInvalidShipTypeForColonization     = errors.New("invalid ship type for colonization")
 	ErrDuplicateFleetUnitID               = errors.New("duplicate fleet unit ID")
 	ErrFleetUnitCountCannotBeZero         = errors.New("fleet unit count cannot be zero")
+	ErrMissionNotFound                    = errors.New("mission not found")
+	ErrMissionIsReturning                 = errors.New("mission is already returning")
+	ErrCargoIsNotEmpty                    = errors.New("cargo is not empty")
+	ErrMistNotFound                       = errors.New("mist not found")
 
 	// Research errors
 	ErrResearchInProgress = errors.New("research is already in progress")

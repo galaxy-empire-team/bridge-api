@@ -67,16 +67,22 @@ func (s *Service) generateEventForFleetConstruct(ctx context.Context, planetID u
 		return models.FleetConstructEvent{}, fmt.Errorf("planetRepo.GetResourcesForUpdate(): %w", err)
 	}
 
-	if resources.Metal < fleetUnitStats.MetalCost*fleet.Count ||
-		resources.Crystal < fleetUnitStats.CrystalCost*fleet.Count ||
-		resources.Gas < fleetUnitStats.GasCost*fleet.Count {
+	resourcesCost := models.Resources{
+		Metal:   fleetUnitStats.MetalCost * fleet.Count,
+		Crystal: fleetUnitStats.CrystalCost * fleet.Count,
+		Gas:     fleetUnitStats.GasCost * fleet.Count,
+	}
+
+	if resources.Metal < resourcesCost.Metal ||
+		resources.Crystal < resourcesCost.Crystal ||
+		resources.Gas < resourcesCost.Gas {
 		return models.FleetConstructEvent{}, models.ErrNotEnoughResources
 	}
 
 	leftResources := models.Resources{
-		Metal:     resources.Metal - (fleetUnitStats.MetalCost * fleet.Count),
-		Crystal:   resources.Crystal - (fleetUnitStats.CrystalCost * fleet.Count),
-		Gas:       resources.Gas - (fleetUnitStats.GasCost * fleet.Count),
+		Metal:     resources.Metal - resourcesCost.Metal,
+		Crystal:   resources.Crystal - resourcesCost.Crystal,
+		Gas:       resources.Gas - resourcesCost.Gas,
 		UpdatedAt: resources.UpdatedAt,
 	}
 
@@ -87,11 +93,12 @@ func (s *Service) generateEventForFleetConstruct(ctx context.Context, planetID u
 
 	startedAt := time.Now().UTC()
 	fleetConstructEvent := models.FleetConstructEvent{
-		PlanetID:   planetID,
-		FleetID:    fleet.ID,
-		Count:      fleet.Count,
-		StartedAt:  startedAt,
-		FinishedAt: startedAt.Add(time.Duration(fleetUnitStats.BuildTimeSec*fleet.Count) * time.Second).UTC(),
+		PlanetID:      planetID,
+		FleetID:       fleet.ID,
+		Count:         fleet.Count,
+		ResourcesCost: resourcesCost,
+		StartedAt:     startedAt,
+		FinishedAt:    startedAt.Add(time.Duration(fleetUnitStats.BuildTimeSec*fleet.Count) * time.Second).UTC(),
 	}
 
 	return fleetConstructEvent, nil

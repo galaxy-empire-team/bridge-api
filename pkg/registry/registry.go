@@ -16,6 +16,7 @@ type Registry struct {
 	researches    map[consts.ResearchID]ResearchStats
 	missions      map[consts.MissionID]consts.MissionType
 	notifications map[consts.NotificationID]consts.NotificationType
+	boosts        map[consts.BoostID]BoostStats
 	npcStats      map[consts.PlanetPositionZ]NPCStats
 
 	zeroLvlBuildings  map[consts.BuildingType]consts.BuildingID
@@ -389,6 +390,42 @@ func (r *Registry) fillNPCStats(ctx context.Context, pool *pgxpool.Pool) error {
 		}
 
 		r.npcStats[stat.PositionZ] = stat
+	}
+
+	if err = rows.Err(); err != nil {
+		return fmt.Errorf("rows.Err(): %w", err)
+	}
+
+	return nil
+}
+
+func (r *Registry) fillBoostStats(ctx context.Context, pool *pgxpool.Pool) error {
+	const getBoostStatsQuery = `
+		SELECT 
+			id,
+			tier,
+			boost_time_s
+		FROM session_beta.s_boosts;
+	`
+
+	r.boosts = make(map[consts.BoostID]BoostStats)
+	rows, err := pool.Query(ctx, getBoostStatsQuery)
+	if err != nil {
+		return fmt.Errorf("pool.Query(): %w", err)
+	}
+
+	for rows.Next() {
+		var boostStats BoostStats
+		err = rows.Scan(
+			&boostStats.ID,
+			&boostStats.Tier,
+			&boostStats.BoostTimeS,
+		)
+		if err != nil {
+			return fmt.Errorf("rows.Scan(): %w", err)
+		}
+
+		r.boosts[boostStats.ID] = boostStats
 	}
 
 	if err = rows.Err(); err != nil {

@@ -10,3 +10,7 @@ type Resources struct {
 	Gas       uint64
 	UpdatedAt time.Time
 }
+
+func (r Resources) IsEmpty() bool {
+	return r == Resources{}
+}

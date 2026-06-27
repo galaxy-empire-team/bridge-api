@@ -14,4 +14,6 @@ const (
 	MissionTypeSpy       MissionType = "spy"
 	MissionTypeTransport MissionType = "transport"
 	MissionTypeRecycle   MissionType = "recycle"
+	MissionTypeReturn    MissionType = "return"
+	MissionTypeMist      MissionType = "mist"
 )

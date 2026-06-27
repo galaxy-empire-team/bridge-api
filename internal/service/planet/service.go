@@ -40,10 +40,14 @@ type researchStorage interface {
 // Separate storage methods that executes inside a transaction
 type TxStorages interface {
 	GetResourcesForUpdate(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
+	AddResources(ctx context.Context, planetID uuid.UUID, resources models.Resources) error
 	SetResources(ctx context.Context, planetID uuid.UUID, updatedResources models.Resources) error
 	CreateBuildingEvent(ctx context.Context, buildEvent models.BuildEvent) error
 	CreateResearchEvent(ctx context.Context, researchEvent models.ResearchEvent) error
 	CreateFleetConstructEvent(ctx context.Context, fleetConstructEvent models.FleetConstructEvent) error
+	DeleteBuildingEvent(ctx context.Context, planetID uuid.UUID, buildingID consts.BuildingID) error
+	DeleteResearchEvent(ctx context.Context, userID uuid.UUID, researchID consts.ResearchID) error
+	DeleteFleetConstructionEvent(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
 }
 
 type txManager interface {

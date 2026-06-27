@@ -20,6 +20,13 @@ type MissionEvent struct {
 	FinishedAt  time.Time
 }
 
+type CancelMission struct {
+	ID          uint64
+	IsReturning bool
+	StartedAt   time.Time
+	FinishedAt  time.Time
+}
+
 type UserMission struct {
 	ID          uint64
 	Type        string

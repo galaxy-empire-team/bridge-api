@@ -9,11 +9,12 @@ import (
 )
 
 type FleetConstructEvent struct {
-	PlanetID   uuid.UUID
-	FleetID    consts.FleetUnitID
-	Count      uint64
-	StartedAt  time.Time
-	FinishedAt time.Time
+	PlanetID      uuid.UUID
+	FleetID       consts.FleetUnitID
+	Count         uint64
+	ResourcesCost Resources
+	StartedAt     time.Time
+	FinishedAt    time.Time
 }
 
 type Fleet struct {

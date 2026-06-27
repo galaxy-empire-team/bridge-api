@@ -9,9 +9,18 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (s *Service) Attack(ctx context.Context, mission models.MissionStart) error {
+const (
+	// mistMissionDuration = 59 * time.Minute
+	mistMissionDuration = 1 * time.Second
+)
+
+func (s *Service) Mist(ctx context.Context, mission models.MissionStart) error {
 	if !mission.Cargo.IsEmpty() {
 		return models.ErrCargoIsNotEmpty
+	}
+
+	if mission.PlanetTo.Z != consts.MistPlanetCoordinateZ {
+		return models.ErrMistNotFound
 	}
 
 	err := s.checkFleetValid(mission.Fleet)
@@ -19,31 +28,21 @@ func (s *Service) Attack(ctx context.Context, mission models.MissionStart) error
 		return fmt.Errorf("checkFleetValid(): %w", err)
 	}
 
-	planetExists, err := s.planetStorage.CheckPlanetExists(ctx, mission.PlanetTo)
-	if err != nil {
-		return fmt.Errorf("planetStorage.CheckPlanetExists(): %w", err)
-	}
-	if !planetExists && !s.isPlanetNPC(mission.PlanetTo.Z) {
-		return models.ErrPlanetNotFound
-	}
-
 	if err := s.repository.CheckPlanetOwner(ctx, mission.UserID, mission.PlanetFrom); err != nil {
 		return fmt.Errorf("CheckPlanetOwner(): %w", err)
 	}
 
-	missionID, err := s.registry.GetMissionIDByType(consts.MissionTypeAttack)
-	if err != nil {
-		return fmt.Errorf("registry.GetMissionIDByType(): %w", err)
-	}
-
-	planetFromCoordinates, err := s.planetStorage.GetCoordinates(ctx, mission.PlanetFrom)
+	planetCoordinates, err := s.planetStorage.GetCoordinates(ctx, mission.PlanetFrom)
 	if err != nil {
 		return fmt.Errorf("planetStorage.GetCoordinates(): %w", err)
 	}
 
-	missionDuration, err := s.calculateMissionDuration(planetFromCoordinates, mission.PlanetTo, mission.Fleet, mission.SpeedMultiplier)
+	// 1 is when a player start from current system
+	distanceToMist := diffPositionY(planetCoordinates.Y, mission.PlanetTo.Y) + 1
+
+	missionID, err := s.registry.GetMissionIDByType(consts.MissionTypeMist)
 	if err != nil {
-		return fmt.Errorf("calculateMissionDuration(): %w", err)
+		return fmt.Errorf("registry.GetMissionIDByType(): %w", err)
 	}
 
 	return s.txManager.ExecMissionTx(ctx, func(ctx context.Context, storages TxStorages) error {
@@ -53,22 +52,31 @@ func (s *Service) Attack(ctx context.Context, mission models.MissionStart) error
 		}
 
 		startedAt := time.Now().UTC()
-		attackEvent := models.MissionEvent{
+		mistEvent := models.MissionEvent{
 			UserID:      mission.UserID,
 			PlanetFrom:  mission.PlanetFrom,
 			PlanetTo:    mission.PlanetTo,
 			Type:        missionID,
 			Fleet:       mission.Fleet,
+			Cargo:       mission.Cargo,
 			IsReturning: false,
 			StartedAt:   startedAt,
-			FinishedAt:  startedAt.Add(missionDuration),
+			FinishedAt:  startedAt.Add(mistMissionDuration * time.Duration(distanceToMist)),
 		}
 
-		err = storages.CreateMissionEvent(ctx, attackEvent)
+		err = storages.CreateMissionEvent(ctx, mistEvent)
 		if err != nil {
 			return fmt.Errorf("missionStorage.CreateMissionEvent(): %w", err)
 		}
 
 		return nil
 	})
+}
+
+func diffPositionY(x consts.PlanetPositionY, y consts.PlanetPositionY) consts.PlanetPositionY {
+	if x < y {
+		return y - x
+	}
+
+	return x - y
 }

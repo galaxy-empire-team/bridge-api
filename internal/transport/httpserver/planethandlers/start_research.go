@@ -60,7 +60,7 @@ func handleStartResearchError(c *gin.Context, err error) {
 		})
 	case errors.Is(err, models.ErrNotEnoughResources):
 		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
-			Err: "not enough resources to upgrade building",
+			Err: "not enough resources to upgrade research",
 		})
 	case errors.Is(err, models.ErrEventIsAlreadyScheduled):
 		c.JSON(http.StatusConflict, ErrorResponse{

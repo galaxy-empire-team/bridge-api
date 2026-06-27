@@ -18,6 +18,8 @@ const (
 	NPCTierTwoLogin       = "Pirates tier II"
 	NPCTierThreeLogin     = "Pirates tier III"
 
+	MistPlanetCoordinateZ = 16
+
 	SpeedMultiplierMin        = 0.3
 	SpeedMultiplierMax        = 1.0
 	TimeToReachNearestPlanetS = 60

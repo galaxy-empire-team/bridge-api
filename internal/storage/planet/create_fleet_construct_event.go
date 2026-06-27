@@ -13,14 +13,20 @@ func (s *PlanetStorage) CreateFleetConstructEvent(ctx context.Context, fleetCons
 			planet_id,
 			fleet_id, 
 			count,
+			metal_cost,
+			crystal_cost,
+			gas_cost,
 			started_at,
 			finished_at
 		) VALUES (
 			$1,    -- planet_id
 			$2,    -- fleet_id
 			$3,    -- count
-			$4,    -- started_at
-			$5	   -- finished_at
+			$4,    -- metal_cost
+			$5,    -- crystal_cost
+			$6,    -- gas_cost
+			$7,    -- started_at
+			$8	   -- finished_at
 		) ON CONFLICT (planet_id) DO NOTHING;
 		`
 
@@ -28,6 +34,9 @@ func (s *PlanetStorage) CreateFleetConstructEvent(ctx context.Context, fleetCons
 		fleetConstructEvent.PlanetID,
 		fleetConstructEvent.FleetID,
 		fleetConstructEvent.Count,
+		fleetConstructEvent.ResourcesCost.Metal,
+		fleetConstructEvent.ResourcesCost.Crystal,
+		fleetConstructEvent.ResourcesCost.Gas,
 		fleetConstructEvent.StartedAt,
 		fleetConstructEvent.FinishedAt,
 	)

@@ -36,6 +36,8 @@ type TxStorages interface {
 	SetResources(ctx context.Context, planetID uuid.UUID, updatedResources models.Resources) error
 	// --- missionStorage ---
 	CreateMissionEvent(ctx context.Context, colonizeEvent models.MissionEvent) error
+	GetMissionForUpdate(ctx context.Context, userID uuid.UUID, id uint64) (models.CancelMission, error)
+	CancelMissionEvent(ctx context.Context, event models.CancelMission) error
 }
 
 type txManager interface {

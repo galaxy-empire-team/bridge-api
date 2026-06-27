@@ -28,8 +28,11 @@ func (hs *HttpServer) RegisterRoutes(
 	hs.apiRouter.GET("/planet/buildings", planethandlers.GetPlanetBuildings(planetService))
 	hs.apiRouter.POST("/planet/capitol/colonize", planethandlers.ColonizeCapitol(planetService))
 	hs.apiRouter.POST("/planet/building/upgrade", planethandlers.StartBuildingUpgrade(planetService))
+	hs.apiRouter.POST("/planet/building/cancel", planethandlers.CancelBuildingUpgrade(planetService))
 	hs.apiRouter.POST("/planet/research/start", planethandlers.StartResearch(planetService))
+	hs.apiRouter.POST("/planet/research/cancel", planethandlers.CancelResearch(planetService))
 	hs.apiRouter.POST("/planet/fleet/construct", planethandlers.StartFleetConstruction(planetService))
+	hs.apiRouter.POST("/planet/fleet/cancel", planethandlers.CancelFleetConstruction(planetService))
 
 	// ----- Mission Routes -----
 	hs.apiRouter.GET("/mission/all", missionhandlers.GetCurrentMissions(missionService))
@@ -38,6 +41,8 @@ func (hs *HttpServer) RegisterRoutes(
 	hs.apiRouter.POST("/mission/spy", missionhandlers.Spy(missionService))
 	hs.apiRouter.POST("/mission/transport", missionhandlers.Transport(missionService))
 	hs.apiRouter.POST("/mission/recycle", missionhandlers.Recycle(missionService))
+	hs.apiRouter.POST("/mission/mist", missionhandlers.Mist(missionService))
+	hs.apiRouter.POST("/mission/cancel", missionhandlers.CancelMissionEvent(missionService))
 
 	// ----- System Routes -----
 	hs.apiRouter.GET("/system/planets", systemhandlers.GetSystemPlanets(systemService))

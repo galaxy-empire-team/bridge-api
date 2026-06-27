@@ -25,7 +25,17 @@ type StartBuildingUpgradeRequest struct {
 	BuildingID consts.BuildingID `json:"buildingID"`
 }
 
+type CancelBuildingUpgradeRequest struct {
+	PlanetID   uuid.UUID         `json:"planetID"`
+	BuildingID consts.BuildingID `json:"buildingID"`
+}
+
 type StartResearchRequest struct {
+	PlanetID   uuid.UUID         `json:"planetID"`
+	ResearchID consts.ResearchID `json:"researchID"`
+}
+
+type CancelResearchRequest struct {
 	PlanetID   uuid.UUID         `json:"planetID"`
 	ResearchID consts.ResearchID `json:"researchID"`
 }
@@ -34,6 +44,10 @@ type StartFleetConstructionRequest struct {
 	PlanetID uuid.UUID          `json:"planetID"`
 	FleetID  consts.FleetUnitID `json:"fleetID"`
 	Count    uint64             `json:"count"`
+}
+
+type CancelFleetConstructionRequest struct {
+	PlanetID uuid.UUID `json:"planetID"`
 }
 
 type PlanetResponse struct {

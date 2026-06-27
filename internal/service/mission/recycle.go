@@ -18,6 +18,10 @@ func (s *Service) Recycle(ctx context.Context, mission models.MissionStart) erro
 		return models.ErrFleetCannotBeEmpty
 	}
 
+	if mission.Cargo.IsEmpty() {
+		return models.ErrCargoIsNotEmpty
+	}
+
 	fleetUnitStats, err := s.registry.GetFleetUnitStatsByID(mission.Fleet[0].ID)
 	if err != nil {
 		return fmt.Errorf("registry.GetFleetUnitStatsByID(): %w", err)

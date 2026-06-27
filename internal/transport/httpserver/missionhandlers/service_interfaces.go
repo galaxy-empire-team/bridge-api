@@ -15,4 +15,6 @@ type MissionService interface {
 	Spy(ctx context.Context, mission models.MissionStart) error
 	Transport(ctx context.Context, mission models.MissionStart) error
 	Recycle(ctx context.Context, mission models.MissionStart) error
+	Mist(ctx context.Context, mission models.MissionStart) error
+	CancelMission(ctx context.Context, userID uuid.UUID, missionID uint64) (models.CancelMission, error)
 }

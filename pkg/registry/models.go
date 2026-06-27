@@ -78,3 +78,9 @@ type NPCStats struct {
 	Fleet      []FleetUnitCount
 	LootFleet  []FleetUnitCount
 }
+
+type BoostStats struct {
+	ID         consts.BoostID
+	Tier       consts.BoostTier
+	BoostTimeS uint64
+}

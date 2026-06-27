@@ -10,6 +10,10 @@ import (
 )
 
 func (s *Service) Spy(ctx context.Context, mission models.MissionStart) error {
+	if !mission.Cargo.IsEmpty() {
+		return models.ErrCargoIsNotEmpty
+	}
+
 	if len(mission.Fleet) != 1 {
 		return models.ErrInvalidInput
 	}

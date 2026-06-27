@@ -21,4 +21,7 @@ type PlanetService interface {
 	StartBuildingUpgrade(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, buildingID consts.BuildingID) (models.FinishTime, error)
 	StartResearch(ctx context.Context, userID uuid.UUID, currentPlanet uuid.UUID, currentResearchID consts.ResearchID) (models.ResearchProgressInfo, error)
 	StartFleetConstruction(ctx context.Context, userID uuid.UUID, currentPlanet uuid.UUID, fleet models.FleetUnitCount) (models.FleetUnitConstructionInfo, error)
+	CancelBuildingUpgrade(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, buildingID consts.BuildingID) error
+	CancelResearch(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, researchID consts.ResearchID) error
+	CancelFleetConstruction(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) error
 }
