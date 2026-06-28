@@ -9,8 +9,8 @@ import (
 
 	"github.com/galaxy-empire-team/bridge-api/internal/db"
 	repository "github.com/galaxy-empire-team/bridge-api/internal/repository"
+	eventservice "github.com/galaxy-empire-team/bridge-api/internal/service/event"
 	missionservice "github.com/galaxy-empire-team/bridge-api/internal/service/mission"
-	planetservice "github.com/galaxy-empire-team/bridge-api/internal/service/planet"
 )
 
 type TxManager struct {
@@ -21,14 +21,14 @@ func New(connPool *db.ConnPool) *TxManager {
 	return &TxManager{pool: connPool}
 }
 
-// ExecPlanetTx implemets methods required by planet service. I decided to copy func for each service
+// ExecEventTx implemets methods required by event service. I decided to copy func for each service
 // insted of making factories or use empty interfaces.
-func (m *TxManager) ExecPlanetTx(
+func (m *TxManager) ExecEventTx(
 	ctx context.Context,
-	handler func(ctx context.Context, storages planetservice.TxStorages) error,
+	handler func(ctx context.Context, storages eventservice.TxStorages) error,
 ) error {
 	return m.exec(ctx, func(tx pgx.Tx) error {
-		return handler(ctx, newPlanetResearchStorageSet(tx))
+		return handler(ctx, newEventStorageSet(tx))
 	})
 }
 

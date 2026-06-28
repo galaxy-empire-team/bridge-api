@@ -56,6 +56,11 @@ func New(ctx context.Context, connPool *pgxpool.Pool) (*Registry, error) {
 		return nil, fmt.Errorf("fillNPCStats(): %w", err)
 	}
 
+	err = r.fillBoostStats(ctx, connPool)
+	if err != nil {
+		return nil, fmt.Errorf("fillBoostStats(): %w", err)
+	}
+
 	return r, nil
 }
 
@@ -404,7 +409,7 @@ func (r *Registry) fillBoostStats(ctx context.Context, pool *pgxpool.Pool) error
 		SELECT 
 			id,
 			tier,
-			boost_time_s
+			duration_s
 		FROM session_beta.s_boosts;
 	`
 
@@ -419,7 +424,7 @@ func (r *Registry) fillBoostStats(ctx context.Context, pool *pgxpool.Pool) error
 		err = rows.Scan(
 			&boostStats.ID,
 			&boostStats.Tier,
-			&boostStats.BoostTimeS,
+			&boostStats.DurationS,
 		)
 		if err != nil {
 			return fmt.Errorf("rows.Scan(): %w", err)

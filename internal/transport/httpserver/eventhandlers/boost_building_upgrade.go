@@ -1,4 +1,4 @@
-package planethandlers
+package eventhandlers
 
 import (
 	"errors"
@@ -8,10 +8,9 @@ import (
 
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/middleware"
-	"github.com/galaxy-empire-team/bridge-api/pkg/registry"
 )
 
-func CancelResearch(planetService PlanetService) func(c *gin.Context) {
+func BoostBuildingUpgrade(eventService EventService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		userID, err := middleware.RetrieveUserID(c)
 		if err != nil {
@@ -22,7 +21,7 @@ func CancelResearch(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		var req CancelResearchRequest
+		var req BoostBuildingUpgradeRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{
 				Err: "invalid request body",
@@ -30,19 +29,29 @@ func CancelResearch(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		err = planetService.CancelResearch(c.Request.Context(), userID, req.PlanetID, req.ResearchID)
+		eventFinishTime, err := eventService.BoostBuildingUpgrade(
+			c.Request.Context(),
+			userID,
+			req.PlanetID,
+			req.BuildingID,
+			models.UserBoost{
+				ID:    req.Boost.ID,
+				Count: req.Boost.Count,
+			},
+		)
 		if err != nil {
-			handleCancelResearchError(c, err)
+			handleBoostBuildingUpgradeError(c, err)
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"success": true,
+		c.JSON(http.StatusOK, FinishTimeResponse{
+			StartedAt:  eventFinishTime.StartedAt.UTC(),
+			FinishedAt: eventFinishTime.FinishedAt.UTC(),
 		})
 	}
 }
 
-func handleCancelResearchError(c *gin.Context, err error) {
+func handleBoostBuildingUpgradeError(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, models.ErrPlanetDoesNotBelongToUser):
 		c.JSON(http.StatusBadRequest, ErrorResponse{
@@ -52,9 +61,13 @@ func handleCancelResearchError(c *gin.Context, err error) {
 		c.JSON(http.StatusConflict, ErrorResponse{
 			Err: "event is not scheduled",
 		})
-	case errors.Is(err, registry.ErrNotFound):
+	case errors.Is(err, models.ErrNotEnoughBoosts):
 		c.JSON(http.StatusBadRequest, ErrorResponse{
-			Err: "researchID not found",
+			Err: "not enough boosts",
+		})
+	case errors.Is(err, models.ErrBoostNotFound):
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Err: "boost for user not found",
 		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{

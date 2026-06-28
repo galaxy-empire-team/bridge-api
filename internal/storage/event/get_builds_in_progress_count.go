@@ -1,4 +1,4 @@
-package planet
+package event
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (r *PlanetStorage) GetBuildsInProgressCount(ctx context.Context, planetID uuid.UUID) (uint8, error) {
+func (r *EventStorage) GetBuildsInProgressCount(ctx context.Context, planetID uuid.UUID) (uint8, error) {
 	const getCurrentBuildsCountQuery = `
 		SELECT count(id)
 		FROM session_beta.event_buildings

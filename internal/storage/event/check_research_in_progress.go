@@ -1,4 +1,4 @@
-package research
+package event
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *ResearchStorage) CheckResearchInProgress(ctx context.Context, user_id uuid.UUID) (bool, error) {
+func (s *EventStorage) CheckResearchInProgress(ctx context.Context, user_id uuid.UUID) (bool, error) {
 	const getResearchProgressCountQuery = `
 		SELECT EXISTS (
 			SELECT 1

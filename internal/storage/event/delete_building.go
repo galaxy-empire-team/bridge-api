@@ -1,4 +1,4 @@
-package planet
+package event
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (s *PlanetStorage) DeleteBuildingEvent(ctx context.Context, planetID uuid.UUID, buildingID consts.BuildingID) error {
+func (s *EventStorage) DeleteBuildingEvent(ctx context.Context, planetID uuid.UUID, buildingID consts.BuildingID) error {
 	const deleteBuildingEventQuery = `
 			DELETE FROM session_beta.event_buildings
 			WHERE planet_id = $1 AND building_id = $2;

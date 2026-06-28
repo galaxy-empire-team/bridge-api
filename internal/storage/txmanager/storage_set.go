@@ -3,6 +3,7 @@ package txmanager
 import (
 	"github.com/jackc/pgx/v5"
 
+	eventstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/event"
 	missionstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/mission"
 	planetstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/planet"
 	researchstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/research"
@@ -30,5 +31,17 @@ func newPlanetResearchStorageSet(tx pgx.Tx) planetResearchStorageSet {
 	return planetResearchStorageSet{
 		PlanetStorage:   planetstorage.New(tx),
 		ResearchStorage: researchstorage.New(tx),
+	}
+}
+
+type eventStorageSet struct {
+	*planetstorage.PlanetStorage
+	*eventstorage.EventStorage
+}
+
+func newEventStorageSet(tx pgx.Tx) eventStorageSet {
+	return eventStorageSet{
+		PlanetStorage: planetstorage.New(tx),
+		EventStorage:  eventstorage.New(tx),
 	}
 }

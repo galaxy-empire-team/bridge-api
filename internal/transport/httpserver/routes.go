@@ -1,6 +1,7 @@
 package httpserver
 
 import (
+	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/eventhandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/missionhandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/planethandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/statichandlers"
@@ -11,6 +12,7 @@ import (
 func (hs *HttpServer) RegisterRoutes(
 	userService userhandlers.UserService,
 	planetService planethandlers.PlanetService,
+	eventService eventhandlers.EventService,
 	missionService missionhandlers.MissionService,
 	systemService systemhandlers.SystemService,
 	staticsService statichandlers.StaticService,
@@ -28,12 +30,17 @@ func (hs *HttpServer) RegisterRoutes(
 	hs.apiRouter.GET("/planet/userresources", planethandlers.GetUserResources(planetService))
 	hs.apiRouter.GET("/planet/buildings", planethandlers.GetPlanetBuildings(planetService))
 	hs.apiRouter.POST("/planet/capitol/colonize", planethandlers.ColonizeCapitol(planetService))
-	hs.apiRouter.POST("/planet/building/upgrade", planethandlers.StartBuildingUpgrade(planetService))
-	hs.apiRouter.POST("/planet/building/cancel", planethandlers.CancelBuildingUpgrade(planetService))
-	hs.apiRouter.POST("/planet/research/start", planethandlers.StartResearch(planetService))
-	hs.apiRouter.POST("/planet/research/cancel", planethandlers.CancelResearch(planetService))
-	hs.apiRouter.POST("/planet/fleet/construct", planethandlers.StartFleetConstruction(planetService))
-	hs.apiRouter.POST("/planet/fleet/cancel", planethandlers.CancelFleetConstruction(planetService))
+
+	// ----- Event Routes -----
+	hs.apiRouter.POST("/event/building/upgrade", eventhandlers.StartBuildingUpgrade(eventService))
+	hs.apiRouter.POST("/event/building/cancel", eventhandlers.CancelBuildingUpgrade(eventService))
+	hs.apiRouter.POST("/event/building/boost", eventhandlers.BoostBuildingUpgrade(eventService))
+	hs.apiRouter.POST("/event/research/start", eventhandlers.StartResearch(eventService))
+	hs.apiRouter.POST("/event/research/cancel", eventhandlers.CancelResearch(eventService))
+	hs.apiRouter.POST("/event/research/boost", eventhandlers.BoostResearch(eventService))
+	hs.apiRouter.POST("/event/fleet/construct", eventhandlers.StartFleetConstruction(eventService))
+	hs.apiRouter.POST("/event/fleet/cancel", eventhandlers.CancelFleetConstruction(eventService))
+	hs.apiRouter.POST("/event/fleet/boost", eventhandlers.BoostFleetConstruction(eventService))
 
 	// ----- Mission Routes -----
 	hs.apiRouter.GET("/mission/all", missionhandlers.GetCurrentMissions(missionService))

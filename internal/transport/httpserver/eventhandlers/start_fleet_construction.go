@@ -1,4 +1,4 @@
-package planethandlers
+package eventhandlers
 
 import (
 	"errors"
@@ -11,7 +11,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/registry"
 )
 
-func StartFleetConstruction(planetService PlanetService) func(c *gin.Context) {
+func StartFleetConstruction(eventService EventService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		userID, err := middleware.RetrieveUserID(c)
 		if err != nil {
@@ -30,7 +30,7 @@ func StartFleetConstruction(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		constructionInfo, err := planetService.StartFleetConstruction(c.Request.Context(), userID, req.PlanetID, models.FleetUnitCount{
+		constructionInfo, err := eventService.StartFleetConstruction(c.Request.Context(), userID, req.PlanetID, models.FleetUnitCount{
 			ID:    req.FleetID,
 			Count: req.Count,
 		})

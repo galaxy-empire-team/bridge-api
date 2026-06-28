@@ -1,4 +1,4 @@
-package planet
+package event
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
-func (s *PlanetStorage) CreateBuildingEvent(ctx context.Context, buildEvent models.BuildEvent) error {
+func (s *EventStorage) CreateBuildingEvent(ctx context.Context, buildEvent models.BuildEvent) error {
 	const setBuildLvlQuery = `
 		INSERT INTO session_beta.event_buildings (
 			planet_id,

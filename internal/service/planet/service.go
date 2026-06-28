@@ -10,7 +10,6 @@ import (
 
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
-	"github.com/galaxy-empire-team/bridge-api/pkg/registry"
 )
 
 type planetStorage interface {
@@ -20,14 +19,12 @@ type planetStorage interface {
 	GetCoordinates(ctx context.Context, planetID uuid.UUID) (models.Coordinates, error)
 	GetColonizedCoordinates(ctx context.Context, system models.Coordinates) ([]consts.PlanetPositionZ, error)
 	GetResourcesForUpdate(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
-	GetBuildsInProgressCount(ctx context.Context, planetID uuid.UUID) (uint8, error)
 	GetCurrentBuilds(ctx context.Context, planetID uuid.UUID) ([]models.BuildingInProgress, error)
 	GetCurrentFleetConstruction(ctx context.Context, planetID uuid.UUID) (models.FleetUnitConstructionInfo, error)
 	GetAllUserPlanets(ctx context.Context, userID uuid.UUID) ([]models.Planet, error)
 	GetFleetForUpdate(ctx context.Context, planetID uuid.UUID) ([]models.FleetUnitCount, error)
-	GetAllPlanetBuildings(ctx context.Context, userID uuid.UUID) ([]consts.BuildingID, error)
+	GetAllPlanetBuildings(ctx context.Context, planetID uuid.UUID) ([]consts.BuildingID, error)
 	CheckPlanetBelongsToUser(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (bool, error)
-	CheckFleetConstruction(ctx context.Context, planetID uuid.UUID) (bool, error)
 	ColonizePlanet(ctx context.Context, planet models.Planet, operationID uint64) error
 	GetUserResources(ctx context.Context, userID uuid.UUID) (models.UserResources, error)
 	GetUserBoosts(ctx context.Context, userID uuid.UUID) ([]models.UserBoost, error)
@@ -36,24 +33,6 @@ type planetStorage interface {
 type researchStorage interface {
 	GetAllUserResearches(ctx context.Context, userID uuid.UUID) ([]consts.ResearchID, error)
 	GetUserResearchesProgress(ctx context.Context, userID uuid.UUID) ([]models.ResearchProgressInfo, error)
-	CheckResearchInProgress(ctx context.Context, user_id uuid.UUID) (bool, error)
-}
-
-// Separate storage methods that executes inside a transaction
-type TxStorages interface {
-	GetResourcesForUpdate(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
-	AddResources(ctx context.Context, planetID uuid.UUID, resources models.Resources) error
-	SetResources(ctx context.Context, planetID uuid.UUID, updatedResources models.Resources) error
-	CreateBuildingEvent(ctx context.Context, buildEvent models.BuildEvent) error
-	CreateResearchEvent(ctx context.Context, researchEvent models.ResearchEvent) error
-	CreateFleetConstructEvent(ctx context.Context, fleetConstructEvent models.FleetConstructEvent) error
-	DeleteBuildingEvent(ctx context.Context, planetID uuid.UUID, buildingID consts.BuildingID) error
-	DeleteResearchEvent(ctx context.Context, userID uuid.UUID, researchID consts.ResearchID) error
-	DeleteFleetConstructionEvent(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
-}
-
-type txManager interface {
-	ExecPlanetTx(ctx context.Context, fn func(ctx context.Context, storages TxStorages) error) error
 }
 
 type repository interface {
@@ -62,45 +41,31 @@ type repository interface {
 	RecalcResourcesWithUpdatedTime(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, updatedAt time.Time) error
 }
 
-type registryProvider interface {
-	GetBuildingStatsByID(buildingID consts.BuildingID) (registry.BuildingStats, error)
-	GetBuildingNextLvlID(buildingID consts.BuildingID) (consts.BuildingID, error)
-	GetResearchNextLvlID(researchID consts.ResearchID) (consts.ResearchID, error)
-	GetFleetUnitStatsByID(fleetUnitID consts.FleetUnitID) (registry.FleetUnitStats, error)
-	GetResearchStatsByID(researchID consts.ResearchID) (registry.ResearchStats, error)
-}
-
 //go:generate mockery --name=randGenerator --filename=rand_generator.go --exported --with-expecter
 type randGenerator interface {
 	Uint32() uint32
 }
 
 type Service struct {
-	txManager       txManager
 	planetStorage   planetStorage
 	researchStorage researchStorage
 	repository      repository
-	registry        registryProvider
 	randomGenerator randGenerator
 	log             *zap.Logger
 }
 
 func New(
-	txManager txManager,
 	planetStorage planetStorage,
 	researchStorage researchStorage,
 	repository repository,
-	registry registryProvider,
 	log *zap.Logger,
 ) *Service {
 	gen := rand.New(rand.NewSource((time.Now().UnixNano())))
 
 	return &Service{
-		txManager:       txManager,
 		planetStorage:   planetStorage,
 		researchStorage: researchStorage,
 		repository:      repository,
-		registry:        registry,
 		randomGenerator: gen,
 		log:             log,
 	}

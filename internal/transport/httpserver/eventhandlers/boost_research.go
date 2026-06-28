@@ -1,4 +1,4 @@
-package planethandlers
+package eventhandlers
 
 import (
 	"errors"
@@ -10,7 +10,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/middleware"
 )
 
-func CancelFleetConstruction(planetService PlanetService) func(c *gin.Context) {
+func BoostResearch(eventService EventService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		userID, err := middleware.RetrieveUserID(c)
 		if err != nil {
@@ -21,7 +21,7 @@ func CancelFleetConstruction(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		var req CancelFleetConstructionRequest
+		var req BoostResearchRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{
 				Err: "invalid request body",
@@ -29,19 +29,28 @@ func CancelFleetConstruction(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		err = planetService.CancelFleetConstruction(c.Request.Context(), userID, req.PlanetID)
+		eventFinishTime, err := eventService.BoostResearch(
+			c.Request.Context(),
+			userID,
+			req.ResearchID,
+			models.UserBoost{
+				ID:    req.Boost.ID,
+				Count: req.Boost.Count,
+			},
+		)
 		if err != nil {
-			handleCancelFleetConstructionError(c, err)
+			handleBoostResearchError(c, err)
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"success": true,
+		c.JSON(http.StatusOK, FinishTimeResponse{
+			StartedAt:  eventFinishTime.StartedAt.UTC(),
+			FinishedAt: eventFinishTime.FinishedAt.UTC(),
 		})
 	}
 }
 
-func handleCancelFleetConstructionError(c *gin.Context, err error) {
+func handleBoostResearchError(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, models.ErrPlanetDoesNotBelongToUser):
 		c.JSON(http.StatusBadRequest, ErrorResponse{
@@ -50,6 +59,14 @@ func handleCancelFleetConstructionError(c *gin.Context, err error) {
 	case errors.Is(err, models.ErrEventIsNotScheduled):
 		c.JSON(http.StatusConflict, ErrorResponse{
 			Err: "event is not scheduled",
+		})
+	case errors.Is(err, models.ErrNotEnoughBoosts):
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Err: "not enough boosts",
+		})
+	case errors.Is(err, models.ErrBoostNotFound):
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Err: "boost for user not found",
 		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{

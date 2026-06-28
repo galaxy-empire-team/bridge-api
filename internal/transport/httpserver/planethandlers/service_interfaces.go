@@ -7,7 +7,6 @@ import (
 
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 	planetservice "github.com/galaxy-empire-team/bridge-api/internal/service/planet"
-	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
 type PlanetService interface {
@@ -19,11 +18,5 @@ type PlanetService interface {
 	GetFleet(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (models.Fleet, error)
 	GetResearches(ctx context.Context, userID uuid.UUID) (models.UserResearches, error)
 	GetBuildings(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (models.Buildings, error)
-	StartBuildingUpgrade(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, buildingID consts.BuildingID) (models.FinishTime, error)
-	StartResearch(ctx context.Context, userID uuid.UUID, currentPlanet uuid.UUID, currentResearchID consts.ResearchID) (models.ResearchProgressInfo, error)
-	StartFleetConstruction(ctx context.Context, userID uuid.UUID, currentPlanet uuid.UUID, fleet models.FleetUnitCount) (models.FleetUnitConstructionInfo, error)
-	CancelBuildingUpgrade(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, buildingID consts.BuildingID) error
-	CancelResearch(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, researchID consts.ResearchID) error
-	CancelFleetConstruction(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) error
 	GetUserResources(ctx context.Context, userID uuid.UUID) (planetservice.GetUserResourcesResponse, error)
 }

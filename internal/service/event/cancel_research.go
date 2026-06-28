@@ -1,4 +1,4 @@
-package planet
+package event
 
 import (
 	"context"
@@ -15,7 +15,7 @@ func (s *Service) CancelResearch(ctx context.Context, userID uuid.UUID, planetID
 		return fmt.Errorf("CheckPlanetOwner(): %w", err)
 	}
 
-	return s.txManager.ExecPlanetTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
+	return s.txManager.ExecEventTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
 		err := planetRepo.DeleteResearchEvent(ctx, userID, researchID)
 		if err != nil {
 			return fmt.Errorf("planetStorage.DeleteBuildingEvent(): %w", err)

@@ -1,4 +1,4 @@
-package planet
+package event
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *PlanetStorage) CheckFleetConstruction(ctx context.Context, planetID uuid.UUID) (bool, error) {
+func (s *EventStorage) CheckFleetConstruction(ctx context.Context, planetID uuid.UUID) (bool, error) {
 	const getFleetConstructionQuery = `
 		SELECT EXISTS (
 			SELECT 1

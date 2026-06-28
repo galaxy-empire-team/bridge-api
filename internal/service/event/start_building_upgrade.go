@@ -1,4 +1,4 @@
-package planet
+package event
 
 import (
 	"context"
@@ -17,7 +17,7 @@ func (s *Service) StartBuildingUpgrade(ctx context.Context, userID uuid.UUID, pl
 		return models.FinishTime{}, fmt.Errorf("CheckPlanetOwner(): %w", err)
 	}
 
-	currentBuildsCount, err := s.planetStorage.GetBuildsInProgressCount(ctx, planetID)
+	currentBuildsCount, err := s.eventStorage.GetBuildsInProgressCount(ctx, planetID)
 	if err != nil {
 		return models.FinishTime{}, fmt.Errorf("planetStorage.GetBuildsInProgressCount(): %w", err)
 	}
@@ -40,6 +40,18 @@ func (s *Service) StartBuildingUpgrade(ctx context.Context, userID uuid.UUID, pl
 		if buildStats.Level != consts.ZeroBuildingLevel {
 			return models.FinishTime{}, models.ErrBuildingNotFound
 		}
+
+		// Check if user already has building
+		for _, planetBuildingID := range planetBuildingIDs {
+			planetBuildingStats, err := s.registry.GetBuildingStatsByID(planetBuildingID)
+			if err != nil {
+				return models.FinishTime{}, fmt.Errorf("registry.GetBuildingStatsByID(): %w", err)
+			}
+
+			if planetBuildingStats.Type == buildStats.Type {
+				return models.FinishTime{}, models.ErrUserAlreadyHasBuilding
+			}
+		}
 	}
 
 	err = s.repository.RecalcResources(ctx, userID, planetID)
@@ -49,7 +61,7 @@ func (s *Service) StartBuildingUpgrade(ctx context.Context, userID uuid.UUID, pl
 
 	finishTime := models.FinishTime{}
 
-	return finishTime, s.txManager.ExecPlanetTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
+	return finishTime, s.txManager.ExecEventTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
 		buildEvent, err := s.generateEventForExistingBuilding(ctx, planetID, buildingID, planetRepo)
 		if err != nil {
 			return fmt.Errorf("generateEventForExistingBuilding(): %w", err)

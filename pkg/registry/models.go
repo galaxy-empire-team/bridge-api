@@ -80,7 +80,7 @@ type NPCStats struct {
 }
 
 type BoostStats struct {
-	ID         consts.BoostID
-	Tier       consts.BoostTier
-	BoostTimeS uint64
+	ID        consts.BoostID
+	Tier      consts.BoostTier
+	DurationS uint64
 }

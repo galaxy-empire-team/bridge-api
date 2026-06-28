@@ -20,36 +20,6 @@ type CapitolIDResponse struct {
 	CapitolPlanetID uuid.UUID `json:"capitolID"`
 }
 
-type StartBuildingUpgradeRequest struct {
-	PlanetID   uuid.UUID         `json:"planetID"`
-	BuildingID consts.BuildingID `json:"buildingID"`
-}
-
-type CancelBuildingUpgradeRequest struct {
-	PlanetID   uuid.UUID         `json:"planetID"`
-	BuildingID consts.BuildingID `json:"buildingID"`
-}
-
-type StartResearchRequest struct {
-	PlanetID   uuid.UUID         `json:"planetID"`
-	ResearchID consts.ResearchID `json:"researchID"`
-}
-
-type CancelResearchRequest struct {
-	PlanetID   uuid.UUID         `json:"planetID"`
-	ResearchID consts.ResearchID `json:"researchID"`
-}
-
-type StartFleetConstructionRequest struct {
-	PlanetID uuid.UUID          `json:"planetID"`
-	FleetID  consts.FleetUnitID `json:"fleetID"`
-	Count    uint64             `json:"count"`
-}
-
-type CancelFleetConstructionRequest struct {
-	PlanetID uuid.UUID `json:"planetID"`
-}
-
 type PlanetResponse struct {
 	PlanetID    uuid.UUID       `json:"planetID"`
 	X           uint8           `json:"x"`
@@ -101,11 +71,6 @@ type FleetPlanetsResponse struct {
 type FleetUnitCount struct {
 	ID    uint8  `json:"id"`
 	Count uint64 `json:"count"`
-}
-
-type FinishTimeResponse struct {
-	StartedAt  time.Time `json:"startedAt"`
-	FinishedAt time.Time `json:"finishedAt"`
 }
 
 type FleetConstructionResponse struct {

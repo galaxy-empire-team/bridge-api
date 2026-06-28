@@ -1,4 +1,4 @@
-package research
+package event
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
-func (s *ResearchStorage) CreateResearchEvent(ctx context.Context, researchEvent models.ResearchEvent) error {
+func (s *EventStorage) CreateResearchEvent(ctx context.Context, researchEvent models.ResearchEvent) error {
 	const createResearchEventQuery = `
 		INSERT INTO session_beta.event_researches (
 			user_id,

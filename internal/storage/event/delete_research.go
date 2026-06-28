@@ -1,4 +1,4 @@
-package research
+package event
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (s *ResearchStorage) DeleteResearchEvent(ctx context.Context, userID uuid.UUID, researchID consts.ResearchID) error {
+func (s *EventStorage) DeleteResearchEvent(ctx context.Context, userID uuid.UUID, researchID consts.ResearchID) error {
 	const deleteResearchEventQuery = `
 			DELETE FROM session_beta.event_researches
 			WHERE user_id = $1 AND research_id = $2;

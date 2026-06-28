@@ -1,4 +1,4 @@
-package planethandlers
+package eventhandlers
 
 import (
 	"errors"
@@ -8,10 +8,9 @@ import (
 
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/middleware"
-	"github.com/galaxy-empire-team/bridge-api/pkg/registry"
 )
 
-func StartResearch(planetService PlanetService) func(c *gin.Context) {
+func StartBuildingUpgrade(eventService EventService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		userID, err := middleware.RetrieveUserID(c)
 		if err != nil {
@@ -22,7 +21,7 @@ func StartResearch(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		var req StartResearchRequest
+		var req StartBuildingUpgradeRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{
 				Err: "invalid request body",
@@ -30,45 +29,40 @@ func StartResearch(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		researchProgress, err := planetService.StartResearch(c.Request.Context(), userID, req.PlanetID, req.ResearchID)
+		finishTime, err := eventService.StartBuildingUpgrade(c.Request.Context(), userID, req.PlanetID, req.BuildingID)
 		if err != nil {
-			handleStartResearchError(c, err)
+			handleUpgradeBuildingError(c, err)
 			return
 		}
 
-		c.JSON(http.StatusOK, ResearchProgressResponse{
-			ResearchID: researchProgress.ResearchID,
-			StartedAt:  researchProgress.StartedAt,
-			FinishedAt: researchProgress.FinishedAt,
+		c.JSON(http.StatusOK, FinishTimeResponse{
+			StartedAt:  finishTime.StartedAt.UTC(),
+			FinishedAt: finishTime.FinishedAt.UTC(),
 		})
 	}
 }
 
-func handleStartResearchError(c *gin.Context, err error) {
+func handleUpgradeBuildingError(c *gin.Context, err error) {
 	switch {
-	case errors.Is(err, models.ErrPlanetDoesNotBelongToUser):
+	case errors.Is(err, models.ErrTooManyBuildingsInProgress):
 		c.JSON(http.StatusBadRequest, ErrorResponse{
-			Err: "planet does not belong to user",
+			Err: "too many buildings in progress",
 		})
-	case errors.Is(err, models.ErrResearchInProgress):
+	case errors.Is(err, models.ErrBuildingNotFound):
 		c.JSON(http.StatusBadRequest, ErrorResponse{
-			Err: "research already in progress",
+			Err: "building not found",
 		})
-	case errors.Is(err, registry.ErrMaxLevelReached):
+	case errors.Is(err, models.ErrBuildingMaxLevelReached):
 		c.JSON(http.StatusConflict, ErrorResponse{
-			Err: "research has reached max level",
+			Err: "building has reached max level",
 		})
 	case errors.Is(err, models.ErrNotEnoughResources):
 		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
-			Err: "not enough resources to upgrade research",
+			Err: "not enough resources to upgrade building",
 		})
 	case errors.Is(err, models.ErrEventIsAlreadyScheduled):
 		c.JSON(http.StatusConflict, ErrorResponse{
 			Err: "event is already scheduled",
-		})
-	case errors.Is(err, models.ErrUserHasNotResearch):
-		c.JSON(http.StatusConflict, ErrorResponse{
-			Err: "user has not research id to upgrade",
 		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{

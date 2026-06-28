@@ -1,4 +1,4 @@
-package planet
+package event
 
 import (
 	"context"
@@ -17,7 +17,7 @@ func (s *Service) StartResearch(ctx context.Context, userID uuid.UUID, planet uu
 		return models.ResearchProgressInfo{}, fmt.Errorf("CheckPlanetOwner(): %w", err)
 	}
 
-	researchInProgress, err := s.researchStorage.CheckResearchInProgress(ctx, userID)
+	researchInProgress, err := s.eventStorage.CheckResearchInProgress(ctx, userID)
 	if err != nil {
 		return models.ResearchProgressInfo{}, fmt.Errorf("researchStorage.CheckResearchInProgress(): %w", err)
 	}
@@ -38,6 +38,18 @@ func (s *Service) StartResearch(ctx context.Context, userID uuid.UUID, planet uu
 		if researchStats.Level != consts.ZeroResearchLevel {
 			return models.ResearchProgressInfo{}, models.ErrUserHasNotResearch
 		}
+
+		// Check if user already has research
+		for _, userResearchID := range userResearches {
+			userResearchStats, err := s.registry.GetResearchStatsByID(userResearchID)
+			if err != nil {
+				return models.ResearchProgressInfo{}, fmt.Errorf("registry.GetResearchStatsByID(): %w", err)
+			}
+
+			if userResearchStats.Type == researchStats.Type {
+				return models.ResearchProgressInfo{}, models.ErrUserAlreadyHasResearch
+			}
+		}
 	}
 
 	err = s.repository.RecalcResources(ctx, userID, planet)
@@ -49,7 +61,7 @@ func (s *Service) StartResearch(ctx context.Context, userID uuid.UUID, planet uu
 		ResearchID: currentResearchID,
 	}
 
-	return researchProgress, s.txManager.ExecPlanetTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
+	return researchProgress, s.txManager.ExecEventTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
 		researchEvent, err := s.generateEventForResearch(ctx, userID, planet, currentResearchID, planetRepo)
 		if err != nil {
 			return fmt.Errorf("generateEventForResearch(): %w", err)

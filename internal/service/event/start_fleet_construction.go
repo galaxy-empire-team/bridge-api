@@ -1,4 +1,4 @@
-package planet
+package event
 
 import (
 	"context"
@@ -19,7 +19,7 @@ func (s *Service) StartFleetConstruction(ctx context.Context, userID uuid.UUID, 
 		return models.FleetUnitConstructionInfo{}, fmt.Errorf("CheckPlanetOwner(): %w", err)
 	}
 
-	fleetConstructionInProgress, err := s.planetStorage.CheckFleetConstruction(ctx, planet)
+	fleetConstructionInProgress, err := s.eventStorage.CheckFleetConstruction(ctx, planet)
 	if err != nil {
 		return models.FleetUnitConstructionInfo{}, fmt.Errorf("planetStorage.CheckFleetConstruction(): %w", err)
 	}
@@ -37,7 +37,7 @@ func (s *Service) StartFleetConstruction(ctx context.Context, userID uuid.UUID, 
 		Count:   fleet.Count,
 	}
 
-	return info, s.txManager.ExecPlanetTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
+	return info, s.txManager.ExecEventTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
 		fleetConstructEvent, err := s.generateEventForFleetConstruct(ctx, planet, fleet, planetRepo)
 		if err != nil {
 			return fmt.Errorf("generateEventForFleetConstruct(): %w", err)

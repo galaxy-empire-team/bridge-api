@@ -1,4 +1,4 @@
-package planethandlers
+package eventhandlers
 
 import (
 	"errors"
@@ -11,7 +11,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/registry"
 )
 
-func CancelBuildingUpgrade(planetService PlanetService) func(c *gin.Context) {
+func CancelResearch(eventService EventService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		userID, err := middleware.RetrieveUserID(c)
 		if err != nil {
@@ -22,7 +22,7 @@ func CancelBuildingUpgrade(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		var req CancelBuildingUpgradeRequest
+		var req CancelResearchRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{
 				Err: "invalid request body",
@@ -30,9 +30,9 @@ func CancelBuildingUpgrade(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		err = planetService.CancelBuildingUpgrade(c.Request.Context(), userID, req.PlanetID, req.BuildingID)
+		err = eventService.CancelResearch(c.Request.Context(), userID, req.PlanetID, req.ResearchID)
 		if err != nil {
-			handleCancelBuildingUpgradeError(c, err)
+			handleCancelResearchError(c, err)
 			return
 		}
 
@@ -42,7 +42,7 @@ func CancelBuildingUpgrade(planetService PlanetService) func(c *gin.Context) {
 	}
 }
 
-func handleCancelBuildingUpgradeError(c *gin.Context, err error) {
+func handleCancelResearchError(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, models.ErrPlanetDoesNotBelongToUser):
 		c.JSON(http.StatusBadRequest, ErrorResponse{
@@ -54,7 +54,7 @@ func handleCancelBuildingUpgradeError(c *gin.Context, err error) {
 		})
 	case errors.Is(err, registry.ErrNotFound):
 		c.JSON(http.StatusBadRequest, ErrorResponse{
-			Err: "buildingID not found on planet",
+			Err: "researchID not found",
 		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{

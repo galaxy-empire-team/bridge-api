@@ -1,4 +1,4 @@
-package planet
+package event
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
-func (s *PlanetStorage) DeleteFleetConstructionEvent(ctx context.Context, planetID uuid.UUID) (models.Resources, error) {
+func (s *EventStorage) DeleteFleetConstructionEvent(ctx context.Context, planetID uuid.UUID) (models.Resources, error) {
 	const deleteFleetConstructionEventQuery = `
 			DELETE FROM session_beta.event_fleet_constructions
 			WHERE planet_id = $1

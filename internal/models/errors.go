@@ -27,6 +27,9 @@ var (
 	ErrInvalidFleetConstructionRequest = errors.New("invalid fleet construction request")
 	ErrNoPlanetIDProvided              = errors.New("no planet ID provided")
 	ErrNoUserIDProvided                = errors.New("no user ID provided")
+	ErrBoostNotFound                   = errors.New("boost not found")
+	ErrNotEnoughBoosts                 = errors.New("not enough boosts")
+	ErrUserAlreadyHasBuilding          = errors.New("user already has building of this type")
 
 	// Mission errors
 	ErrColonizePlanetAlreadyExists        = errors.New("planet already exists at the target coordinates")
@@ -48,6 +51,7 @@ var (
 	ErrMistNotFound                       = errors.New("mist not found")
 
 	// Research errors
-	ErrResearchInProgress = errors.New("research is already in progress")
-	ErrUserHasNotResearch = errors.New("user has not research id to upgrade")
+	ErrResearchInProgress     = errors.New("research is already in progress")
+	ErrUserHasNotResearch     = errors.New("user has not research id to upgrade")
+	ErrUserAlreadyHasResearch = errors.New("user already has research of this type")
 )
