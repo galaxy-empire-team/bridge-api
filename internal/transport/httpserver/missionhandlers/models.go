@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
+	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
 type ColonizeRequest struct {
@@ -69,13 +71,13 @@ type UserMissionsResponse struct {
 }
 
 type Mission struct {
-	ID          uint64      `json:"id"`
-	Type        string      `json:"type"`
-	PlanetFrom  Coordinates `json:"planetFrom"`
-	PlanetTo    Coordinates `json:"planetTo"`
-	IsReturning bool        `json:"isReturning"`
-	StartedAt   time.Time   `json:"startedAt"`
-	FinishedAt  time.Time   `json:"finishedAt"`
+	ID          uint64           `json:"id"`
+	Type        consts.MissionID `json:"type"`
+	PlanetFrom  Coordinates      `json:"planetFrom"`
+	PlanetTo    Coordinates      `json:"planetTo"`
+	IsReturning bool             `json:"isReturning"`
+	StartedAt   time.Time        `json:"startedAt"`
+	FinishedAt  time.Time        `json:"finishedAt"`
 }
 
 type RecycleRequest struct {

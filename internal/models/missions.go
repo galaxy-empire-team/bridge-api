@@ -29,7 +29,7 @@ type CancelMission struct {
 
 type UserMission struct {
 	ID          uint64
-	Type        string
+	Type        consts.MissionID
 	PlanetFrom  Coordinates
 	PlanetTo    Coordinates
 	IsReturning bool

@@ -23,11 +23,13 @@ func (s *Service) CancelMission(ctx context.Context, userID uuid.UUID, missionID
 			return models.ErrMissionIsReturning
 		}
 
+		now := time.Now().UTC()
+
 		updatedMissionEvent = models.CancelMission{
 			ID:          missionEvent.ID,
 			IsReturning: true,
-			StartedAt:   time.Now().UTC(),
-			FinishedAt:  time.Now().UTC().Add(missionEvent.FinishedAt.Sub(missionEvent.StartedAt)),
+			StartedAt:   now,
+			FinishedAt:  now.Add(now.Sub(missionEvent.StartedAt)),
 		}
 
 		err = storages.CancelMissionEvent(ctx, updatedMissionEvent)

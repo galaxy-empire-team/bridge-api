@@ -1,24 +1,37 @@
 package systemhandlers
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+
+	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
+)
 
 type SystemPlanetsRequest struct {
-	X uint64 `json:"x"`
-	Y uint64 `json:"y"`
+	X consts.PlanetPositionX `json:"x"`
+	Y consts.PlanetPositionY `json:"y"`
 }
 
 type SystemPlanetsResponse struct {
-	X       uint64                `json:"x"`
-	Y       uint64                `json:"y"`
-	Planets map[uint64]PlanetInfo `json:"planets"`
+	X       consts.PlanetPositionX                `json:"x"`
+	Y       consts.PlanetPositionY                `json:"y"`
+	Planets map[consts.PlanetPositionZ]PlanetInfo `json:"planets"`
+	NPC     []NPC                                 `json:"npc"`
 }
 
 type PlanetInfo struct {
-	ID        uuid.UUID `json:"id"`
-	Type      string    `json:"type"`
-	UserLogin string    `json:"userLogin"`
-	HasMoon   bool      `json:"hasMoon"`
-	Debris    Debris    `json:"debris"`
+	ID         uuid.UUID `json:"id"`
+	Type       string    `json:"type"`
+	UserLogin  string    `json:"userLogin"`
+	HasMoon    bool      `json:"hasMoon"`
+	Debris     Debris    `json:"debris"`
+	AttackedAt time.Time `json:"attackedAt,omitzero"`
+}
+
+type NPC struct {
+	Z          consts.PlanetPositionZ `json:"z"`
+	AttackedAt time.Time              `json:"attackedAt"`
 }
 
 type ErrorResponse struct {

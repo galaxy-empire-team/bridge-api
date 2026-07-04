@@ -73,7 +73,7 @@ func run() error {
 	planetService := planetservice.New(planetStorage, researchStorage, resourceRepo, app.ComponentLogger("planetService"))
 	eventService := eventservice.New(txManager, eventStorage, planetStorage, researchStorage, resourceRepo, reg)
 	missionService := missionservice.New(txManager, planetStorage, missionStorage, researchStorage, resourceRepo, reg)
-	systemService := systemservice.New(systemStorage)
+	systemService := systemservice.New(planetStorage, systemStorage)
 	staticService := staticservice.New(reg)
 
 	// initialize http server

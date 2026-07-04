@@ -15,7 +15,7 @@ var (
 	ErrBuildTypeInvalid                = errors.New("invalid building type")
 	ErrBuildingNotFound                = errors.New("building not found on planet")
 	ErrNotEnoughResources              = errors.New("not enough resources")
-	ErrNoDebrisFound                   = errors.New("no debris found on planet")
+	ErrNoDebrisFound                   = errors.New("no debris found")
 	ErrEventIsAlreadyScheduled         = errors.New("event is already scheduled")
 	ErrEventIsNotScheduled             = errors.New("event is not scheduled")
 	ErrTooManyBuildingsInProgress      = errors.New("too many buildings are already in progress")
@@ -49,6 +49,9 @@ var (
 	ErrMissionIsReturning                 = errors.New("mission is already returning")
 	ErrCargoIsNotEmpty                    = errors.New("cargo is not empty")
 	ErrMistNotFound                       = errors.New("mist not found")
+	ErrNPCCooldownNotExpired              = errors.New("NPC cooldown not expired")
+	ErrNPCMissionAlreadyExists            = errors.New("NPC mission already exists")
+	ErrPlanetAttackedCooldownNotExpired   = errors.New("planet attacked cooldown not expired")
 
 	// Research errors
 	ErrResearchInProgress     = errors.New("research is already in progress")

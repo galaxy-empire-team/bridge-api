@@ -1,12 +1,23 @@
 package systemhandlers
 
-import "github.com/galaxy-empire-team/bridge-api/internal/models"
+import (
+	"github.com/samber/lo"
+
+	"github.com/galaxy-empire-team/bridge-api/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
+)
 
 func toSystemPlanetsResponse(sp models.SystemPlanets) SystemPlanetsResponse {
 	response := SystemPlanetsResponse{
 		X:       sp.System.X,
 		Y:       sp.System.Y,
-		Planets: make(map[uint64]PlanetInfo),
+		Planets: make(map[consts.PlanetPositionZ]PlanetInfo),
+		NPC: lo.Map(sp.NPC, func(npc models.NPCAttack, _ int) NPC {
+			return NPC{
+				Z:          npc.Z,
+				AttackedAt: npc.AttackedAt.UTC(),
+			}
+		}),
 	}
 
 	for _, planet := range sp.Planets {
@@ -19,6 +30,7 @@ func toSystemPlanetsResponse(sp models.SystemPlanets) SystemPlanetsResponse {
 				Metal:   planet.Debris.Metal,
 				Crystal: planet.Debris.Crystal,
 			},
+			AttackedAt: planet.AttackedAt.UTC(),
 		}
 	}
 

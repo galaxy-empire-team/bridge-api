@@ -8,22 +8,42 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
+const (
+	// Addition time to prevent fast missions
+	missionDurationAdd    = 3 * time.Minute
+	missionDurationAddSpy = 30 * time.Second
+)
+
 type coordinate interface {
 	consts.PlanetPositionX | consts.PlanetPositionY | consts.PlanetPositionZ
 }
 
-func (s *Service) calculateMissionDuration(planetFrom models.Coordinates, planetTo models.Coordinates, fleet []models.FleetUnitCount, speedMultiplier float64) (time.Duration, error) {
-	if speedMultiplier < consts.SpeedMultiplierMin || speedMultiplier > consts.SpeedMultiplierMax {
-		return 0, fmt.Errorf("invalid speed multiplier: %f", speedMultiplier)
+type durationInput struct {
+	PlanetFrom      models.Coordinates
+	PlanetTo        models.Coordinates
+	Fleet           []models.FleetUnitCount
+	SpeedMultiplier float64
+	IsSpyMission    bool
+}
+
+func (s *Service) calculateMissionDuration(input durationInput) (time.Duration, error) {
+	if input.SpeedMultiplier < consts.SpeedMultiplierMin || input.SpeedMultiplier > consts.SpeedMultiplierMax {
+		return 0, fmt.Errorf("invalid speed multiplier: %f", input.SpeedMultiplier)
 	}
 
-	minSpeed, err := s.calcMinSpeed(fleet)
+	minSpeed, err := s.calcMinSpeed(input.Fleet)
 	if err != nil {
 		return 0, fmt.Errorf("calcMinSpeed(): %w", err)
 	}
 
-	duration := calcDistanceDuration(planetFrom, planetTo) / time.Duration(minSpeed)
-	duration = time.Duration(float64(duration) / speedMultiplier)
+	duration := calcDistanceDuration(input.PlanetFrom, input.PlanetTo) / time.Duration(minSpeed)
+	duration = time.Duration(float64(duration) / input.SpeedMultiplier)
+
+	if input.IsSpyMission {
+		duration += missionDurationAddSpy
+	} else {
+		duration += missionDurationAdd
+	}
 
 	return duration, nil
 }

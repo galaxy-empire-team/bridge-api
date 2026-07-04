@@ -12,7 +12,7 @@ type Resources struct {
 }
 
 func (r Resources) IsEmpty() bool {
-	return r == Resources{}
+	return r.Metal == 0 && r.Crystal == 0 && r.Gas == 0
 }
 
 type UserResources struct {

@@ -52,7 +52,13 @@ func (s *Service) Spy(ctx context.Context, mission models.MissionStart) error {
 		return fmt.Errorf("planetStorage.GetCoordinates(): %w", err)
 	}
 
-	missionDuration, err := s.calculateMissionDuration(planetFromCoordinates, mission.PlanetTo, mission.Fleet, mission.SpeedMultiplier)
+	missionDuration, err := s.calculateMissionDuration(durationInput{
+		PlanetFrom:      planetFromCoordinates,
+		PlanetTo:        mission.PlanetTo,
+		Fleet:           mission.Fleet,
+		SpeedMultiplier: mission.SpeedMultiplier,
+		IsSpyMission:    true,
+	})
 	if err != nil {
 		return fmt.Errorf("calculateMissionDuration(): %w", err)
 	}

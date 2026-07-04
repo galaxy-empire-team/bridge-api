@@ -18,10 +18,13 @@ type planetStorage interface {
 	CheckPlanetBelongsToUser(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (bool, error)
 	GetUserPlanetsCount(ctx context.Context, userID uuid.UUID) (uint8, error)
 	GetCoordinates(ctx context.Context, planetID uuid.UUID) (models.Coordinates, error)
+	GetUserNPCAttackByZ(ctx context.Context, userID uuid.UUID, z consts.PlanetPositionZ) (*models.NPCAttack, error)
+	GetPlanetAttackedAt(ctx context.Context, coordinates models.Coordinates) (*time.Time, error)
 }
 
 type missionStorage interface {
 	GetCurrentUserMissions(ctx context.Context, userID uuid.UUID) ([]models.UserMission, error)
+	CheckNPCMissionExists(ctx context.Context, userID uuid.UUID, z consts.PlanetPositionZ) (bool, error)
 }
 
 type researchStorage interface {

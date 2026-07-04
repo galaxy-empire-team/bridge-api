@@ -64,6 +64,18 @@ func handleAttackError(c *gin.Context, err error) {
 		c.JSON(http.StatusForbidden, ErrorResponse{
 			Err: "not enough fleet units",
 		})
+	case errors.Is(err, models.ErrNPCCooldownNotExpired):
+		c.JSON(http.StatusForbidden, ErrorResponse{
+			Err: "NPC cooldown not expired",
+		})
+	case errors.Is(err, models.ErrNPCMissionAlreadyExists):
+		c.JSON(http.StatusForbidden, ErrorResponse{
+			Err: "NPC mission already exists",
+		})
+	case errors.Is(err, models.ErrPlanetAttackedCooldownNotExpired):
+		c.JSON(http.StatusForbidden, ErrorResponse{
+			Err: "planet attack cooldown not expired",
+		})
 	default:
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
 			Err: err.Error(),
