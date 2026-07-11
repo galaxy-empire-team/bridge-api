@@ -10,8 +10,9 @@ import (
 
 const (
 	// Addition time to prevent fast missions
-	missionDurationAdd    = 3 * time.Minute
-	missionDurationAddSpy = 30 * time.Second
+	missionDurationAddSpy  = 15 * time.Second
+	missionDurationAdd     = 3 * time.Minute
+	missionDurationAddMist = 40 * time.Minute
 )
 
 type coordinate interface {
@@ -23,7 +24,7 @@ type durationInput struct {
 	PlanetTo        models.Coordinates
 	Fleet           []models.FleetUnitCount
 	SpeedMultiplier float64
-	IsSpyMission    bool
+	Type            consts.MissionType
 }
 
 func (s *Service) calculateMissionDuration(input durationInput) (time.Duration, error) {
@@ -39,10 +40,13 @@ func (s *Service) calculateMissionDuration(input durationInput) (time.Duration, 
 	duration := calcDistanceDuration(input.PlanetFrom, input.PlanetTo) / time.Duration(minSpeed)
 	duration = time.Duration(float64(duration) / input.SpeedMultiplier)
 
-	if input.IsSpyMission {
+	switch input.Type {
+	case consts.MissionTypeSpy:
 		duration += missionDurationAddSpy
-	} else {
+	case consts.MissionTypeColonize:
 		duration += missionDurationAdd
+	case consts.MissionTypeMist:
+		duration += missionDurationAddMist
 	}
 
 	return duration, nil

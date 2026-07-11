@@ -29,7 +29,7 @@ func Recycle(missionService MissionService) func(c *gin.Context) {
 			return
 		}
 
-		err = missionService.Recycle(
+		mission, err := missionService.Recycle(
 			c.Request.Context(),
 			models.MissionStart{
 				UserID:          userID,
@@ -44,9 +44,7 @@ func Recycle(missionService MissionService) func(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"success": true,
-		})
+		c.JSON(http.StatusOK, fromUserMission(mission))
 	}
 }
 

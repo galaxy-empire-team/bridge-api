@@ -32,6 +32,7 @@ type FleetUnitStats struct {
 	CrystalCost   uint64
 	GasCost       uint64
 	CargoCapacity uint64
+	GasStartCost  uint64
 	BuildTimeSec  uint64
 }
 

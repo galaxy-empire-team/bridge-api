@@ -8,16 +8,29 @@ import (
 )
 
 func (s *MissionStorage) CancelMissionEvent(ctx context.Context, event models.CancelMission) error {
-	const deleteMissionEventQuery = `
+	const updateMissionEventQuery = `
 		UPDATE session_beta.event_missions
 		SET 	
-			is_returning = $2,
-			started_at = $3,
-			finished_at = $4
+			planet_to_x = $2,
+			planet_to_y = $3,
+			planet_to_z = $4,
+			is_returning = $5,
+			started_at = $6,
+			finished_at = $7
 		WHERE id = $1;
 	`
 
-	_, err := s.DB.Exec(ctx, deleteMissionEventQuery, event.ID, event.IsReturning, event.StartedAt, event.FinishedAt)
+	_, err := s.DB.Exec(
+		ctx,
+		updateMissionEventQuery,
+		event.ID,
+		event.PlanetTo.X,
+		event.PlanetTo.Y,
+		event.PlanetTo.Z,
+		event.IsReturning,
+		event.StartedAt,
+		event.FinishedAt,
+	)
 	if err != nil {
 		return fmt.Errorf("DB.Exec(): %w", err)
 	}

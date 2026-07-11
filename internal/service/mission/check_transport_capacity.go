@@ -4,10 +4,10 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
-func (s *Service) checkTransportCapacity(cargo models.Resources, fleet []models.FleetUnitCount, registry registryProvider) bool {
+func (s *Service) checkTransportCapacity(fleet []models.FleetUnitCount, cargo models.Resources) bool {
 	var cargoLimit uint64
 	for _, fleetUnit := range fleet {
-		fStats, err := registry.GetFleetUnitStatsByID(fleetUnit.ID)
+		fStats, err := s.registry.GetFleetUnitStatsByID(fleetUnit.ID)
 		if err != nil {
 			return false
 		}

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/galaxy-empire-team/bridge-api/internal/app"
+	"github.com/galaxy-empire-team/bridge-api/internal/application"
 	"github.com/galaxy-empire-team/bridge-api/internal/config"
 	"github.com/galaxy-empire-team/bridge-api/internal/db"
 	repository "github.com/galaxy-empire-team/bridge-api/internal/repository"
@@ -38,9 +38,9 @@ func run() error {
 		return fmt.Errorf("config.New(): %w", err)
 	}
 
-	ctx, app, err := app.New(cfg.App)
+	ctx, app, err := application.New(cfg.App)
 	if err != nil {
-		return fmt.Errorf("app.New(): %w", err)
+		return fmt.Errorf("application.New(): %w", err)
 	}
 
 	// initialize pgx infra

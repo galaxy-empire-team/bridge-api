@@ -11,9 +11,9 @@ import (
 )
 
 func (s *Service) CancelMission(ctx context.Context, userID uuid.UUID, missionID uint64) (models.CancelMission, error) {
-	updatedMissionEvent := models.CancelMission{}
+	canceledMissionEvent := models.CancelMission{}
 
-	return updatedMissionEvent, s.txManager.ExecMissionTx(ctx, func(ctx context.Context, storages TxStorages) error {
+	return canceledMissionEvent, s.txManager.ExecMissionTx(ctx, func(ctx context.Context, storages TxStorages) error {
 		missionEvent, err := storages.GetMissionForUpdate(ctx, userID, missionID)
 		if err != nil {
 			return fmt.Errorf("missionStorage.GetMissionForUpdate(): %w", err)
@@ -23,16 +23,23 @@ func (s *Service) CancelMission(ctx context.Context, userID uuid.UUID, missionID
 			return models.ErrMissionIsReturning
 		}
 
+		planetFromCoordinates, err := s.planetStorage.GetCoordinates(ctx, missionEvent.PlanetFrom)
+		if err != nil {
+			return fmt.Errorf("planetStorage.GetCoordinates(): %w", err)
+		}
+
 		now := time.Now().UTC()
 
-		updatedMissionEvent = models.CancelMission{
+		canceledMissionEvent = models.CancelMission{
 			ID:          missionEvent.ID,
+			PlanetFrom:  uuid.Nil,
+			PlanetTo:    planetFromCoordinates,
 			IsReturning: true,
 			StartedAt:   now,
 			FinishedAt:  now.Add(now.Sub(missionEvent.StartedAt)),
 		}
 
-		err = storages.CancelMissionEvent(ctx, updatedMissionEvent)
+		err = storages.CancelMissionEvent(ctx, canceledMissionEvent)
 		if err != nil {
 			return fmt.Errorf("missionStorage.CancelMissionEvent(): %w", err)
 		}

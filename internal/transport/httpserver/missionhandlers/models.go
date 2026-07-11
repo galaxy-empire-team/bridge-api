@@ -72,7 +72,7 @@ type UserMissionsResponse struct {
 
 type Mission struct {
 	ID          uint64           `json:"id"`
-	Type        consts.MissionID `json:"type"`
+	MissionID   consts.MissionID `json:"missionId"`
 	PlanetFrom  Coordinates      `json:"planetFrom"`
 	PlanetTo    Coordinates      `json:"planetTo"`
 	IsReturning bool             `json:"isReturning"`

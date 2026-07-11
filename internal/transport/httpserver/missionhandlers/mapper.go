@@ -42,21 +42,25 @@ func toFleetUnits(fleet []FleetUnitCount) []models.FleetUnitCount {
 	return units
 }
 
+func fromUserMission(m models.UserMission) Mission {
+	return Mission{
+		ID:          m.ID,
+		MissionID:   m.MissionID,
+		PlanetFrom:  fromCoordinatesModel(m.PlanetFrom),
+		PlanetTo:    fromCoordinatesModel(m.PlanetTo),
+		IsReturning: m.IsReturning,
+		StartedAt:   m.StartedAt.UTC(),
+		FinishedAt:  m.FinishedAt.UTC(),
+	}
+}
+
 func fromUserMissions(userMissions []models.UserMission) UserMissionsResponse {
 	resp := UserMissionsResponse{
 		Missions: make([]Mission, 0, len(userMissions)),
 	}
 
 	for _, m := range userMissions {
-		resp.Missions = append(resp.Missions, Mission{
-			ID:          m.ID,
-			Type:        m.Type,
-			PlanetFrom:  fromCoordinatesModel(m.PlanetFrom),
-			PlanetTo:    fromCoordinatesModel(m.PlanetTo),
-			IsReturning: m.IsReturning,
-			StartedAt:   m.StartedAt,
-			FinishedAt:  m.FinishedAt,
-		})
+		resp.Missions = append(resp.Missions, fromUserMission(m))
 	}
 
 	return resp

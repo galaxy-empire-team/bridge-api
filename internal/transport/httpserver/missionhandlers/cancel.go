@@ -38,8 +38,8 @@ func CancelMissionEvent(missionService MissionService) func(c *gin.Context) {
 		c.JSON(http.StatusOK, CancelMissionEventResponse{
 			ID:          updatedMissionEvent.ID,
 			IsReturning: updatedMissionEvent.IsReturning,
-			StartedAt:   updatedMissionEvent.StartedAt,
-			FinishedAt:  updatedMissionEvent.FinishedAt,
+			StartedAt:   updatedMissionEvent.StartedAt.UTC(),
+			FinishedAt:  updatedMissionEvent.FinishedAt.UTC(),
 		})
 	}
 }

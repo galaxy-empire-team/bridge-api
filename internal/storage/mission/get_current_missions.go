@@ -42,7 +42,7 @@ func (s *MissionStorage) GetCurrentUserMissions(ctx context.Context, userID uuid
 		var mission models.UserMission
 		err = rows.Scan(
 			&mission.ID,
-			&mission.Type,
+			&mission.MissionID,
 			&mission.PlanetFrom.X,
 			&mission.PlanetFrom.Y,
 			&mission.PlanetFrom.Z,

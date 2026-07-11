@@ -142,6 +142,7 @@ func (r *Registry) fillFleetStats(ctx context.Context, pool *pgxpool.Pool) error
 			metal_cost,
 			crystal_cost,
 			gas_cost,
+			gas_start_cost,
 			build_time_s
 		FROM session_beta.s_fleet;
 	`
@@ -164,6 +165,7 @@ func (r *Registry) fillFleetStats(ctx context.Context, pool *pgxpool.Pool) error
 			&fleetUnitStats.MetalCost,
 			&fleetUnitStats.CrystalCost,
 			&fleetUnitStats.GasCost,
+			&fleetUnitStats.GasStartCost,
 			&fleetUnitStats.BuildTimeSec,
 		)
 		if err != nil {

@@ -29,7 +29,7 @@ func Attack(missionService MissionService) func(c *gin.Context) {
 			return
 		}
 
-		err = missionService.Attack(
+		event, err := missionService.Attack(
 			c.Request.Context(),
 			models.MissionStart{
 				UserID:          userID,
@@ -44,9 +44,7 @@ func Attack(missionService MissionService) func(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"success": true,
-		})
+		c.JSON(http.StatusOK, fromUserMission(event))
 	}
 }
 

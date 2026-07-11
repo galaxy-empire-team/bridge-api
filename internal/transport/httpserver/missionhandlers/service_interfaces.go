@@ -10,11 +10,11 @@ import (
 
 type MissionService interface {
 	GetCurrentMissions(ctx context.Context, userID uuid.UUID) ([]models.UserMission, error)
-	Colonize(ctx context.Context, mission models.MissionStart) error
-	Attack(ctx context.Context, mission models.MissionStart) error
-	Spy(ctx context.Context, mission models.MissionStart) error
-	Transport(ctx context.Context, mission models.MissionStart) error
-	Recycle(ctx context.Context, mission models.MissionStart) error
-	Mist(ctx context.Context, mission models.MissionStart) error
+	Colonize(ctx context.Context, mission models.MissionStart) (models.UserMission, error)
+	Attack(ctx context.Context, mission models.MissionStart) (models.UserMission, error)
+	Spy(ctx context.Context, mission models.MissionStart) (models.UserMission, error)
+	Transport(ctx context.Context, mission models.MissionStart) (models.UserMission, error)
+	Recycle(ctx context.Context, mission models.MissionStart) (models.UserMission, error)
+	Mist(ctx context.Context, mission models.MissionStart) (models.UserMission, error)
 	CancelMission(ctx context.Context, userID uuid.UUID, missionID uint64) (models.CancelMission, error)
 }

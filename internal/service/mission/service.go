@@ -38,7 +38,7 @@ type TxStorages interface {
 	GetResourcesForUpdate(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
 	SetResources(ctx context.Context, planetID uuid.UUID, updatedResources models.Resources) error
 	// --- missionStorage ---
-	CreateMissionEvent(ctx context.Context, colonizeEvent models.MissionEvent) error
+	CreateMissionEvent(ctx context.Context, colonizeEvent models.MissionEvent) (uint64, error)
 	GetMissionForUpdate(ctx context.Context, userID uuid.UUID, id uint64) (models.CancelMission, error)
 	CancelMissionEvent(ctx context.Context, event models.CancelMission) error
 }
@@ -51,7 +51,6 @@ type repository interface {
 	CheckPlanetOwner(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) error
 	GetResearchByType(ctx context.Context, userID uuid.UUID, researchType consts.ResearchType) (registry.ResearchStats, error)
 	RecalcResources(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) error
-	RecalcResourcesWithUpdatedTime(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, updatedAt time.Time) error
 }
 
 type registryProvider interface {

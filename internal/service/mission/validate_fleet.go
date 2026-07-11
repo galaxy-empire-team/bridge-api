@@ -7,7 +7,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
 )
 
-func (s *Service) checkFleetValid(fleet []models.FleetUnitCount) error {
+func (s *Service) validateFleet(fleet []models.FleetUnitCount, cargo models.Resources) error {
 	if len(fleet) == 0 {
 		return models.ErrFleetCannotBeEmpty
 	}
@@ -31,6 +31,12 @@ func (s *Service) checkFleetValid(fleet []models.FleetUnitCount) error {
 		}
 
 		duplicateFleetUnitIDs[fleetUnit.ID] = struct{}{}
+	}
+
+	if !cargo.IsEmpty() {
+		if s.checkTransportCapacity(fleet, cargo) {
+			return models.ErrTransportCargoExceedsFleetCapacity
+		}
 	}
 
 	return nil

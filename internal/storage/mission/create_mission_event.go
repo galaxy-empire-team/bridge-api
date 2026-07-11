@@ -8,7 +8,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
-func (s *MissionStorage) CreateMissionEvent(ctx context.Context, missionEvent models.MissionEvent) error {
+func (s *MissionStorage) CreateMissionEvent(ctx context.Context, missionEvent models.MissionEvent) (uint64, error) {
 	const createEventQuery = `
 		INSERT INTO session_beta.event_missions (
 			mission_id,
@@ -35,20 +35,22 @@ func (s *MissionStorage) CreateMissionEvent(ctx context.Context, missionEvent mo
 			$10,   -- started_at
 			$11	   -- finished_at
 		)  
+		RETURNING id
 	`
 
 	fleetJson, err := json.Marshal(toFleetUnits(missionEvent.Fleet))
 	if err != nil {
-		return fmt.Errorf("json.Marshal(): %w", err)
+		return 0, fmt.Errorf("json.Marshal(): %w", err)
 	}
 
 	cargoJson, err := json.Marshal(toResources(missionEvent.Cargo))
 	if err != nil {
-		return fmt.Errorf("json.Marshal(): %w", err)
+		return 0, fmt.Errorf("json.Marshal(): %w", err)
 	}
 
-	_, err = s.DB.Exec(ctx, createEventQuery,
-		missionEvent.Type,
+	var eventID uint64
+	err = s.DB.QueryRow(ctx, createEventQuery,
+		missionEvent.MissionID,
 		missionEvent.UserID,
 		missionEvent.PlanetFrom,
 		missionEvent.PlanetTo.X,
@@ -59,10 +61,10 @@ func (s *MissionStorage) CreateMissionEvent(ctx context.Context, missionEvent mo
 		missionEvent.IsReturning,
 		missionEvent.StartedAt,
 		missionEvent.FinishedAt,
-	)
+	).Scan(&eventID)
 	if err != nil {
-		return fmt.Errorf("DB.Exec(): %w", err)
+		return 0, fmt.Errorf("DB.QueryRow(): %w", err)
 	}
 
-	return nil
+	return eventID, nil
 }

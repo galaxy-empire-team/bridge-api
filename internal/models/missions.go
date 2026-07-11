@@ -12,7 +12,7 @@ type MissionEvent struct {
 	UserID      uuid.UUID
 	PlanetFrom  uuid.UUID
 	PlanetTo    Coordinates
-	Type        consts.MissionID
+	MissionID   consts.MissionID
 	Fleet       []FleetUnitCount
 	Cargo       Resources
 	IsReturning bool
@@ -22,6 +22,8 @@ type MissionEvent struct {
 
 type CancelMission struct {
 	ID          uint64
+	PlanetFrom  uuid.UUID
+	PlanetTo    Coordinates
 	IsReturning bool
 	StartedAt   time.Time
 	FinishedAt  time.Time
@@ -29,7 +31,7 @@ type CancelMission struct {
 
 type UserMission struct {
 	ID          uint64
-	Type        consts.MissionID
+	MissionID   consts.MissionID
 	PlanetFrom  Coordinates
 	PlanetTo    Coordinates
 	IsReturning bool
