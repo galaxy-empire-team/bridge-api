@@ -85,3 +85,9 @@ type BoostStats struct {
 	Tier      consts.BoostTier
 	DurationS uint64
 }
+
+type MoonBoostStats struct {
+	ID         consts.MoonBoostID
+	MatterCost uint64
+	DurationS  uint64
+}

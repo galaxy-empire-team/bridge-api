@@ -1,0 +1,44 @@
+package planethandlers
+
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/middleware"
+)
+
+func GetMoonInfo(planetService PlanetService) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		userID, err := middleware.RetrieveUserID(c)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, ErrorResponse{
+				Err: err.Error(),
+			})
+
+			return
+		}
+
+		var req PlanetIDRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, ErrorResponse{
+				Err: "invalid request body",
+			})
+			return
+		}
+
+		moonInfo, err := planetService.GetMoonInfo(c.Request.Context(), userID, req.PlanetID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, ErrorResponse{
+				Err: err.Error(),
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, PlanetMoonInfoResponse{
+			PlanetID:       moonInfo.PlanetID,
+			HasMoon:        moonInfo.HasMoon,
+			ActivateUntill: moonInfo.ActivateUntill,
+		})
+	}
+}

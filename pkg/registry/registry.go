@@ -17,6 +17,7 @@ type Registry struct {
 	missions      map[consts.MissionID]consts.MissionType
 	notifications map[consts.NotificationID]consts.NotificationType
 	boosts        map[consts.BoostID]BoostStats
+	moonBoosts    map[consts.MoonBoostID]MoonBoostStats
 	npcStats      map[consts.PlanetPositionZ]NPCStats
 
 	zeroLvlBuildings  map[consts.BuildingType]consts.BuildingID
@@ -59,6 +60,11 @@ func New(ctx context.Context, connPool *pgxpool.Pool) (*Registry, error) {
 	err = r.fillBoostStats(ctx, connPool)
 	if err != nil {
 		return nil, fmt.Errorf("fillBoostStats(): %w", err)
+	}
+
+	err = r.fillMoonBoostStats(ctx, connPool)
+	if err != nil {
+		return nil, fmt.Errorf("fillMoonBoostStats(): %w", err)
 	}
 
 	return r, nil
@@ -433,6 +439,42 @@ func (r *Registry) fillBoostStats(ctx context.Context, pool *pgxpool.Pool) error
 		}
 
 		r.boosts[boostStats.ID] = boostStats
+	}
+
+	if err = rows.Err(); err != nil {
+		return fmt.Errorf("rows.Err(): %w", err)
+	}
+
+	return nil
+}
+
+func (r *Registry) fillMoonBoostStats(ctx context.Context, pool *pgxpool.Pool) error {
+	const getMoonBoostStatsQuery = `
+		SELECT 
+			id,
+			matter_cost,
+			duration_s
+		FROM session_beta.s_moon_boosts;
+	`
+
+	r.moonBoosts = make(map[consts.MoonBoostID]MoonBoostStats)
+	rows, err := pool.Query(ctx, getMoonBoostStatsQuery)
+	if err != nil {
+		return fmt.Errorf("pool.Query(): %w", err)
+	}
+
+	for rows.Next() {
+		var moonBoostStats MoonBoostStats
+		err = rows.Scan(
+			&moonBoostStats.ID,
+			&moonBoostStats.MatterCost,
+			&moonBoostStats.DurationS,
+		)
+		if err != nil {
+			return fmt.Errorf("rows.Scan(): %w", err)
+		}
+
+		r.moonBoosts[moonBoostStats.ID] = moonBoostStats
 	}
 
 	if err = rows.Err(); err != nil {

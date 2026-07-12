@@ -45,3 +45,13 @@ func newEventStorageSet(tx pgx.Tx) eventStorageSet {
 		EventStorage:  eventstorage.New(tx),
 	}
 }
+
+type planetStorageSet struct {
+	*planetstorage.PlanetStorage
+}
+
+func newPlanetStorageSet(tx pgx.Tx) planetStorageSet {
+	return planetStorageSet{
+		PlanetStorage: planetstorage.New(tx),
+	}
+}

@@ -105,3 +105,15 @@ type UserBoost struct {
 	ID    consts.BoostID `json:"id"`
 	Count uint64         `json:"count"`
 }
+
+type PlanetMoonInfoResponse struct {
+	PlanetID       uuid.UUID `json:"planetID"`
+	HasMoon        bool      `json:"hasMoon"`
+	ActivateUntill time.Time `json:"activateUntill"`
+}
+
+type ActivateMoonRequest struct {
+	PlanetID uuid.UUID          `json:"planetID"`
+	BoostID  consts.MoonBoostID `json:"boostID"`
+	Count    uint64             `json:"count"`
+}

@@ -30,6 +30,8 @@ var (
 	ErrBoostNotFound                   = errors.New("boost not found")
 	ErrNotEnoughBoosts                 = errors.New("not enough boosts")
 	ErrUserAlreadyHasBuilding          = errors.New("user already has building of this type")
+	ErrMoonNotFound                    = errors.New("moon not found")
+	ErrNotEnoughMatter                 = errors.New("not enough matter")
 
 	// Mission errors
 	ErrColonizePlanetAlreadyExists        = errors.New("planet already exists at the target coordinates")

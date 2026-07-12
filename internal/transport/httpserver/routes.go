@@ -29,6 +29,8 @@ func (hs *HttpServer) RegisterRoutes(
 	hs.apiRouter.GET("/planet/resources", planethandlers.GetPlanetResources(planetService))
 	hs.apiRouter.GET("/planet/userresources", planethandlers.GetUserResources(planetService))
 	hs.apiRouter.GET("/planet/buildings", planethandlers.GetPlanetBuildings(planetService))
+	hs.apiRouter.GET("/planet/moon", planethandlers.GetMoonInfo(planetService))
+	hs.apiRouter.POST("/planet/moon/activate", planethandlers.ActivateMoon(planetService))
 	hs.apiRouter.POST("/planet/capitol/colonize", planethandlers.ColonizeCapitol(planetService))
 
 	// ----- Event Routes -----

@@ -10,6 +10,7 @@ import (
 
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
+	"github.com/galaxy-empire-team/bridge-api/pkg/registry"
 )
 
 type planetStorage interface {
@@ -28,6 +29,8 @@ type planetStorage interface {
 	ColonizePlanet(ctx context.Context, planet models.Planet, operationID uint64) error
 	GetUserResources(ctx context.Context, userID uuid.UUID) (models.UserResources, error)
 	GetUserBoosts(ctx context.Context, userID uuid.UUID) ([]models.UserBoost, error)
+	CheckPlanetHasMoon(ctx context.Context, planetID uuid.UUID) (bool, error)
+	GetMoonActivationForUpdate(ctx context.Context, planetID uuid.UUID) (models.MoonInfo, error)
 }
 
 type researchStorage interface {
@@ -41,6 +44,22 @@ type repository interface {
 	RecalcResourcesWithUpdatedTime(ctx context.Context, userID uuid.UUID, planetID uuid.UUID, updatedAt time.Time) error
 }
 
+// Separate storage methods that executes inside a transaction
+type TxStorages interface {
+	GetUserResourcesForUpdate(ctx context.Context, userID uuid.UUID) (models.UserResources, error)
+	SetUserMatter(ctx context.Context, userID uuid.UUID, matter uint64) error
+	GetMoonActivationForUpdate(ctx context.Context, planetID uuid.UUID) (models.MoonInfo, error)
+	SetMoonActivation(ctx context.Context, planetID uuid.UUID, activateUntill time.Time) error
+}
+
+type txManager interface {
+	ExecPlanetTx(ctx context.Context, fn func(ctx context.Context, storages TxStorages) error) error
+}
+
+type registryProvider interface {
+	GetMoonBoostStatsByID(id consts.MoonBoostID) (registry.MoonBoostStats, error)
+}
+
 //go:generate mockery --name=randGenerator --filename=rand_generator.go --exported --with-expecter
 type randGenerator interface {
 	Uint32() uint32
@@ -50,6 +69,8 @@ type Service struct {
 	planetStorage   planetStorage
 	researchStorage researchStorage
 	repository      repository
+	txManager       txManager
+	registry        registryProvider
 	randomGenerator randGenerator
 	log             *zap.Logger
 }
@@ -58,6 +79,8 @@ func New(
 	planetStorage planetStorage,
 	researchStorage researchStorage,
 	repository repository,
+	txManager txManager,
+	registry registryProvider,
 	log *zap.Logger,
 ) *Service {
 	gen := rand.New(rand.NewSource((time.Now().UnixNano())))
@@ -66,6 +89,8 @@ func New(
 		planetStorage:   planetStorage,
 		researchStorage: researchStorage,
 		repository:      repository,
+		txManager:       txManager,
+		registry:        registry,
 		randomGenerator: gen,
 		log:             log,
 	}
