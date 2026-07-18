@@ -35,7 +35,7 @@ func LoggingMiddleware(logger *zap.Logger) func(c *gin.Context) {
 			return
 		}
 
-		logger.Info("processing success",
+		logger.Info("success",
 			zap.String("method", c.Request.Method),
 			zap.String("path", c.Request.URL.Path),
 			zap.String("ip", c.ClientIP()),

@@ -11,12 +11,14 @@ import (
 	eventservice "github.com/galaxy-empire-team/bridge-api/internal/service/event"
 	missionservice "github.com/galaxy-empire-team/bridge-api/internal/service/mission"
 	planetservice "github.com/galaxy-empire-team/bridge-api/internal/service/planet"
+	ratingservice "github.com/galaxy-empire-team/bridge-api/internal/service/rating"
 	staticservice "github.com/galaxy-empire-team/bridge-api/internal/service/static"
 	systemservice "github.com/galaxy-empire-team/bridge-api/internal/service/system"
 	userservice "github.com/galaxy-empire-team/bridge-api/internal/service/user"
 	eventstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/event"
 	missionstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/mission"
 	planetstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/planet"
+	ratingstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/rating"
 	researchstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/research"
 	systemstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/system"
 	"github.com/galaxy-empire-team/bridge-api/internal/storage/txmanager"
@@ -58,6 +60,7 @@ func run() error {
 	missionStorage := missionstorage.New(db)
 	eventStorage := eventstorage.New(db)
 	researchStorage := researchstorage.New(db)
+	ratingStorage := ratingstorage.New(db)
 
 	// initialize registry
 	reg, err := registry.New(ctx, db.Pool)
@@ -70,6 +73,7 @@ func run() error {
 
 	// initialize services
 	userService := userservice.New(userStorage)
+	ratingService := ratingservice.New(ratingStorage)
 	planetService := planetservice.New(planetStorage, researchStorage, resourceRepo, txManager, reg, app.ComponentLogger("planetService"))
 	eventService := eventservice.New(txManager, eventStorage, planetStorage, researchStorage, resourceRepo, reg)
 	missionService := missionservice.New(txManager, planetStorage, missionStorage, researchStorage, resourceRepo, reg)
@@ -79,7 +83,7 @@ func run() error {
 	// initialize http server
 	httpServer := httpserver.New(app.ComponentLogger("httpserver"))
 
-	httpServer.RegisterRoutes(userService, planetService, eventService, missionService, systemService, staticService)
+	httpServer.RegisterRoutes(userService, ratingService, planetService, eventService, missionService, systemService, staticService)
 
 	shutdownFunc, err := httpServer.Start(ctx, cfg.HTTPServer)
 	if err != nil {

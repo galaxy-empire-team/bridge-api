@@ -4,6 +4,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/eventhandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/missionhandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/planethandlers"
+	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/ratinghandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/statichandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/systemhandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/userhandlers"
@@ -11,6 +12,7 @@ import (
 
 func (hs *HttpServer) RegisterRoutes(
 	userService userhandlers.UserService,
+	ratingService ratinghandlers.RatingService,
 	planetService planethandlers.PlanetService,
 	eventService eventhandlers.EventService,
 	missionService missionhandlers.MissionService,
@@ -19,6 +21,9 @@ func (hs *HttpServer) RegisterRoutes(
 ) {
 	// ----- User Routes -----
 	hs.apiRouter.POST("/user/create", userhandlers.CreateUser(userService))
+
+	// ----- Rating Routes -----
+	hs.apiRouter.GET("/rating", ratinghandlers.GetRating(ratingService))
 
 	// ----- Planet Routes -----
 	hs.apiRouter.GET("/planet", planethandlers.GetPlanet(planetService))
