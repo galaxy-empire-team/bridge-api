@@ -21,14 +21,15 @@ type CapitolIDResponse struct {
 }
 
 type PlanetResponse struct {
-	PlanetID    uuid.UUID       `json:"planetID"`
-	X           uint8           `json:"x"`
-	Y           uint16          `json:"y"`
-	Z           uint8           `json:"z"`
-	Resources   PlanetResources `json:"resources"`
-	IsCapitol   bool            `json:"isCapitol"`
-	HasMoon     bool            `json:"hasMoon"`
-	ColonizedAt time.Time       `json:"colonizedAt"`
+	PlanetID        uuid.UUID       `json:"planetID"`
+	X               uint8           `json:"x"`
+	Y               uint16          `json:"y"`
+	Z               uint8           `json:"z"`
+	Resources       PlanetResources `json:"resources"`
+	IsCapitol       bool            `json:"isCapitol"`
+	HasMoon         bool            `json:"hasMoon"`
+	MoonActiveUntil time.Time       `json:"moonActiveUntil,omitzero"`
+	ColonizedAt     time.Time       `json:"colonizedAt"`
 }
 
 type BuildingInProgress struct {

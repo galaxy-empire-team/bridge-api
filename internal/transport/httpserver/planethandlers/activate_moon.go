@@ -44,7 +44,7 @@ func ActivateMoon(planetService PlanetService) func(c *gin.Context) {
 		c.JSON(http.StatusOK, PlanetMoonInfoResponse{
 			PlanetID:       moonInfo.PlanetID,
 			HasMoon:        moonInfo.HasMoon,
-			ActivateUntill: moonInfo.ActivateUntill,
+			ActivateUntill: moonInfo.ActivateUntill.UTC(),
 		})
 	}
 }

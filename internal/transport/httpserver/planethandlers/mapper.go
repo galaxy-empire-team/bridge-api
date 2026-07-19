@@ -10,11 +10,12 @@ import (
 
 func toPlanetResponse(p models.Planet) PlanetResponse {
 	return PlanetResponse{
-		PlanetID: p.ID,
-		X:        p.Coordinates.X.ToUint8(),
-		Y:        p.Coordinates.Y.ToUint16(),
-		Z:        p.Coordinates.Z.ToUint8(),
-		HasMoon:  p.HasMoon,
+		PlanetID:        p.ID,
+		X:               p.Coordinates.X.ToUint8(),
+		Y:               p.Coordinates.Y.ToUint16(),
+		Z:               p.Coordinates.Z.ToUint8(),
+		HasMoon:         p.HasMoon,
+		MoonActiveUntil: p.MoonActiveUntil.UTC(),
 		Resources: PlanetResources{
 			Metal:     p.Resources.Metal,
 			Crystal:   p.Resources.Crystal,
@@ -22,7 +23,7 @@ func toPlanetResponse(p models.Planet) PlanetResponse {
 			UpdatedAt: p.Resources.UpdatedAt.UTC(),
 		},
 		IsCapitol:   p.IsCapitol,
-		ColonizedAt: p.ColonizedAt,
+		ColonizedAt: p.ColonizedAt.UTC(),
 	}
 }
 

@@ -22,11 +22,13 @@ func (r *PlanetStorage) GetPlanet(ctx context.Context, planetID uuid.UUID) (mode
 			r.gas,
 			r.updated_at,
 			p.has_moon,
+			pm.active_until,
 			p.is_capitol,
 			p.colonized_at,
 			p.updated_at
 		FROM session_beta.planets p
 		JOIN session_beta.planet_resources r ON p.id = r.planet_id
+		JOIN session_beta.planet_moons pm ON p.id = pm.planet_id
 		WHERE p.id = $1;
 	`
 
@@ -42,6 +44,7 @@ func (r *PlanetStorage) GetPlanet(ctx context.Context, planetID uuid.UUID) (mode
 		&planet.Resources.Gas,
 		&planet.Resources.UpdatedAt,
 		&planet.HasMoon,
+		&planet.MoonActiveUntil,
 		&planet.IsCapitol,
 		&colonizedAt,
 		&updatedAt,
