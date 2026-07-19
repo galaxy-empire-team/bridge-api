@@ -2,6 +2,7 @@ package planet
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -18,10 +19,10 @@ const (
 	attemptsCount       = 3
 )
 
-func (s *Service) ColonizeCapitol(ctx context.Context, userID uuid.UUID) error {
+func (s *Service) ColonizeCapitol(ctx context.Context, userID uuid.UUID) (uuid.UUID, error) {
 	planetID, err := uuid.NewV7()
 	if err != nil {
-		return fmt.Errorf("uuid.NewV7(): %w", err)
+		return uuid.Nil, fmt.Errorf("uuid.NewV7(): %w", err)
 	}
 
 	for i := 0; i < attemptsCount; i++ {
@@ -31,7 +32,7 @@ func (s *Service) ColonizeCapitol(ctx context.Context, userID uuid.UUID) error {
 		}
 		colonizedSystemPlanets, err := s.planetStorage.GetColonizedCoordinates(ctx, position)
 		if err != nil {
-			return fmt.Errorf("planetStorage.GetColonizedCoordinates(): %w", err)
+			return uuid.Nil, fmt.Errorf("planetStorage.GetColonizedCoordinates(): %w", err)
 		}
 
 		availablePositionZ, ok := s.findAvailablePositionZ(colonizedSystemPlanets)
@@ -51,9 +52,16 @@ func (s *Service) ColonizeCapitol(ctx context.Context, userID uuid.UUID) error {
 
 		err = s.planetStorage.ColonizePlanet(ctx, planetToColonize, colonizeOperationID)
 		if err != nil {
-			return fmt.Errorf("planetStorage.ColonizePlanet(): %w", err)
+			if errors.Is(err, models.ErrPlanetCoordinatesAlreadyTaken) {
+				s.log.Info("colonization failed, coordinates already taken", zap.Int("attempt", i))
+				continue
+			}
+
+			return uuid.Nil, fmt.Errorf("planetStorage.ColonizePlanet(): %w", err)
 		}
+
+		break
 	}
 
-	return nil
+	return planetID, nil
 }

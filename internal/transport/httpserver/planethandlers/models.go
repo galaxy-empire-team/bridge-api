@@ -16,6 +16,10 @@ type PlanetIDRequest struct {
 	PlanetID uuid.UUID `json:"planetID"`
 }
 
+type PlanetIDResponse struct {
+	PlanetID uuid.UUID `json:"planetID"`
+}
+
 type CapitolIDResponse struct {
 	CapitolPlanetID uuid.UUID `json:"capitolID"`
 }

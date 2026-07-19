@@ -6,14 +6,14 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
-type userRepository interface {
-	CreateUser(ctx context.Context, user models.User) (models.User, error)
+type userStorage interface {
+	CreateUser(ctx context.Context, user models.User) error
 }
 
 type Service struct {
-	userRepo userRepository
+	userStorage userStorage
 }
 
-func New(repo userRepository) *Service {
-	return &Service{userRepo: repo}
+func New(userStorage userStorage) *Service {
+	return &Service{userStorage: userStorage}
 }

@@ -8,31 +8,11 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 
+	"github.com/galaxy-empire-team/bridge-api/internal/db"
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 func (r *PlanetStorage) ColonizePlanet(ctx context.Context, planet models.Planet, operationID uint64) error {
-	tx, err := r.DB.Begin(ctx)
-	if err != nil {
-		return fmt.Errorf("pool.Begin(): %w", err)
-	}
-
-	defer func() {
-		rollbackErr := tx.Rollback(ctx)
-
-		if rollbackErr == nil || errors.Is(rollbackErr, pgx.ErrTxClosed) {
-			return
-		}
-
-		if err != nil {
-			err = fmt.Errorf("%w; tx.Rollback(): %w", err, rollbackErr)
-
-			return
-		}
-
-		err = fmt.Errorf("tx.Rollback(): %w", rollbackErr)
-	}()
-
 	if operationID != 0 {
 		isAvailable, err := r.CheckIsCreationAvailable(ctx, operationID)
 		if err != nil {
@@ -46,19 +26,26 @@ func (r *PlanetStorage) ColonizePlanet(ctx context.Context, planet models.Planet
 
 	planetToColonize := fromPlanetModel(planet)
 
-	err = r.createPlanetRow(ctx, tx, planetToColonize)
-	if err != nil {
-		return fmt.Errorf("createPlanet(): %w", err)
+	cp, ok := r.DB.(*db.ConnPool)
+	if !ok {
+		return fmt.Errorf("DB is not a *db.ConnPool")
 	}
 
-	err = r.createResourcesRow(ctx, tx, planetToColonize)
-	if err != nil {
-		return fmt.Errorf("createResources(): %w", err)
-	}
+	err := cp.ExecTx(ctx, func(ctx context.Context, tx pgx.Tx) error {
+		err := r.createPlanetRow(ctx, tx, planetToColonize)
+		if err != nil {
+			return fmt.Errorf("createPlanet(): %w", err)
+		}
 
-	err = tx.Commit(ctx)
+		err = r.createResourcesRow(ctx, tx, planetToColonize)
+		if err != nil {
+			return fmt.Errorf("createResources(): %w", err)
+		}
+
+		return nil
+	})
 	if err != nil {
-		return fmt.Errorf("tx.Commit(): %w", err)
+		return fmt.Errorf("ExecTx(): %w", err)
 	}
 
 	return nil

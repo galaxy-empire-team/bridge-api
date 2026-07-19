@@ -21,14 +21,14 @@ func ColonizeCapitol(planetService PlanetService) func(c *gin.Context) {
 			return
 		}
 
-		err = planetService.ColonizeCapitol(c.Request.Context(), userID)
+		planetID, err := planetService.ColonizeCapitol(c.Request.Context(), userID)
 		if err != nil {
 			handleColonizeCapitolError(c, err)
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"status": "success",
+		c.JSON(http.StatusOK, PlanetIDResponse{
+			PlanetID: planetID,
 		})
 	}
 }

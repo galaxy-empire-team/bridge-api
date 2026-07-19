@@ -20,10 +20,10 @@ func (s *Service) CreateUser(ctx context.Context, user models.User) (models.User
 		Login: user.Login,
 	}
 
-	createdUser, err := s.userRepo.CreateUser(ctx, userToCreate)
+	err = s.userStorage.CreateUser(ctx, userToCreate)
 	if err != nil {
-		return models.User{}, fmt.Errorf("userRepo.CreateUser(): %w", err)
+		return models.User{}, fmt.Errorf("userStorage.CreateUser(): %w", err)
 	}
 
-	return createdUser, nil
+	return userToCreate, nil
 }

@@ -28,12 +28,13 @@ func (r *PlanetStorage) GetPlanet(ctx context.Context, planetID uuid.UUID) (mode
 			p.updated_at
 		FROM session_beta.planets p
 		JOIN session_beta.planet_resources r ON p.id = r.planet_id
-		JOIN session_beta.planet_moons pm ON p.id = pm.planet_id
+		LEFT JOIN session_beta.planet_moons pm ON p.id = pm.planet_id
 		WHERE p.id = $1;
 	`
 
 	var planet models.Planet
 	var colonizedAt, updatedAt time.Time
+	var moonActiveUntil *time.Time
 	err := r.DB.QueryRow(ctx, getPlanetsQuery, planetID).Scan(
 		&planet.ID,
 		&planet.Coordinates.X,
@@ -44,7 +45,7 @@ func (r *PlanetStorage) GetPlanet(ctx context.Context, planetID uuid.UUID) (mode
 		&planet.Resources.Gas,
 		&planet.Resources.UpdatedAt,
 		&planet.HasMoon,
-		&planet.MoonActiveUntil,
+		&moonActiveUntil,
 		&planet.IsCapitol,
 		&colonizedAt,
 		&updatedAt,
@@ -52,6 +53,9 @@ func (r *PlanetStorage) GetPlanet(ctx context.Context, planetID uuid.UUID) (mode
 
 	planet.ColonizedAt = colonizedAt.UTC()
 	planet.UpdatedAt = updatedAt.UTC()
+	if moonActiveUntil != nil {
+		planet.MoonActiveUntil = moonActiveUntil.UTC()
+	}
 
 	if err != nil {
 		return models.Planet{}, fmt.Errorf("DB.QueryRow.Scan(): %w", err)
