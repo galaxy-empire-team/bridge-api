@@ -34,7 +34,7 @@ func (s *Service) validateFleet(fleet []models.FleetUnitCount, cargo models.Reso
 	}
 
 	if !cargo.IsEmpty() {
-		if s.checkTransportCapacity(fleet, cargo) {
+		if s.isCapacityExceeded(fleet, cargo) {
 			return models.ErrTransportCargoExceedsFleetCapacity
 		}
 	}

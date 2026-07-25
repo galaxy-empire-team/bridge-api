@@ -10,14 +10,10 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
-func (s *Service) GetRating(ctx context.Context, userID uuid.UUID) (models.Ratings, error) {
-	var (
-		errG    errgroup.Group
-		ratings models.Ratings
-	)
-
+func (s *Service) GetRating(ctx context.Context, userID uuid.UUID) (ratings models.Ratings, err error) {
+	errG, gCtx := errgroup.WithContext(ctx)
 	errG.Go(func() error {
-		userRating, err := s.getUsersRating(ctx, userID)
+		userRating, err := s.getUsersRating(gCtx, userID)
 		if err != nil {
 			return fmt.Errorf("getUsersRating(): %w", err)
 		}
@@ -28,7 +24,7 @@ func (s *Service) GetRating(ctx context.Context, userID uuid.UUID) (models.Ratin
 	})
 
 	errG.Go(func() error {
-		fleetRating, err := s.getFleetRating(ctx, userID)
+		fleetRating, err := s.getFleetRating(gCtx, userID)
 		if err != nil {
 			return fmt.Errorf("getFleetRating(): %w", err)
 		}

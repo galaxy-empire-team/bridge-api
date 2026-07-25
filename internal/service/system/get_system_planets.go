@@ -10,15 +10,10 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
-func (s *Service) GetSystemPlanets(ctx context.Context, userID uuid.UUID, system models.System) (models.SystemPlanets, error) {
-	var (
-		errGroup errgroup.Group
-		planets  models.SystemPlanets
-		err      error
-	)
-
-	errGroup.Go(func() error {
-		planets.Planets, err = s.systemStorage.GetSystemPlanets(ctx, system)
+func (s *Service) GetSystemPlanets(ctx context.Context, userID uuid.UUID, system models.System) (planets models.SystemPlanets, err error) {
+	errG, gCtx := errgroup.WithContext(ctx)
+	errG.Go(func() error {
+		planets.Planets, err = s.systemStorage.GetSystemPlanets(gCtx, system)
 		if err != nil {
 			return fmt.Errorf("systemStorage.GetSystemPlanets(): %w", err)
 		}
@@ -26,8 +21,8 @@ func (s *Service) GetSystemPlanets(ctx context.Context, userID uuid.UUID, system
 		return nil
 	})
 
-	errGroup.Go(func() error {
-		planets.NPC, err = s.planetStorage.GetUserNPCAttacks(ctx, userID)
+	errG.Go(func() error {
+		planets.NPC, err = s.planetStorage.GetUserNPCAttacks(gCtx, userID)
 		if err != nil {
 			return fmt.Errorf("planetStorage.GetUserNPCAttacks(): %w", err)
 		}
@@ -35,8 +30,8 @@ func (s *Service) GetSystemPlanets(ctx context.Context, userID uuid.UUID, system
 		return nil
 	})
 
-	if err = errGroup.Wait(); err != nil {
-		return models.SystemPlanets{}, fmt.Errorf("errGroup.Wait(): %w", err)
+	if err = errG.Wait(); err != nil {
+		return models.SystemPlanets{}, fmt.Errorf("errG.Wait(): %w", err)
 	}
 
 	planets.System = system

@@ -4,7 +4,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
-func (s *Service) checkTransportCapacity(fleet []models.FleetUnitCount, cargo models.Resources) bool {
+func (s *Service) isCapacityExceeded(fleet []models.FleetUnitCount, cargo models.Resources) bool {
 	var cargoLimit uint64
 	for _, fleetUnit := range fleet {
 		fStats, err := s.registry.GetFleetUnitStatsByID(fleetUnit.ID)
@@ -15,5 +15,5 @@ func (s *Service) checkTransportCapacity(fleet []models.FleetUnitCount, cargo mo
 		cargoLimit += fStats.CargoCapacity * fleetUnit.Count
 	}
 
-	return cargo.Metal+cargo.Crystal+cargo.Gas <= cargoLimit
+	return cargo.Metal+cargo.Crystal+cargo.Gas > cargoLimit
 }

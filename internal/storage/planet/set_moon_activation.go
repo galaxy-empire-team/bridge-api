@@ -6,25 +6,19 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-
-	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
 func (r *PlanetStorage) SetMoonActivation(ctx context.Context, planetID uuid.UUID, activateUntill time.Time) error {
 	const setMoonActivationQuery = `
-		UPDATE session_beta.planet_moons
-		SET 
-			active_until = $2
-		WHERE planet_id = $1;
+		INSERT INTO session_beta.planet_moons (planet_id, active_until)
+		VALUES ($1, $2)
+		ON CONFLICT (planet_id) DO UPDATE SET
+			active_until = excluded.active_until;
 	`
 
-	cmd, err := r.DB.Exec(ctx, setMoonActivationQuery, planetID, activateUntill)
+	_, err := r.DB.Exec(ctx, setMoonActivationQuery, planetID, activateUntill)
 	if err != nil {
 		return fmt.Errorf("DB.Exec(): %w", err)
-	}
-
-	if cmd.RowsAffected() == 0 {
-		return models.ErrMoonNotFound
 	}
 
 	return nil

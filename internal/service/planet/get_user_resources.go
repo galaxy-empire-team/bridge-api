@@ -8,15 +8,10 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-func (s *Service) GetUserResources(ctx context.Context, userID uuid.UUID) (GetUserResourcesResponse, error) {
-	var (
-		errG errgroup.Group
-		res  GetUserResourcesResponse
-		err  error
-	)
-
+func (s *Service) GetUserResources(ctx context.Context, userID uuid.UUID) (res GetUserResourcesResponse, err error) {
+	errG, gCtx := errgroup.WithContext(ctx)
 	errG.Go(func() error {
-		res.UserResources, err = s.planetStorage.GetUserResources(ctx, userID)
+		res.UserResources, err = s.planetStorage.GetUserResources(gCtx, userID)
 		if err != nil {
 			return fmt.Errorf("planetStorage.GetUserResources(): %w", err)
 		}
@@ -25,7 +20,7 @@ func (s *Service) GetUserResources(ctx context.Context, userID uuid.UUID) (GetUs
 	})
 
 	errG.Go(func() error {
-		res.Boosts, err = s.planetStorage.GetUserBoosts(ctx, userID)
+		res.Boosts, err = s.planetStorage.GetUserBoosts(gCtx, userID)
 		if err != nil {
 			return fmt.Errorf("planetStorage.GetUserBoosts(): %w", err)
 		}
