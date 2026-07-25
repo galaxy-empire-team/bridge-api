@@ -32,7 +32,11 @@ var (
 	ErrNotEnoughBoosts                 = errors.New("not enough boosts")
 	ErrUserAlreadyHasBuilding          = errors.New("user already has building of this type")
 	ErrMoonNotFound                    = errors.New("moon not found")
+	ErrMoonAlreadyExists               = errors.New("moon already exists")
 	ErrNotEnoughMatter                 = errors.New("not enough matter")
+	ErrNotEnoughDoreye                 = errors.New("not enough doreye")
+	ErrUnknownTraderItemType           = errors.New("unknown trader item type")
+	ErrTraderItemNotImplemented        = errors.New("trader item type not implemented")
 
 	// Mission errors
 	ErrColonizePlanetAlreadyExists        = errors.New("planet already exists at the target coordinates")

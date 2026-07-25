@@ -54,12 +54,13 @@ func fromUserMission(m models.UserMission) Mission {
 	}
 }
 
-func fromUserMissions(userMissions []models.UserMission) UserMissionsResponse {
+func fromUserMissions(userMissions models.UserMissions) UserMissionsResponse {
 	resp := UserMissionsResponse{
-		Missions: make([]Mission, 0, len(userMissions)),
+		Missions:     make([]Mission, 0, len(userMissions.Missions)),
+		MistLaunches: userMissions.MistLaunches,
 	}
 
-	for _, m := range userMissions {
+	for _, m := range userMissions.Missions {
 		resp.Missions = append(resp.Missions, fromUserMission(m))
 	}
 

@@ -67,7 +67,8 @@ type FleetUnitCount struct {
 }
 
 type UserMissionsResponse struct {
-	Missions []Mission `json:"missions"`
+	Missions     []Mission `json:"missions"`
+	MistLaunches uint64    `json:"mistLaunches"`
 }
 
 type Mission struct {

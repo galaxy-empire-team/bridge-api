@@ -14,6 +14,7 @@ import (
 	ratingservice "github.com/galaxy-empire-team/bridge-api/internal/service/rating"
 	staticservice "github.com/galaxy-empire-team/bridge-api/internal/service/static"
 	systemservice "github.com/galaxy-empire-team/bridge-api/internal/service/system"
+	traderservice "github.com/galaxy-empire-team/bridge-api/internal/service/trader"
 	userservice "github.com/galaxy-empire-team/bridge-api/internal/service/user"
 	eventstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/event"
 	missionstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/mission"
@@ -79,11 +80,21 @@ func run() error {
 	missionService := missionservice.New(txManager, planetStorage, missionStorage, researchStorage, resourceRepo, reg)
 	systemService := systemservice.New(planetStorage, systemStorage)
 	staticService := staticservice.New(reg)
+	traderService := traderservice.New(txManager, planetStorage, resourceRepo, reg)
 
 	// initialize http server
 	httpServer := httpserver.New(app.ComponentLogger("httpserver"))
 
-	httpServer.RegisterRoutes(userService, ratingService, planetService, eventService, missionService, systemService, staticService)
+	httpServer.RegisterRoutes(
+		userService, 
+		ratingService, 
+		planetService, 
+		eventService, 
+		missionService, 
+		systemService, 
+		staticService, 
+		traderService,
+	)
 
 	shutdownFunc, err := httpServer.Start(ctx, cfg.HTTPServer)
 	if err != nil {

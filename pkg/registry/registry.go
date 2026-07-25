@@ -2,6 +2,7 @@ package registry
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -19,6 +20,7 @@ type Registry struct {
 	boosts        map[consts.BoostID]BoostStats
 	moonBoosts    map[consts.MoonBoostID]MoonBoostStats
 	npcStats      map[consts.PlanetPositionZ]NPCStats
+	traderStats   map[consts.TraderItemID]TraderItemStats
 
 	zeroLvlBuildings  map[consts.BuildingType]consts.BuildingID
 	zeroLvlResearches map[consts.ResearchType]consts.ResearchID
@@ -65,6 +67,11 @@ func New(ctx context.Context, connPool *pgxpool.Pool) (*Registry, error) {
 	err = r.fillMoonBoostStats(ctx, connPool)
 	if err != nil {
 		return nil, fmt.Errorf("fillMoonBoostStats(): %w", err)
+	}
+
+	err = r.fillTraderStats(ctx, connPool)
+	if err != nil {
+		return nil, fmt.Errorf("fillTraderStats(): %w", err)
 	}
 
 	return r, nil
@@ -475,6 +482,106 @@ func (r *Registry) fillMoonBoostStats(ctx context.Context, pool *pgxpool.Pool) e
 		}
 
 		r.moonBoosts[moonBoostStats.ID] = moonBoostStats
+	}
+
+	if err = rows.Err(); err != nil {
+		return fmt.Errorf("rows.Err(): %w", err)
+	}
+
+	return nil
+}
+
+type traderItemBoost struct {
+	ID    consts.BoostID `json:"id"`
+	Count uint64         `json:"count"`
+}
+
+type traderItemSpaceship struct {
+	ID    consts.FleetUnitID `json:"id"`
+	Count uint64             `json:"count"`
+}
+
+type traderItemAutoMistLaunch struct {
+	Count uint64 `json:"count"`
+}
+
+func (r *Registry) fillTraderStats(ctx context.Context, pool *pgxpool.Pool) error {
+	const getTraderStatsQuery = `
+		SELECT 
+			id,
+			metal_cost,
+			crystal_cost,
+			gas_cost,
+			matter_cost,
+			doreye_cost,
+			item_type,
+			item
+		FROM session_beta.s_trader;
+	`
+
+	r.traderStats = make(map[consts.TraderItemID]TraderItemStats)
+	rows, err := pool.Query(ctx, getTraderStatsQuery)
+	if err != nil {
+		return fmt.Errorf("pool.Query(): %w", err)
+	}
+
+	for rows.Next() {
+		var (
+			traderStats TraderItemStats
+			item        []byte
+		)
+
+		err = rows.Scan(
+			&traderStats.ID,
+			&traderStats.Cost.Metal,
+			&traderStats.Cost.Crystal,
+			&traderStats.Cost.Gas,
+			&traderStats.Cost.Matter,
+			&traderStats.Cost.Doreye,
+			&traderStats.ItemType,
+			&item,
+		)
+
+		switch traderStats.ItemType {
+		case consts.TraderItemTypeBoost:
+			var boost traderItemBoost
+			err = json.Unmarshal(item, &boost)
+			if err != nil {
+				return fmt.Errorf("json.Unmarshal(): %w", err)
+			}
+
+			traderStats.Item = TraderItemBoost{
+				ID:    boost.ID,
+				Count: boost.Count,
+			}
+		case consts.TraderItemTypeSpaceship:
+			var spaceship traderItemSpaceship
+			err = json.Unmarshal(item, &spaceship)
+			if err != nil {
+				return fmt.Errorf("json.Unmarshal(): %w", err)
+			}
+
+			traderStats.Item = TraderItemSpaceship{
+				ID:    spaceship.ID,
+				Count: spaceship.Count,
+			}
+		case consts.TraderItemTypeAutoMistLaunch:
+			var autoMistLaunch traderItemAutoMistLaunch
+			err = json.Unmarshal(item, &autoMistLaunch)
+			if err != nil {
+				return fmt.Errorf("json.Unmarshal(): %w", err)
+			}
+
+			traderStats.Item = TraderItemAutoMistLaunch{
+				Count: autoMistLaunch.Count,
+			}
+		case consts.TraderItemTypeMoon:
+			traderStats.Item = TraderItemMoon{}
+		default:
+			return fmt.Errorf("unknown trader item type: %s", traderStats.ItemType)
+		}
+
+		r.traderStats[traderStats.ID] = traderStats
 	}
 
 	if err = rows.Err(); err != nil {

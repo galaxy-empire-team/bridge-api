@@ -2,8 +2,11 @@ package planet
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
+
+	"github.com/jackc/pgx/v5"
 
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
@@ -20,6 +23,10 @@ func (r *PlanetStorage) GetPlanetAttackedAt(ctx context.Context, coordinate mode
 
 	err := r.DB.QueryRow(ctx, getPlanetAttackedAtQuery, coordinate.X, coordinate.Y, coordinate.Z).Scan(&time)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+
 		return nil, fmt.Errorf("DB.QueryRow(): %w", err)
 	}
 

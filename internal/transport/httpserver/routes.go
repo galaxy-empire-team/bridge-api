@@ -7,6 +7,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/ratinghandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/statichandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/systemhandlers"
+	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/traderhandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/userhandlers"
 )
 
@@ -18,6 +19,7 @@ func (hs *HttpServer) RegisterRoutes(
 	missionService missionhandlers.MissionService,
 	systemService systemhandlers.SystemService,
 	staticsService statichandlers.StaticService,
+	traderService traderhandlers.TraderService,
 ) {
 	// ----- User Routes -----
 	hs.apiRouter.POST("/user/create", userhandlers.CreateUser(userService))
@@ -64,4 +66,7 @@ func (hs *HttpServer) RegisterRoutes(
 
 	// ----- Static Routes -----
 	hs.apiRouter.GET("/static/buildings", statichandlers.GetBuildingStats(staticsService))
+
+	// ----- Trader Routes -----
+	hs.apiRouter.POST("/trader/buy", traderhandlers.BuyItem(traderService))
 }

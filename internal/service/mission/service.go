@@ -20,6 +20,7 @@ type planetStorage interface {
 	GetCoordinates(ctx context.Context, planetID uuid.UUID) (models.Coordinates, error)
 	GetUserNPCAttackByZ(ctx context.Context, userID uuid.UUID, z consts.PlanetPositionZ) (*models.NPCAttack, error)
 	GetPlanetAttackedAt(ctx context.Context, coordinates models.Coordinates) (*time.Time, error)
+	GetMistLaunches(ctx context.Context, userID uuid.UUID) (uint64, error)
 }
 
 type missionStorage interface {

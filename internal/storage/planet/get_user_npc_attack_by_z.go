@@ -20,7 +20,6 @@ func (r *PlanetStorage) GetUserNPCAttackByZ(ctx context.Context, userID uuid.UUI
 		WHERE user_id = $1 AND npc_coordinate_z = $2;
 	`
 
-	fmt.Println(userID)
 	npcAttack := &models.NPCAttack{
 		Z: z,
 	}

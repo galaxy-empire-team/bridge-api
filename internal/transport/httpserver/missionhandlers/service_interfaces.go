@@ -9,7 +9,7 @@ import (
 )
 
 type MissionService interface {
-	GetCurrentMissions(ctx context.Context, userID uuid.UUID) ([]models.UserMission, error)
+	GetCurrentMissions(ctx context.Context, userID uuid.UUID) (models.UserMissions, error)
 	Colonize(ctx context.Context, mission models.MissionStart) (models.UserMission, error)
 	Attack(ctx context.Context, mission models.MissionStart) (models.UserMission, error)
 	Spy(ctx context.Context, mission models.MissionStart) (models.UserMission, error)

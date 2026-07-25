@@ -12,6 +12,7 @@ import (
 	eventservice "github.com/galaxy-empire-team/bridge-api/internal/service/event"
 	missionservice "github.com/galaxy-empire-team/bridge-api/internal/service/mission"
 	planetservice "github.com/galaxy-empire-team/bridge-api/internal/service/planet"
+	traderservice "github.com/galaxy-empire-team/bridge-api/internal/service/trader"
 )
 
 type TxManager struct {
@@ -52,6 +53,17 @@ func (m *TxManager) ExecPlanetTx(
 ) error {
 	return m.exec(ctx, func(tx pgx.Tx) error {
 		return handler(ctx, newPlanetStorageSet(tx))
+	})
+}
+
+// ExecTraderTx implemets methods required by trader service. I decided to copy func for each service
+// insted of making factories or use empty interfaces.
+func (m *TxManager) ExecTraderTx(
+	ctx context.Context,
+	handler func(ctx context.Context, storages traderservice.TxStorages) error,
+) error {
+	return m.exec(ctx, func(tx pgx.Tx) error {
+		return handler(ctx, newTraderStorageSet(tx))
 	})
 }
 

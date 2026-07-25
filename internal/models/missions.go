@@ -47,3 +47,8 @@ type MissionStart struct {
 	Cargo           Resources
 	SpeedMultiplier float64
 }
+
+type UserMissions struct {
+	Missions     []UserMission
+	MistLaunches uint64
+}

@@ -19,3 +19,7 @@ type UserResources struct {
 	Matter uint64
 	Doreye uint64
 }
+
+func (r UserResources) IsEmpty() bool {
+	return r.Matter == 0 && r.Doreye == 0
+}

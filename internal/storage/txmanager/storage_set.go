@@ -55,3 +55,15 @@ func newPlanetStorageSet(tx pgx.Tx) planetStorageSet {
 		PlanetStorage: planetstorage.New(tx),
 	}
 }
+
+type traderStorageSet struct {
+	*planetstorage.PlanetStorage
+	*eventstorage.EventStorage
+}
+
+func newTraderStorageSet(tx pgx.Tx) traderStorageSet {
+	return traderStorageSet{
+		PlanetStorage: planetstorage.New(tx),
+		EventStorage:  eventstorage.New(tx),
+	}
+}

@@ -63,6 +63,8 @@ type Resources struct {
 	Metal   uint64
 	Crystal uint64
 	Gas     uint64
+	Matter  uint64
+	Doreye  uint64
 }
 
 type FleetUnitCount struct {
@@ -90,4 +92,29 @@ type MoonBoostStats struct {
 	ID         consts.MoonBoostID
 	MatterCost uint64
 	DurationS  uint64
+}
+
+// --- Trader items ---
+type TraderItemStats struct {
+	ID       consts.TraderItemID
+	ItemType consts.TraderItemType
+	Cost     Resources
+	Item     any
+}
+
+// Item in traderStats are cast to one of these types:
+type TraderItemMoon struct{}
+
+type TraderItemBoost struct {
+	ID    consts.BoostID
+	Count uint64
+}
+
+type TraderItemSpaceship struct {
+	ID    consts.FleetUnitID
+	Count uint64
+}
+
+type TraderItemAutoMistLaunch struct {
+	Count uint64
 }
