@@ -40,7 +40,7 @@ func (s *Service) Transport(ctx context.Context, mission models.MissionStart) (m
 
 		transportEvent := models.MissionEvent{
 			UserID:      mission.UserID,
-			PlanetFrom:  mission.PlanetFrom,
+			PlanetFrom:  transportMission.PlanetFrom,
 			PlanetTo:    mission.PlanetTo,
 			MissionID:   transportMission.MissionID,
 			Fleet:       mission.Fleet,

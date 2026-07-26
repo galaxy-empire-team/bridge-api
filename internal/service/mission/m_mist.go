@@ -34,7 +34,7 @@ func (s *Service) Mist(ctx context.Context, mission models.MissionStart) (models
 
 		mistEvent := models.MissionEvent{
 			UserID:      mission.UserID,
-			PlanetFrom:  mission.PlanetFrom,
+			PlanetFrom:  mistMission.PlanetFrom,
 			PlanetTo:    mission.PlanetTo,
 			MissionID:   mistMission.MissionID,
 			Fleet:       mission.Fleet,

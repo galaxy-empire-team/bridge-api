@@ -15,9 +15,9 @@ func (s *Service) prepareUserMission(ctx context.Context, mission models.Mission
 		return models.UserMission{}, fmt.Errorf("registry.GetMissionIDByType(): %w", err)
 	}
 
-	planetFromCoordinates, err := s.planetStorage.GetCoordinates(ctx, mission.PlanetFrom)
+	planetFromCoordinates, err := s.planetStorage.GetPlanetCoordinatesById(ctx, mission.PlanetFrom)
 	if err != nil {
-		return models.UserMission{}, fmt.Errorf("planetStorage.GetCoordinates(): %w", err)
+		return models.UserMission{}, fmt.Errorf("planetStorage.GetPlanetCoordinatesById(): %w", err)
 	}
 
 	missionDuration, err := s.calculateMissionDuration(durationInput{

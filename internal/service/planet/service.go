@@ -17,7 +17,6 @@ type planetStorage interface {
 	GetCapitolID(ctx context.Context, userID uuid.UUID) (uuid.UUID, error)
 	GetPlanet(ctx context.Context, planetID uuid.UUID) (models.Planet, error)
 	GetUserPlanetIDs(ctx context.Context, userID uuid.UUID) ([]models.PlanetIDCapitol, error)
-	GetCoordinates(ctx context.Context, planetID uuid.UUID) (models.Coordinates, error)
 	GetColonizedCoordinates(ctx context.Context, system models.Coordinates) ([]consts.PlanetPositionZ, error)
 	GetResourcesForUpdate(ctx context.Context, planetID uuid.UUID) (models.Resources, error)
 	GetCurrentBuilds(ctx context.Context, planetID uuid.UUID) ([]models.BuildingInProgress, error)

@@ -38,7 +38,7 @@ func (s *Service) Spy(ctx context.Context, mission models.MissionStart) (models.
 
 		spyEvent := models.MissionEvent{
 			UserID:      mission.UserID,
-			PlanetFrom:  mission.PlanetFrom,
+			PlanetFrom:  spyMission.PlanetFrom,
 			PlanetTo:    mission.PlanetTo,
 			MissionID:   spyMission.MissionID,
 			Fleet:       mission.Fleet,

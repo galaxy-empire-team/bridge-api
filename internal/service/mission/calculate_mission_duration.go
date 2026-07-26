@@ -43,10 +43,10 @@ func (s *Service) calculateMissionDuration(input durationInput) (time.Duration, 
 	switch input.Type {
 	case consts.MissionTypeSpy:
 		duration += missionDurationAddSpy
-	case consts.MissionTypeColonize:
-		duration += missionDurationAdd
 	case consts.MissionTypeMist:
 		duration += missionDurationAddMist
+	default:
+		duration += missionDurationAdd
 	}
 
 	return duration, nil

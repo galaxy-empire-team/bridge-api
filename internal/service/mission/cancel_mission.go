@@ -23,17 +23,12 @@ func (s *Service) CancelMission(ctx context.Context, userID uuid.UUID, missionID
 			return models.ErrMissionIsReturning
 		}
 
-		planetFromCoordinates, err := s.planetStorage.GetCoordinates(ctx, missionEvent.PlanetFrom)
-		if err != nil {
-			return fmt.Errorf("planetStorage.GetCoordinates(): %w", err)
-		}
-
 		now := time.Now().UTC()
 
 		canceledMissionEvent = models.CancelMission{
 			ID:          missionEvent.ID,
-			PlanetFrom:  uuid.Nil,
-			PlanetTo:    planetFromCoordinates,
+			PlanetFrom:  missionEvent.PlanetFrom,
+			PlanetTo:    missionEvent.PlanetFrom,
 			IsReturning: true,
 			StartedAt:   now,
 			FinishedAt:  now.Add(now.Sub(missionEvent.StartedAt)),

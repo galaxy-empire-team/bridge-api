@@ -17,10 +17,10 @@ type planetStorage interface {
 	CheckPlanetExists(ctx context.Context, coordinates models.Coordinates) (bool, error)
 	CheckPlanetBelongsToUser(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (bool, error)
 	GetUserPlanetsCount(ctx context.Context, userID uuid.UUID) (uint8, error)
-	GetCoordinates(ctx context.Context, planetID uuid.UUID) (models.Coordinates, error)
 	GetUserNPCAttackByZ(ctx context.Context, userID uuid.UUID, z consts.PlanetPositionZ) (*models.NPCAttack, error)
 	GetPlanetAttackedAt(ctx context.Context, coordinates models.Coordinates) (*time.Time, error)
 	GetMistLaunches(ctx context.Context, userID uuid.UUID) (uint64, error)
+	GetPlanetCoordinatesById(ctx context.Context, planetID uuid.UUID) (models.Coordinates, error)
 }
 
 type missionStorage interface {

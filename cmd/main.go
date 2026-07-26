@@ -86,13 +86,13 @@ func run() error {
 	httpServer := httpserver.New(app.ComponentLogger("httpserver"))
 
 	httpServer.RegisterRoutes(
-		userService, 
-		ratingService, 
-		planetService, 
-		eventService, 
-		missionService, 
-		systemService, 
-		staticService, 
+		userService,
+		ratingService,
+		planetService,
+		eventService,
+		missionService,
+		systemService,
+		staticService,
 		traderService,
 	)
 

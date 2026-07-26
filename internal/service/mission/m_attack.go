@@ -49,7 +49,7 @@ func (s *Service) Attack(ctx context.Context, mission models.MissionStart) (mode
 
 		attackEvent := models.MissionEvent{
 			UserID:      mission.UserID,
-			PlanetFrom:  mission.PlanetFrom,
+			PlanetFrom:  attackMission.PlanetFrom,
 			PlanetTo:    mission.PlanetTo,
 			MissionID:   attackMission.MissionID,
 			Fleet:       mission.Fleet,

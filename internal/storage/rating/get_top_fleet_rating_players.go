@@ -10,7 +10,7 @@ import (
 func (r *RatingStorage) GetTopFleetRatingPlayers(ctx context.Context, version uint32, limit uint32) ([]models.RatingPlayer, error) {
 	const getTopFleetRatingPlayersQuery = `
 		SELECT
-			rfp.user_id,
+			u.id,
 			u.login,
 			rfp.fleet_power,
 			rfp.rank,

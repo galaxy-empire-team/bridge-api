@@ -15,9 +15,9 @@ func (s *MissionStorage) GetCurrentUserMissions(ctx context.Context, userID uuid
 		SELECT
 			ev.id,
 			ev.mission_id,
-			p.x,
-			p.y,
-			p.z,
+			ev.planet_from_x,
+			ev.planet_from_y,
+			ev.planet_from_z,
 			ev.planet_to_x,
 			ev.planet_to_y,
 			ev.planet_to_z,
@@ -25,8 +25,6 @@ func (s *MissionStorage) GetCurrentUserMissions(ctx context.Context, userID uuid
 			ev.started_at,
 			ev.finished_at
 		FROM session_beta.event_missions ev
-		JOIN session_beta.planets p ON
-			ev.planet_from = p.id
 		WHERE ev.user_id = $1;
 	`
 

@@ -13,7 +13,9 @@ func (s *MissionStorage) CreateMissionEvent(ctx context.Context, missionEvent mo
 		INSERT INTO session_beta.event_missions (
 			mission_id,
 			user_id,
-			planet_from,
+			planet_from_x,
+			planet_from_y,
+			planet_from_z,
 			planet_to_x, 
 			planet_to_y, 
 			planet_to_z, 
@@ -25,15 +27,17 @@ func (s *MissionStorage) CreateMissionEvent(ctx context.Context, missionEvent mo
 		) VALUES (
 			$1,    -- mission_id
 			$2,    -- user_id
-			$3,    -- planet_from
-			$4,    -- planet_to_x
-			$5,    -- planet_to_y
-			$6,    -- planet_to_z
-			$7,    -- fleet
-			$8,    -- cargo
-			$9,    -- is_returning
-			$10,   -- started_at
-			$11	   -- finished_at
+			$3,    -- planet_from_x
+			$4,    -- planet_from_y
+			$5,    -- planet_from_z
+			$6,    -- planet_to_x
+			$7,    -- planet_to_y
+			$8,    -- planet_to_z
+			$9,    -- fleet
+			$10,    -- cargo
+			$11,   -- is_returning
+			$12,   -- started_at
+			$13	   -- finished_at
 		)  
 		RETURNING id
 	`
@@ -52,7 +56,9 @@ func (s *MissionStorage) CreateMissionEvent(ctx context.Context, missionEvent mo
 	err = s.DB.QueryRow(ctx, createEventQuery,
 		missionEvent.MissionID,
 		missionEvent.UserID,
-		missionEvent.PlanetFrom,
+		missionEvent.PlanetFrom.X,
+		missionEvent.PlanetFrom.Y,
+		missionEvent.PlanetFrom.Z,
 		missionEvent.PlanetTo.X,
 		missionEvent.PlanetTo.Y,
 		missionEvent.PlanetTo.Z,

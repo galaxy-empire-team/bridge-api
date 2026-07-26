@@ -15,7 +15,9 @@ func (s *MissionStorage) GetMissionForUpdate(ctx context.Context, userID uuid.UU
 	const getMissionForUpdateQuery = `
 		SELECT
 			id,
-			planet_from,
+			planet_from_x,
+			planet_from_y,
+			planet_from_z,
 			planet_to_x,
 			planet_to_y,
 			planet_to_z,
@@ -29,7 +31,9 @@ func (s *MissionStorage) GetMissionForUpdate(ctx context.Context, userID uuid.UU
 	var cancelMission models.CancelMission
 	err := s.DB.QueryRow(ctx, getMissionForUpdateQuery, id, userID).Scan(
 		&cancelMission.ID,
-		&cancelMission.PlanetFrom,
+		&cancelMission.PlanetFrom.X,
+		&cancelMission.PlanetFrom.Y,
+		&cancelMission.PlanetFrom.Z,
 		&cancelMission.PlanetTo.X,
 		&cancelMission.PlanetTo.Y,
 		&cancelMission.PlanetTo.Z,

@@ -48,7 +48,7 @@ func (s *Service) Colonize(ctx context.Context, mission models.MissionStart) (mo
 
 		colonizeEvent := models.MissionEvent{
 			UserID:      mission.UserID,
-			PlanetFrom:  mission.PlanetFrom,
+			PlanetFrom:  colonizeMission.PlanetFrom,
 			PlanetTo:    mission.PlanetTo,
 			MissionID:   colonizeMission.MissionID,
 			Fleet:       mission.Fleet,

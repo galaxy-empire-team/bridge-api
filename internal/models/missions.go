@@ -10,7 +10,7 @@ import (
 
 type MissionEvent struct {
 	UserID      uuid.UUID
-	PlanetFrom  uuid.UUID
+	PlanetFrom  Coordinates
 	PlanetTo    Coordinates
 	MissionID   consts.MissionID
 	Fleet       []FleetUnitCount
@@ -22,7 +22,7 @@ type MissionEvent struct {
 
 type CancelMission struct {
 	ID          uint64
-	PlanetFrom  uuid.UUID
+	PlanetFrom  Coordinates
 	PlanetTo    Coordinates
 	IsReturning bool
 	StartedAt   time.Time

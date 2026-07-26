@@ -46,7 +46,7 @@ func (s *Service) Recycle(ctx context.Context, mission models.MissionStart) (mod
 
 		recycleEvent := models.MissionEvent{
 			UserID:      mission.UserID,
-			PlanetFrom:  mission.PlanetFrom,
+			PlanetFrom:  recycleMission.PlanetFrom,
 			PlanetTo:    mission.PlanetTo,
 			MissionID:   recycleMission.MissionID,
 			Fleet:       mission.Fleet,
