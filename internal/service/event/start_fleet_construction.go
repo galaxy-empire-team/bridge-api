@@ -8,6 +8,11 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
+	"github.com/galaxy-empire-team/bridge-api/pkg/consts"
+)
+
+const (
+	baseFleetConstructionSpeedMultiplier = 1.0
 )
 
 func (s *Service) StartFleetConstruction(ctx context.Context, userID uuid.UUID, planet uuid.UUID, fleet models.FleetUnitCount) (models.FleetUnitConstructionInfo, error) {
@@ -91,14 +96,28 @@ func (s *Service) generateEventForFleetConstruct(ctx context.Context, planetID u
 		return models.FleetConstructEvent{}, fmt.Errorf("planetRepo.SetResources(): %w", err)
 	}
 
+	moonInfo, err := planetRepo.GetFullMoonInfo(ctx, planetID)
+	if err != nil {
+		return models.FleetConstructEvent{}, fmt.Errorf("planetRepo.GetFullMoonInfo(): %w", err)
+	}
+
+	speedMultiplier := baseFleetConstructionSpeedMultiplier
+	if moonInfo.HasMoon {
+		speedMultiplier = baseFleetConstructionSpeedMultiplier - consts.InactiveFleetConstructionMoonDecrease
+		if moonInfo.ActivateUntill.After(time.Now().UTC()) {
+			speedMultiplier = baseFleetConstructionSpeedMultiplier - consts.ActiveFleetConstructionMoonDecrease
+		}
+	}
+
 	startedAt := time.Now().UTC()
+	finishedAt := startedAt.Add(time.Duration(float64(fleetUnitStats.BuildTimeSec*fleet.Count)*speedMultiplier) * time.Second).UTC()
 	fleetConstructEvent := models.FleetConstructEvent{
 		PlanetID:      planetID,
 		FleetID:       fleet.ID,
 		Count:         fleet.Count,
 		ResourcesCost: resourcesCost,
 		StartedAt:     startedAt,
-		FinishedAt:    startedAt.Add(time.Duration(fleetUnitStats.BuildTimeSec*fleet.Count) * time.Second).UTC(),
+		FinishedAt:    finishedAt,
 	}
 
 	return fleetConstructEvent, nil

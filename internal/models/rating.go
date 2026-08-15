@@ -17,6 +17,7 @@ type Rating struct {
 }
 
 type Ratings struct {
-	User  Rating
-	Fleet Rating
+	User         Rating
+	Fleet        Rating
+	PlayersCount uint64
 }

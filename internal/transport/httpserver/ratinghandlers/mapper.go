@@ -4,8 +4,9 @@ import "github.com/galaxy-empire-team/bridge-api/internal/models"
 
 func toGetRatingsResponse(ratings models.Ratings) GetRatingsResponse {
 	return GetRatingsResponse{
-		User:  toRatingResponse(ratings.User, true),
-		Fleet: toRatingResponse(ratings.Fleet, false),
+		User:         toRatingResponse(ratings.User, true),
+		Fleet:        toRatingResponse(ratings.Fleet, false),
+		PlayersCount: ratings.PlayersCount,
 	}
 }
 

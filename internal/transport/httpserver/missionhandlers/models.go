@@ -73,10 +73,12 @@ type UserMissionsResponse struct {
 
 type Mission struct {
 	ID          uint64           `json:"id"`
+	PreviousID  uint64           `json:"previousId"`
 	MissionID   consts.MissionID `json:"missionId"`
 	PlanetFrom  Coordinates      `json:"planetFrom"`
 	PlanetTo    Coordinates      `json:"planetTo"`
 	IsReturning bool             `json:"isReturning"`
+	IsCancelled bool             `json:"isCancelled"`
 	StartedAt   time.Time        `json:"startedAt"`
 	FinishedAt  time.Time        `json:"finishedAt"`
 }

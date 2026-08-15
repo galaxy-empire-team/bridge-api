@@ -9,14 +9,15 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/db"
 	repository "github.com/galaxy-empire-team/bridge-api/internal/repository"
 	eventservice "github.com/galaxy-empire-team/bridge-api/internal/service/event"
+	gameconfigservice "github.com/galaxy-empire-team/bridge-api/internal/service/gameconfig"
 	missionservice "github.com/galaxy-empire-team/bridge-api/internal/service/mission"
 	planetservice "github.com/galaxy-empire-team/bridge-api/internal/service/planet"
 	ratingservice "github.com/galaxy-empire-team/bridge-api/internal/service/rating"
-	staticservice "github.com/galaxy-empire-team/bridge-api/internal/service/static"
 	systemservice "github.com/galaxy-empire-team/bridge-api/internal/service/system"
 	traderservice "github.com/galaxy-empire-team/bridge-api/internal/service/trader"
 	userservice "github.com/galaxy-empire-team/bridge-api/internal/service/user"
 	eventstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/event"
+	gameconfigstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/gameconfig"
 	missionstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/mission"
 	planetstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/planet"
 	ratingstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/rating"
@@ -62,6 +63,7 @@ func run() error {
 	eventStorage := eventstorage.New(db)
 	researchStorage := researchstorage.New(db)
 	ratingStorage := ratingstorage.New(db)
+	gameConfigStorage := gameconfigstorage.New(db)
 
 	// initialize registry
 	reg, err := registry.New(ctx, db.Pool)
@@ -74,13 +76,16 @@ func run() error {
 
 	// initialize services
 	userService := userservice.New(userStorage)
-	ratingService := ratingservice.New(ratingStorage)
+	ratingService := ratingservice.New(ratingStorage, userStorage)
 	planetService := planetservice.New(planetStorage, researchStorage, resourceRepo, txManager, reg, app.ComponentLogger("planetService"))
 	eventService := eventservice.New(txManager, eventStorage, planetStorage, researchStorage, resourceRepo, reg)
 	missionService := missionservice.New(txManager, planetStorage, missionStorage, researchStorage, resourceRepo, reg)
 	systemService := systemservice.New(planetStorage, systemStorage)
-	staticService := staticservice.New(reg)
 	traderService := traderservice.New(txManager, planetStorage, resourceRepo, reg)
+	gameConfigService, err := gameconfigservice.New(ctx, gameConfigStorage)
+	if err != nil {
+		return fmt.Errorf("gameconfigservice.New(): %w", err)
+	}
 
 	// initialize http server
 	httpServer := httpserver.New(app.ComponentLogger("httpserver"))
@@ -92,7 +97,7 @@ func run() error {
 		eventService,
 		missionService,
 		systemService,
-		staticService,
+		gameConfigService,
 		traderService,
 	)
 

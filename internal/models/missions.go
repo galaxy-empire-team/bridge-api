@@ -25,16 +25,19 @@ type CancelMission struct {
 	PlanetFrom  Coordinates
 	PlanetTo    Coordinates
 	IsReturning bool
+	IsCancelled bool
 	StartedAt   time.Time
 	FinishedAt  time.Time
 }
 
 type UserMission struct {
 	ID          uint64
+	PreviousID  uint64
 	MissionID   consts.MissionID
 	PlanetFrom  Coordinates
 	PlanetTo    Coordinates
 	IsReturning bool
+	IsCancelled bool
 	StartedAt   time.Time
 	FinishedAt  time.Time
 }

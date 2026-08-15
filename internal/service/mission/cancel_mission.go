@@ -30,6 +30,7 @@ func (s *Service) CancelMission(ctx context.Context, userID uuid.UUID, missionID
 			PlanetFrom:  missionEvent.PlanetFrom,
 			PlanetTo:    missionEvent.PlanetFrom,
 			IsReturning: true,
+			IsCancelled: true,
 			StartedAt:   now,
 			FinishedAt:  now.Add(now.Sub(missionEvent.StartedAt)),
 		}

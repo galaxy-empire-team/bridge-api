@@ -1,7 +1,6 @@
 package userhandlers
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -13,13 +12,9 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/models"
 )
 
-type UserService interface {
-	CreateUser(ctx context.Context, user models.User) (models.User, error)
-}
-
 const (
 	minLoginLength = 3
-	maxLoginLength = 50
+	maxLoginLength = 12
 )
 
 type UserRequest struct {

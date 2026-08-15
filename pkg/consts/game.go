@@ -3,8 +3,8 @@ package consts
 import "time"
 
 const (
-	GalaxyCount          = 1
-	SystemInGalaxyCount  = 3
+	GalaxyCount          = 2
+	SystemInGalaxyCount  = 10
 	PlanetsInSystemCount = 15
 
 	ZeroResearchLevel       = 0
@@ -30,4 +30,7 @@ const (
 	TimeToReachNearestPlanetS = 20
 	TimeToReachNearestSystemS = 30
 	TimeToReachNearestGalaxyS = 1200
+
+	InactiveFleetConstructionMoonDecrease = 0.03
+	ActiveFleetConstructionMoonDecrease   = 0.15
 )

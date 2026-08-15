@@ -13,19 +13,21 @@ import (
 func (s *MissionStorage) GetCurrentUserMissions(ctx context.Context, userID uuid.UUID) ([]models.UserMission, error) {
 	const getCurrentMissionsQuery = `
 		SELECT
-			ev.id,
-			ev.mission_id,
-			ev.planet_from_x,
-			ev.planet_from_y,
-			ev.planet_from_z,
-			ev.planet_to_x,
-			ev.planet_to_y,
-			ev.planet_to_z,
-			ev.is_returning,
-			ev.started_at,
-			ev.finished_at
-		FROM session_beta.event_missions ev
-		WHERE ev.user_id = $1;
+			id,
+			previous_id,
+			mission_id,
+			planet_from_x,
+			planet_from_y,
+			planet_from_z,
+			planet_to_x,
+			planet_to_y,
+			planet_to_z,
+			is_returning,
+			is_cancelled,
+			started_at,
+			finished_at
+		FROM session_beta.event_missions
+		WHERE user_id = $1 AND is_finished = false;
 	`
 
 	rows, err := s.DB.Query(ctx, getCurrentMissionsQuery, userID)
@@ -34,12 +36,17 @@ func (s *MissionStorage) GetCurrentUserMissions(ctx context.Context, userID uuid
 	}
 	defer rows.Close()
 
-	var missions []models.UserMission
-	var startedAt, finishedAt time.Time
+	var (
+		missions   []models.UserMission
+		previousID *uint64
+		startedAt  time.Time
+		finishedAt time.Time
+	)
 	for rows.Next() {
 		var mission models.UserMission
 		err = rows.Scan(
 			&mission.ID,
+			&previousID,
 			&mission.MissionID,
 			&mission.PlanetFrom.X,
 			&mission.PlanetFrom.Y,
@@ -48,6 +55,7 @@ func (s *MissionStorage) GetCurrentUserMissions(ctx context.Context, userID uuid
 			&mission.PlanetTo.Y,
 			&mission.PlanetTo.Z,
 			&mission.IsReturning,
+			&mission.IsCancelled,
 			&startedAt,
 			&finishedAt,
 		)
@@ -57,6 +65,9 @@ func (s *MissionStorage) GetCurrentUserMissions(ctx context.Context, userID uuid
 
 		mission.StartedAt = startedAt.UTC()
 		mission.FinishedAt = finishedAt.UTC()
+		if previousID != nil {
+			mission.PreviousID = *previousID
+		}
 
 		missions = append(missions, mission)
 	}

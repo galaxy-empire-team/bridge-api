@@ -34,6 +34,17 @@ func (s *Service) GetRating(ctx context.Context, userID uuid.UUID) (ratings mode
 		return nil
 	})
 
+	errG.Go(func() error {
+		playersCount, err := s.userStorage.GetUserCount(gCtx)
+		if err != nil {
+			return fmt.Errorf("userStorage.GetUserCount(): %w", err)
+		}
+
+		ratings.PlayersCount = playersCount
+
+		return nil
+	})
+
 	if err := errG.Wait(); err != nil {
 		return models.Ratings{}, fmt.Errorf("errG.Wait(): %w", err)
 	}

@@ -15,8 +15,9 @@ func (s *MissionStorage) CancelMissionEvent(ctx context.Context, event models.Ca
 			planet_to_y = $3,
 			planet_to_z = $4,
 			is_returning = $5,
-			started_at = $6,
-			finished_at = $7
+			is_cancelled = $6,
+			started_at = $7,
+			finished_at = $8
 		WHERE id = $1;
 	`
 
@@ -28,6 +29,7 @@ func (s *MissionStorage) CancelMissionEvent(ctx context.Context, event models.Ca
 		event.PlanetTo.Y,
 		event.PlanetTo.Z,
 		event.IsReturning,
+		event.IsCancelled,
 		event.StartedAt,
 		event.FinishedAt,
 	)

@@ -2,10 +2,10 @@ package httpserver
 
 import (
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/eventhandlers"
+	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/gameconfighandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/missionhandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/planethandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/ratinghandlers"
-	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/statichandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/systemhandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/traderhandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/userhandlers"
@@ -18,11 +18,12 @@ func (hs *HttpServer) RegisterRoutes(
 	eventService eventhandlers.EventService,
 	missionService missionhandlers.MissionService,
 	systemService systemhandlers.SystemService,
-	staticsService statichandlers.StaticService,
+	gameConfigService gameconfighandlers.GameConfigService,
 	traderService traderhandlers.TraderService,
 ) {
 	// ----- User Routes -----
 	hs.apiRouter.POST("/user/create", userhandlers.CreateUser(userService))
+	hs.apiRouter.GET("/user/getID", userhandlers.GetUserID(userService))
 
 	// ----- Rating Routes -----
 	hs.apiRouter.GET("/rating", ratinghandlers.GetRating(ratingService))
@@ -65,7 +66,7 @@ func (hs *HttpServer) RegisterRoutes(
 	hs.apiRouter.GET("/system/planets", systemhandlers.GetSystemPlanets(systemService))
 
 	// ----- Static Routes -----
-	hs.apiRouter.GET("/static/buildings", statichandlers.GetBuildingStats(staticsService))
+	hs.apiRouter.GET("/gameconfig/get", gameconfighandlers.GetBuildingStats(gameConfigService))
 
 	// ----- Trader Routes -----
 	hs.apiRouter.POST("/trader/buy", traderhandlers.BuyItem(traderService))

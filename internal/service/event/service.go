@@ -43,6 +43,7 @@ type TxStorages interface {
 	SetResearchFinishTime(ctx context.Context, researchEvent models.EventFinishTime) error
 	SetBuildingFinishTime(ctx context.Context, buildingEvent models.EventFinishTime) error
 	SetFleetConstructionFinishTime(ctx context.Context, fleetConstructionEvent models.EventFinishTime) error
+	GetFullMoonInfo(ctx context.Context, planetID uuid.UUID) (models.MoonInfo, error)
 }
 
 type txManager interface {

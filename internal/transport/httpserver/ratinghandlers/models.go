@@ -17,6 +17,7 @@ type RatingResponse struct {
 }
 
 type GetRatingsResponse struct {
-	User  RatingResponse `json:"user"`
-	Fleet RatingResponse `json:"fleet"`
+	User         RatingResponse `json:"user"`
+	Fleet        RatingResponse `json:"fleet"`
+	PlayersCount uint64         `json:"playersCount"`
 }

@@ -45,10 +45,12 @@ func toFleetUnits(fleet []FleetUnitCount) []models.FleetUnitCount {
 func fromUserMission(m models.UserMission) Mission {
 	return Mission{
 		ID:          m.ID,
+		PreviousID:  m.PreviousID,
 		MissionID:   m.MissionID,
 		PlanetFrom:  fromCoordinatesModel(m.PlanetFrom),
 		PlanetTo:    fromCoordinatesModel(m.PlanetTo),
 		IsReturning: m.IsReturning,
+		IsCancelled: m.IsCancelled,
 		StartedAt:   m.StartedAt.UTC(),
 		FinishedAt:  m.FinishedAt.UTC(),
 	}

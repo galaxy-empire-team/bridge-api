@@ -26,10 +26,18 @@ type ratingStorage interface {
 	GetFleetRatingPlayersByRankOffset(ctx context.Context, version uint32, offset uint32, limit uint32) ([]models.RatingPlayer, error)
 }
 
-type Service struct {
-	ratingStorage ratingStorage
+type userStorage interface {
+	GetUserCount(ctx context.Context) (uint64, error)
 }
 
-func New(ratingStorage ratingStorage) *Service {
-	return &Service{ratingStorage: ratingStorage}
+type Service struct {
+	ratingStorage ratingStorage
+	userStorage   userStorage
+}
+
+func New(ratingStorage ratingStorage, userStorage userStorage) *Service {
+	return &Service{
+		ratingStorage: ratingStorage,
+		userStorage:   userStorage,
+	}
 }

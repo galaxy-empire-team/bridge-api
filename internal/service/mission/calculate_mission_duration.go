@@ -12,7 +12,7 @@ const (
 	// Addition time to prevent fast missions
 	missionDurationAddSpy  = 15 * time.Second
 	missionDurationAdd     = 3 * time.Minute
-	missionDurationAddMist = 40 * time.Minute
+	missionDurationAddMist = 10 * time.Second
 )
 
 type coordinate interface {
@@ -44,10 +44,12 @@ func (s *Service) calculateMissionDuration(input durationInput) (time.Duration, 
 	case consts.MissionTypeSpy:
 		duration += missionDurationAddSpy
 	case consts.MissionTypeMist:
-		duration += missionDurationAddMist
+		duration = missionDurationAddMist
 	default:
 		duration += missionDurationAdd
 	}
+
+	duration = time.Second * 15
 
 	return duration, nil
 }

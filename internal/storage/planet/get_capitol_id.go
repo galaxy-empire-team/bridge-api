@@ -21,10 +21,11 @@ func (r *PlanetStorage) GetCapitolID(ctx context.Context, userID uuid.UUID) (uui
 	var planetID uuid.UUID
 	err := r.DB.QueryRow(ctx, getPlanetCapitolQuery, userID).Scan(&planetID)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return uuid.UUID{}, models.ErrCapitolNotFound
+		}
+
 		return uuid.UUID{}, fmt.Errorf("DB.QueryRow.Scan(): %w", err)
-	}
-	if errors.Is(err, pgx.ErrNoRows) {
-		return uuid.UUID{}, models.ErrCapitolNotFound
 	}
 
 	return planetID, nil

@@ -14,7 +14,10 @@ func (s *MissionStorage) CheckNPCMissionExists(ctx context.Context, userID uuid.
 		SELECT EXISTS (
 			SELECT 1
 			FROM session_beta.event_missions
-			WHERE user_id = $1 AND planet_to_z = $2 AND is_returning = false
+			WHERE user_id = $1 AND 
+				  planet_to_z = $2 AND 
+				  is_returning = false AND 
+				  is_finished = false
 		);
 	`
 

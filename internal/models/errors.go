@@ -5,6 +5,8 @@ import "errors"
 var (
 	// User errors
 	ErrUserAlreadyExists = errors.New("user already exists")
+	ErrInvalidLogin      = errors.New("invalid login")
+	ErrUserNotFound      = errors.New("user not found")
 	ErrUserNotInRating   = errors.New("user not in rating")
 
 	// Planet errors
