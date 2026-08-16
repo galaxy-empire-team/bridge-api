@@ -14,6 +14,7 @@ import (
 	planetservice "github.com/galaxy-empire-team/bridge-api/internal/service/planet"
 	ratingservice "github.com/galaxy-empire-team/bridge-api/internal/service/rating"
 	systemservice "github.com/galaxy-empire-team/bridge-api/internal/service/system"
+	systemtimeservice "github.com/galaxy-empire-team/bridge-api/internal/service/systemtime"
 	traderservice "github.com/galaxy-empire-team/bridge-api/internal/service/trader"
 	userservice "github.com/galaxy-empire-team/bridge-api/internal/service/user"
 	eventstorage "github.com/galaxy-empire-team/bridge-api/internal/storage/event"
@@ -82,6 +83,7 @@ func run() error {
 	missionService := missionservice.New(txManager, planetStorage, missionStorage, researchStorage, resourceRepo, reg)
 	systemService := systemservice.New(planetStorage, systemStorage)
 	traderService := traderservice.New(txManager, planetStorage, resourceRepo, reg)
+	systemTimeService := systemtimeservice.New()
 	gameConfigService, err := gameconfigservice.New(ctx, gameConfigStorage)
 	if err != nil {
 		return fmt.Errorf("gameconfigservice.New(): %w", err)
@@ -99,6 +101,7 @@ func run() error {
 		systemService,
 		gameConfigService,
 		traderService,
+		systemTimeService,
 	)
 
 	shutdownFunc, err := httpServer.Start(ctx, cfg.HTTPServer)

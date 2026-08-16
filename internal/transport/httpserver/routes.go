@@ -7,6 +7,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/planethandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/ratinghandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/systemhandlers"
+	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/systemtimehandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/traderhandlers"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/userhandlers"
 )
@@ -20,6 +21,7 @@ func (hs *HttpServer) RegisterRoutes(
 	systemService systemhandlers.SystemService,
 	gameConfigService gameconfighandlers.GameConfigService,
 	traderService traderhandlers.TraderService,
+	systemTimeService systemtimehandlers.SystemTimeService,
 ) {
 	// ----- User Routes -----
 	hs.apiRouter.POST("/user/create", userhandlers.CreateUser(userService))
@@ -70,4 +72,7 @@ func (hs *HttpServer) RegisterRoutes(
 
 	// ----- Trader Routes -----
 	hs.apiRouter.POST("/trader/buy", traderhandlers.BuyItem(traderService))
+
+	// ----- System Time Routes -----
+	hs.apiRouter.GET("/systemtime/utc", systemtimehandlers.GetUTC(systemTimeService))
 }
