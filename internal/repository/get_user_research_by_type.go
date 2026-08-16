@@ -21,7 +21,7 @@ func (r *Repository) GetResearchByType(ctx context.Context, userID uuid.UUID, re
 
 	researchStats, ok := researches[researchType]
 	if !ok {
-		return registry.ResearchStats{}, fmt.Errorf("research stats for type %s not found", researchType)
+		return registry.ResearchStats{}, fmt.Errorf("%w: %s", ErrInvalidResearchType, researchType)
 	}
 
 	return researchStats, nil

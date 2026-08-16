@@ -42,8 +42,13 @@ func (s *Service) StartFleetConstruction(ctx context.Context, userID uuid.UUID, 
 		Count:   fleet.Count,
 	}
 
+	speedMultiplier, err := s.calculateSpeedMultiplier(ctx, userID, planet)
+	if err != nil {
+		return models.FleetUnitConstructionInfo{}, fmt.Errorf("calculateSpeedMultiplier(): %w", err)
+	}
+
 	return info, s.txManager.ExecEventTx(ctx, func(ctx context.Context, planetRepo TxStorages) error {
-		fleetConstructEvent, err := s.generateEventForFleetConstruct(ctx, planet, fleet, planetRepo)
+		fleetConstructEvent, err := s.generateEventForFleetConstruct(ctx, planet, fleet, speedMultiplier, planetRepo)
 		if err != nil {
 			return fmt.Errorf("generateEventForFleetConstruct(): %w", err)
 		}
@@ -60,7 +65,7 @@ func (s *Service) StartFleetConstruction(ctx context.Context, userID uuid.UUID, 
 	})
 }
 
-func (s *Service) generateEventForFleetConstruct(ctx context.Context, planetID uuid.UUID, fleet models.FleetUnitCount, planetRepo TxStorages) (models.FleetConstructEvent, error) {
+func (s *Service) generateEventForFleetConstruct(ctx context.Context, planetID uuid.UUID, fleet models.FleetUnitCount, speedMultiplier float64, planetRepo TxStorages) (models.FleetConstructEvent, error) {
 	fleetUnitStats, err := s.registry.GetFleetUnitStatsByID(fleet.ID)
 	if err != nil {
 		return models.FleetConstructEvent{}, fmt.Errorf("registry.GetFleetUnitStatsByID(): %w", err)
@@ -96,21 +101,8 @@ func (s *Service) generateEventForFleetConstruct(ctx context.Context, planetID u
 		return models.FleetConstructEvent{}, fmt.Errorf("planetRepo.SetResources(): %w", err)
 	}
 
-	moonInfo, err := planetRepo.GetFullMoonInfo(ctx, planetID)
-	if err != nil {
-		return models.FleetConstructEvent{}, fmt.Errorf("planetRepo.GetFullMoonInfo(): %w", err)
-	}
-
-	speedMultiplier := baseFleetConstructionSpeedMultiplier
-	if moonInfo.HasMoon {
-		speedMultiplier = baseFleetConstructionSpeedMultiplier - consts.InactiveFleetConstructionMoonDecrease
-		if moonInfo.ActivateUntill.After(time.Now().UTC()) {
-			speedMultiplier = baseFleetConstructionSpeedMultiplier - consts.ActiveFleetConstructionMoonDecrease
-		}
-	}
-
 	startedAt := time.Now().UTC()
-	finishedAt := startedAt.Add(time.Duration(float64(fleetUnitStats.BuildTimeSec*fleet.Count)*speedMultiplier) * time.Second).UTC()
+	finishedAt := startedAt.Add(time.Duration(float64(fleetUnitStats.BuildTimeSec*fleet.Count)/speedMultiplier) * time.Second).UTC()
 	fleetConstructEvent := models.FleetConstructEvent{
 		PlanetID:      planetID,
 		FleetID:       fleet.ID,
@@ -121,4 +113,32 @@ func (s *Service) generateEventForFleetConstruct(ctx context.Context, planetID u
 	}
 
 	return fleetConstructEvent, nil
+}
+
+func (s *Service) calculateSpeedMultiplier(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) (float64, error) {
+	moonInfo, err := s.planetStorage.GetFullMoonInfo(ctx, planetID)
+	if err != nil {
+		return 0, fmt.Errorf("planetStorage.GetFullMoonInfo(): %w", err)
+	}
+
+	speedMultiplier := baseFleetConstructionSpeedMultiplier
+	if moonInfo.HasMoon {
+		if moonInfo.ActivateUntill.After(time.Now().UTC()) {
+			speedMultiplier = baseFleetConstructionSpeedMultiplier + consts.ActiveFleetConstructionMoonSpeedMultiplier
+		} else {
+			speedMultiplier = baseFleetConstructionSpeedMultiplier + consts.InactiveFleetConstructionMoonSpeedMultiplier
+		}
+	}
+
+	spaceportStats, err := s.repository.GetBuildingByType(ctx, planetID, consts.BuildingTypeSpaceport)
+	if err != nil {
+		return 0, fmt.Errorf("repository.GetBuildingByType(): %w", err)
+	}
+
+	constructionOptimizationStats, err := s.repository.GetResearchByType(ctx, userID, consts.ResearchTypeConstructionOptimizationTechnology)
+	if err != nil {
+		return 0, fmt.Errorf("repository.GetResearchByType(): %w", err)
+	}
+
+	return float64(spaceportStats.Bonuses.FleetBuildSpeed) * float64(constructionOptimizationStats.Bonuses.FleetConstructTimeReduce) * speedMultiplier, nil
 }

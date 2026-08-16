@@ -31,6 +31,6 @@ const (
 	TimeToReachNearestSystemS = 30
 	TimeToReachNearestGalaxyS = 1200
 
-	InactiveFleetConstructionMoonDecrease = 0.03
-	ActiveFleetConstructionMoonDecrease   = 0.15
+	InactiveFleetConstructionMoonSpeedMultiplier = 0.03
+	ActiveFleetConstructionMoonSpeedMultiplier   = 0.15
 )

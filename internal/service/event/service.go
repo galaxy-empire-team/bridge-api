@@ -18,6 +18,7 @@ type eventStorage interface {
 
 type planetStorage interface {
 	GetAllPlanetBuildings(ctx context.Context, planetID uuid.UUID) ([]consts.BuildingID, error)
+	GetFullMoonInfo(ctx context.Context, planetID uuid.UUID) (models.MoonInfo, error)
 }
 
 type researchStorage interface {
@@ -43,7 +44,6 @@ type TxStorages interface {
 	SetResearchFinishTime(ctx context.Context, researchEvent models.EventFinishTime) error
 	SetBuildingFinishTime(ctx context.Context, buildingEvent models.EventFinishTime) error
 	SetFleetConstructionFinishTime(ctx context.Context, fleetConstructionEvent models.EventFinishTime) error
-	GetFullMoonInfo(ctx context.Context, planetID uuid.UUID) (models.MoonInfo, error)
 }
 
 type txManager interface {
@@ -53,6 +53,8 @@ type txManager interface {
 type repository interface {
 	CheckPlanetOwner(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) error
 	RecalcResources(ctx context.Context, userID uuid.UUID, planetID uuid.UUID) error
+	GetBuildingByType(ctx context.Context, planetID uuid.UUID, buildingType consts.BuildingType) (registry.BuildingStats, error)
+	GetResearchByType(ctx context.Context, userID uuid.UUID, researchType consts.ResearchType) (registry.ResearchStats, error)
 }
 
 type registryProvider interface {
