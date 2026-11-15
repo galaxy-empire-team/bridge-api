@@ -7,6 +7,7 @@ import (
 	"github.com/galaxy-empire-team/bridge-api/internal/application"
 	"github.com/galaxy-empire-team/bridge-api/internal/config"
 	"github.com/galaxy-empire-team/bridge-api/internal/db"
+	"github.com/galaxy-empire-team/bridge-api/internal/metrics"
 	repository "github.com/galaxy-empire-team/bridge-api/internal/repository"
 	eventservice "github.com/galaxy-empire-team/bridge-api/internal/service/event"
 	gameconfigservice "github.com/galaxy-empire-team/bridge-api/internal/service/gameconfig"
@@ -55,6 +56,9 @@ func run() error {
 	}
 	defer db.Close()
 
+	// initialize metrics client
+	metricsClient := metrics.NewPrometheusClient()
+
 	// initialize storages
 	txManager := txmanager.New(db)
 	userStorage := userstorage.New(db)
@@ -90,7 +94,7 @@ func run() error {
 	}
 
 	// initialize http server
-	httpServer := httpserver.New(app.ComponentLogger("httpserver"))
+	httpServer := httpserver.New(app.ComponentLogger("httpserver"), metricsClient)
 
 	httpServer.RegisterRoutes(
 		userService,

@@ -24,8 +24,14 @@ func (s *Service) getFleetRating(ctx context.Context, userID uuid.UUID) (models.
 	userRank, err := s.ratingStorage.GetFleetRatingRank(ctx, userID, version)
 	if err != nil {
 		if errors.Is(err, models.ErrUserNotInRating) {
+			lastPlayers, err := s.ratingStorage.GetLastFleetRatingPlayers(ctx, version, lastPlayersLimit)
+			if err != nil {
+				return models.Rating{}, fmt.Errorf("GetLastFleetRatingPlayers(): %w", err)
+			}
+
 			return models.Rating{
-				Top: topPlayers,
+				Top:  topPlayers,
+				Near: lastPlayers,
 			}, nil
 		}
 

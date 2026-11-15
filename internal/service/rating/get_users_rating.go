@@ -24,8 +24,14 @@ func (s *Service) getUsersRating(ctx context.Context, userID uuid.UUID) (models.
 	userRank, err := s.ratingStorage.GetUsersRatingRank(ctx, userID, version)
 	if err != nil {
 		if errors.Is(err, models.ErrUserNotInRating) {
+			lastPlayers, err := s.ratingStorage.GetLastUsersRatingPlayers(ctx, version, lastPlayersLimit)
+			if err != nil {
+				return models.Rating{}, fmt.Errorf("GetLastUsersRatingPlayers(): %w", err)
+			}
+
 			return models.Rating{
-				Top: topPlayers,
+				Top:  topPlayers,
+				Near: lastPlayers,
 			}, nil
 		}
 

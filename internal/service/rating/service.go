@@ -14,6 +14,7 @@ const (
 	topPlayersLimit        = 30
 	nearRankOffset         = 3
 	nearPlayersLimit       = 5
+	lastPlayersLimit       = 5
 )
 
 type ratingStorage interface {
@@ -21,9 +22,11 @@ type ratingStorage interface {
 	GetTopUsersRatingPlayers(ctx context.Context, version uint32, limit uint32) ([]models.RatingPlayer, error)
 	GetUsersRatingRank(ctx context.Context, userID uuid.UUID, version uint32) (uint32, error)
 	GetUsersRatingPlayersByRankOffset(ctx context.Context, version uint32, offset uint32, limit uint32) ([]models.RatingPlayer, error)
+	GetLastUsersRatingPlayers(ctx context.Context, version uint32, limit uint32) ([]models.RatingPlayer, error)
 	GetTopFleetRatingPlayers(ctx context.Context, version uint32, limit uint32) ([]models.RatingPlayer, error)
 	GetFleetRatingRank(ctx context.Context, userID uuid.UUID, version uint32) (uint32, error)
 	GetFleetRatingPlayersByRankOffset(ctx context.Context, version uint32, offset uint32, limit uint32) ([]models.RatingPlayer, error)
+	GetLastFleetRatingPlayers(ctx context.Context, version uint32, limit uint32) ([]models.RatingPlayer, error)
 }
 
 type userStorage interface {

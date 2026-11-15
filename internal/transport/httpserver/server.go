@@ -13,6 +13,7 @@ import (
 
 	"github.com/galaxy-empire-team/bridge-api/internal/config"
 	"github.com/galaxy-empire-team/bridge-api/internal/transport/httpserver/middleware"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type HttpServer struct {
@@ -22,13 +23,21 @@ type HttpServer struct {
 	logger *zap.Logger
 }
 
-func New(logger *zap.Logger) *HttpServer {
+func New(logger *zap.Logger, metrics middleware.Metrics) *HttpServer {
 	gin.SetMode(gin.ReleaseMode)
 
 	server := gin.New()
 
 	server.Use(
 		gin.Recovery(),
+		middleware.MetricsMiddleware(metrics),
+	)
+
+	// ----- Metrics Routes -----
+	server.GET("/metrics", gin.WrapH(promhttp.Handler()))
+
+	apiRoutes := server.Group("/api/v1")
+	apiRoutes.Use(
 		middleware.Authorization(),
 		middleware.UseCustomWriter(),
 		middleware.HideInternalError(logger),
@@ -37,7 +46,7 @@ func New(logger *zap.Logger) *HttpServer {
 
 	return &HttpServer{
 		server:    server,
-		apiRouter: server.Group("/api/v1"),
+		apiRouter: apiRoutes,
 		logger:    logger,
 	}
 }
